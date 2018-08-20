@@ -1,10 +1,23 @@
 class App {
 
-  public view:PIXI.Application;
+  public model:Models.Model;
+  public view:Views.View;
+  public rects:Array<PIXI.Graphics>;
 
   constructor () {
 
-    this.view = new PIXI.Application();
+    this.model = new Models.Model().init();
+    this.view = new Views.View().initWithModel(this.model)
+    this.rects = [];
+
+    this.build();
+
+  }
+
+  private build () {
+
+    this.model.build();
+    this.view.build();
 
   }
 
@@ -12,19 +25,22 @@ class App {
 
     console.log("starting...");
 
-    for (let i = 0; i < 100; i++) {
+    this.view.pixi.ticker.add(this.update);
 
-      var x = Math.random() * 640;
-      var y = Math.random() * 640;
+  }
 
-      var rect = new PIXI.Graphics()
-        .beginFill(0xf0ff00)
-        .drawRect(x, y, 20, 20);
+  public update = () => {
 
-      // Add to the stage
-      this.view.stage.addChild(rect);
+    this.model.update();
+    this.view.update();
 
-    }
+  }
+
+  public stop () {
+
+    console.log("stopping...");
+
+    this.view.pixi.ticker.remove(this.update);
 
   }
 

@@ -7,8 +7,6 @@ class Main {
     this.app = new App();
     this.app.start();
 
-    document.body.appendChild(this.app.view.view);
-
   }
 
 }
