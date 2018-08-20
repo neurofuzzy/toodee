@@ -5,30 +5,15 @@ namespace Models {
     public items:Array<Item>;
 
     constructor () {
+      
       this.items = [];
+
     }
 
-    public init () {
+    public init ():Model {
+
       return this;
-    }
 
-    public build () {
-
-      for (let i = 0; i < 100; i++) {
-  
-        var x = Math.random() * 640;
-        var y = Math.random() * 640;
-  
-        var item = new Item();
-        item.x = x;
-        item.y = y;
-        item.w = Math.random() * 10 + 10;
-        item.h = Math.random() * 10 + 10;
-  
-        this.items.push(item);
-  
-      }
-  
     }
 
     public update () {

@@ -4,12 +4,14 @@ class Main {
 
   public static main():void {
 
-    this.app = new App();
+    this.app = new App().init();
     this.app.start();
 
   }
 
 }
+
+// falderal
 
 window.onload = function () {
   //Main.main();

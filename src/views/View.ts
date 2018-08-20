@@ -5,6 +5,11 @@ namespace Views {
     protected model:Util.IModel<Util.IRenderable>;
     protected items:Array<PIXI.Graphics>;
     public pixi:PIXI.Application;
+    private fps:HTMLElement;
+
+    get ticker ():any {
+      return this.pixi.ticker;
+    }
 
     constructor () {
 
@@ -13,20 +18,23 @@ namespace Views {
 
     }
 
-    public initWithModel (model:Util.IModel<Util.IRenderable>):View {
+    public initWithModel (model:Util.IModel<Util.IRenderable>):Util.IView {
 
       this.model = model;
       this.items = [];
+      this.fps =document.getElementById("fps");
+
       return this;
 
     }
 
-    public build () {
+    protected build () {
 
       this.model.items.forEach(item => {
   
         var gfx = new PIXI.Graphics()
-          .beginFill(0xf0ff00)
+          .beginFill(0xff9900, 0.5)
+          .lineStyle(2, 0xffcc00)
           .drawRect(0 - item.w / 2, 0 - item.h / 2, item.w, item.h);
   
         gfx.x = item.x;
@@ -41,6 +49,11 @@ namespace Views {
     }
 
     public update () {
+
+      // temp
+      if (this.items.length == 0) {
+        this.build();
+      }
       
       // view update
       this.model.items.forEach((item, idx) => {
@@ -49,6 +62,8 @@ namespace Views {
         gfx.y = item.y;
         gfx.rotation = item.r;
       });
+
+      this.fps.innerText = this.pixi.ticker.FPS.toString();
 
     }
 
