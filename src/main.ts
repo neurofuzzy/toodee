@@ -14,5 +14,11 @@ class Main {
 }
 
 window.onload = function () {
+  //Main.main();
+  window['Main'] = Main;
   Main.main();
+}
+
+if (window['Main']) {
+  window.location.reload();
 }

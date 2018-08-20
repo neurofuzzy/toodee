@@ -12,17 +12,20 @@ class App {
 
     console.log("starting...");
 
-    var rect = new PIXI.Graphics()
-      .beginFill(0x00ff00)
-      .drawRect(40, 40, 200, 200);
+    for (let i = 0; i < 100; i++) {
 
-    // Add to the stage
-    this.view.stage.addChild(rect);
+      var x = Math.random() * 640;
+      var y = Math.random() * 640;
+
+      var rect = new PIXI.Graphics()
+        .beginFill(0xf0ff00)
+        .drawRect(x, y, 20, 20);
+
+      // Add to the stage
+      this.view.stage.addChild(rect);
+
+    }
 
   }
 
-}
-
-window.onload = function () {
-  Main.main();
 }
