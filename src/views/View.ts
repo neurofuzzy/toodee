@@ -2,7 +2,7 @@ namespace Views {
 
   export class View implements Util.IView {
 
-    protected model:Util.IModel<Util.IRenderable>;
+    protected model:Util.IModel<Util.IModelItem & Util.IRenderable>;
     protected items:Array<PIXI.Graphics>;
     public pixi:PIXI.Application;
     private fps:HTMLElement;
@@ -18,7 +18,7 @@ namespace Views {
 
     }
 
-    public initWithModel (model:Util.IModel<Util.IRenderable>):Util.IView {
+    public initWithModel (model:Util.IModel<Util.IModelItem & Util.IRenderable>):Util.IView {
 
       this.model = model;
       this.items = [];
@@ -57,7 +57,7 @@ namespace Views {
       
       // view update
       this.model.items.forEach((item, idx) => {
-        let gfx = this.items[idx];
+        let gfx = this.items[item.id];
         gfx.x = item.x;
         gfx.y = item.y;
         gfx.rotation = item.r;

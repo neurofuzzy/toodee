@@ -22,6 +22,7 @@ namespace Controllers {
         var y = 100 + Math.random() * 400;
   
         var item = new Models.Item();
+        item.id = i;
         item.x = x;
         item.y = y;
         item.w = Math.random() * 10 + 10;
@@ -45,7 +46,12 @@ namespace Controllers {
 
     public update = () => {
 
-      this.model.update();
+      this.model.items.forEach(item => {
+        item.r += 0.01;
+        item.x += Math.random() - 0.5;
+        item.y += Math.random() - 0.5;
+      });
+
       this.view.update();
 
     }

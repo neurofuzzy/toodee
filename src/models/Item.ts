@@ -1,7 +1,8 @@
 namespace Models {
 
-  export class Item implements Util.IRenderable {
+  export class Item implements Util.IModelItem, Util.IRenderable {
 
+    public id:number;
     public x:number;
     public y:number;
     public w:number;
@@ -15,7 +16,7 @@ namespace Models {
       this.w = 0;
       this.h = 0;
       this.r = 0;
-      
+
     }
 
   }

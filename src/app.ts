@@ -1,6 +1,6 @@
 class App {
 
-  public model:Util.IModel<Util.IRenderable>
+  public model:Util.IModel<Util.IModelItem & Util.IRenderable>
   public view:Util.IView;
   public controller:Util.IController;
 
