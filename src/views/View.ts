@@ -30,12 +30,14 @@ namespace Views {
 
     protected build () {
 
-      this.model.items.forEach(item => {
+      var colors = [0xff9900, 0x0099ff, 0x9900ff, 0x33ff33]
+
+      this.model.items.forEach((item, idx) => {
   
         var b = item.bounds;
         var gfx = new PIXI.Graphics()
-          .beginFill(0xff9900, 0.5)
-          .lineStyle(2, 0xffcc00)
+          .beginFill(colors[idx % 4], 0.5)
+          .lineStyle(2, colors[idx % 4])
           .drawRect(0 - b.hw, 0 - b.hh, b.hw * 2, b.hh * 2);
   
         gfx.x = item.bounds.anchor.x;

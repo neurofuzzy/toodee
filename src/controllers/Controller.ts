@@ -50,6 +50,7 @@ namespace Controllers {
 
       this.model.items.forEach(itemB => {
         if (Geom.boundsIntersect(itemA.bounds, itemB.bounds)) {
+          Geom.resolvePenetrationBetweenBounds(itemA.bounds, itemB.bounds)
           hits++;
         }
       })
