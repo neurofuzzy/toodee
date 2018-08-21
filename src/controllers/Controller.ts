@@ -63,8 +63,8 @@ namespace Controllers {
     public update = () => {
 
       this.model.items.forEach(item => {
-        item.bounds.anchor.x += Math.random() * 2 - 1;
-        item.bounds.anchor.y += Math.random() * 2 - 1;
+        //item.bounds.anchor.x += Math.random() * 2 - 1;
+        //item.bounds.anchor.y += Math.random() * 2 - 1;
         let a = this.countIntersections(item);
 item.rotation = 0.2 + a * 0.3;
       });
