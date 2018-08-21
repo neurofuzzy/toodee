@@ -2,10 +2,10 @@ namespace Controllers {
 
   export class Controller implements Util.IController {
 
-    protected model:Util.IModel<Geom.ISpatial>;
+    protected model:Util.IModel<Util.IModelItem & Geom.ISpatial>;
     protected view:Util.IView
 
-    public initWithModelAndView(model:Util.IModel<Geom.ISpatial>, view:Util.IView):Controller {
+    public initWithModelAndView(model:Util.IModel<Util.IModelItem & Geom.ISpatial>, view:Util.IView):Controller {
 
       this.model = model;
       this.view = view;
@@ -18,14 +18,14 @@ namespace Controllers {
 
       for (let i = 0; i < 100; i++) {
   
-        var x = 200 + Math.random() * 400;
+        var x = 100 + Math.random() * 600;
         var y = 100 + Math.random() * 400;
   
-        var item = new Models.Item().initWithPositionAndSize(
+        var item = new Models.Item().initWithBounds(
           x, 
           y, 
-          Math.random() * 10 + 10, 
-          Math.random() * 10 + 10
+          Math.random() * 20 + 10, 
+          Math.random() * 20 + 10
         );
 
         this.model.addItem(item);
@@ -49,9 +49,9 @@ namespace Controllers {
       let hits = 0;
 
       this.model.items.forEach(itemB => {
-        //if (Geom.rectIntersectsRect(itemA, itemB)) {
-       //   hits++;
-        //}
+        if (Geom.boundsIntersect(itemA.bounds, itemB.bounds)) {
+          hits++;
+        }
       })
 
       return hits;
@@ -62,8 +62,10 @@ namespace Controllers {
     public update = () => {
 
       this.model.items.forEach(item => {
-        item.position.x += Math.random() - 0.5;
-        item.position.y += Math.random() - 0.5;
+        item.bounds.anchor.x += Math.random() * 2 - 1;
+        item.bounds.anchor.y += Math.random() * 2 - 1;
+        let a = this.countIntersections(item);
+item.rotation = 0.2 + a * 0.3;
       });
 
       this.view.update();

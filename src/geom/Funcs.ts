@@ -1,42 +1,43 @@
 namespace Geom {
 
-  export function pointWithinRect(x:number, y:number, rect:IRect, tilescale:number = 1):boolean {
+  export function pointWithinBounds(x:number, y:number, b:IBounds):boolean {
+
+      var a = b.anchor;
 
       return (
-        x >= rect.x * tilescale &&
-        y >= rect.y * tilescale &&
-        x <= (rect.x + rect.w) * tilescale &&
-        y <= (rect.y + rect.h) * tilescale
+        x >= a.x - b.hw &&
+        y >= a.y - b.hh &&
+        x <= a.x + b.hw &&
+        y <= a.y + b.hh
       );
 
     };
 
-  export function rectWithinRect(rectA:IRect, rectB:IRect):boolean {
+  export function boundsWithinBounds(bA:IBounds, bB:IBounds):boolean {
+
+    var aA = bA.anchor;
+    var aB = bB.anchor;
 
     return (
-      rectA.x >= rectB.x &&
-      rectA.y >= rectB.y &&
-      rectA.x + rectA.w <= rectB.x + rectB.w &&
-      rectA.y + rectA.h <= rectB.y + rectB.h
+      aA.x - bA.hw >= aB.x - bB.hw &&
+      aA.y - bA.hh >= aB.y - bB.hh &&
+      aA.x + bA.hw <= aB.x + bB.hw &&
+      aA.y + bA.hh <= aB.y + bB.hh
     );
 
   };
 
-  export function rectIntersectsRect(rectA:IRect, rectB:IRect):boolean {
+  export function boundsIntersect(bA:IBounds, bB:IBounds):boolean {
+    
+    var aA = bA.anchor;
+    var aB = bB.anchor;
 
     return (
-      rectA.x + rectA.w >= rectB.x &&
-      rectA.y + rectA.h >= rectB.y &&
-      rectA.x <= rectB.x + rectB.w &&
-      rectA.y <= rectB.y + rectB.h
+      aA.x + bA.hw >= aB.x - bB.hw &&
+      aA.y + bA.hh >= aB.y - bB.hh &&
+      aA.x - bA.hw <= aB.x + bB.hw &&
+      aA.y - bA.hh <= aB.y + bB.hh
     );
-
-  };
-
-  export function distanceBetweenXY(v1:IPoint, v2:IPoint):number {
-
-    var dx = v1.x - v2.x, dy = v1.y - v2.y;
-    return Math.sqrt(dx * dx + dy * dy);
 
   };
 
@@ -163,12 +164,12 @@ namespace Geom {
     return (x - x1) * (y2 - y1) - (y - y1) * (x2 - x1) > 0 ? 1 : -1;
   }
 
-  export function rectIntersectsLine(rect:IRect, ax:number, ay:number, bx:number, by:number, side?:number):Array<IPoint> {
+  export function rectIntersectsLine(b:IBounds, ax:number, ay:number, bx:number, by:number, side?:number):Array<IPoint> {
 
-    var rx = rect.x;
-    var ry = rect.y;
-    var rx2 = rx + rect.w;
-    var ry2 = ry + rect.h;
+    var rx = b.anchor.x - b.hw;
+    var ry = b.anchor.y - b.hh;
+    var rx2 = rx + b.hw;
+    var ry2 = ry + b.hh;
 
     // bounds check, early out
 
@@ -252,7 +253,7 @@ namespace Geom {
   }
 
 
-  export function resolvePenetrationCircleRect(centerPt:IPoint, radius:number, rect:IRect, tilescale:number):number {
+  export function resolvePenetrationCircleRect(centerPt:IPoint, radius:number, b:IBounds, tilescale:number):number {
 
     var cx = centerPt.x;
     var cy = centerPt.y;
@@ -263,10 +264,10 @@ namespace Geom {
 
     tilescale = tilescale || 1;
 
-    var rx1 = rect.x;
-    var ry1 = rect.y;
-    var rx2 = rx1 + rect.w;
-    var ry2 = ry1 + rect.h;
+    var rx1 = b.anchor.x - b.hw;
+    var ry1 = b.anchor.y - b.hh;
+    var rx2 = rx1 + b.hw;
+    var ry2 = ry1 + b.hh;
     var rx = (rx1 + rx2) * 0.5;
     var ry = (ry1 + ry2) * 0.5;
 

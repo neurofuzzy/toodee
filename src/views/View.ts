@@ -32,13 +32,14 @@ namespace Views {
 
       this.model.items.forEach(item => {
   
+        var b = item.bounds;
         var gfx = new PIXI.Graphics()
           .beginFill(0xff9900, 0.5)
           .lineStyle(2, 0xffcc00)
-          .drawRect(item.bounds.x, item.bounds.y, item.bounds.w, item.bounds.h);
+          .drawRect(0 - b.hw, 0 - b.hh, b.hw * 2, b.hh * 2);
   
-        gfx.x = item.position.x;
-        gfx.y = item.position.y;
+        gfx.x = item.bounds.anchor.x;
+        gfx.y = item.bounds.anchor.y;
 
         // Add to the stage
         this.pixi.stage.addChild(gfx);
@@ -58,9 +59,9 @@ namespace Views {
       // view update
       this.model.items.forEach((item, idx) => {
         let gfx = this.items[item.id];
-        gfx.x = item.position.x;
-        gfx.y = item.position.y;
-        gfx.rotation = item.rotation;
+        gfx.x = item.bounds.anchor.x;
+        gfx.y = item.bounds.anchor.y;
+        gfx.alpha = item.rotation;
       });
 
       this.fps.innerText = this.pixi.ticker.FPS.toString();

@@ -1,10 +1,9 @@
 namespace Geom {
 
   export interface ISpatial {
-    bounds:IRect;
-    position:IPoint;
+    bounds:IBounds;
     rotation:number;
-    initWithPositionAndSize(x:number, y:number, w:number, h:number):ISpatial;
+    initWithBounds(x:number, y:number, hw:number, hh:number, r:number):any;
   }
 
 }

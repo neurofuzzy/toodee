@@ -1,18 +1,16 @@
 namespace Geom {
 
-  export class Rect implements IRect {
+  export class Bounds implements IBounds {
 
-    public x:number;
-    public y:number;
-    public w:number;
-    public h:number;
+    public anchor:IPoint;
+    public hw:number;
+    public hh:number;
 
-    constructor (x:number = 0, y:number = 0, w:number = 0, h:number = 0) {
+    constructor (x:number = 0, y:number = 0, hw:number = 0, hh:number = 0) {
 
-      this.x = x;
-      this.y = y;
-      this.w = w;
-      this.h = h;
+      this.anchor = new Point(x, y);
+      this.hw = hw;
+      this.hh = hh;
 
     }
 
