@@ -35,7 +35,7 @@ namespace Geom {
     var aA = bA.anchor;
     var aB = bB.anchor;
 
-    var hx = hx;
+    var hx = pt.x * 0.5;
     var hy = pt.y * 0.5;
 
     if (hx < hy) {

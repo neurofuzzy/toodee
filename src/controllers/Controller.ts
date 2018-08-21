@@ -63,10 +63,22 @@ namespace Controllers {
     public update = () => {
 
       this.model.items.forEach(item => {
-        //item.bounds.anchor.x += Math.random() * 2 - 1;
-        //item.bounds.anchor.y += Math.random() * 2 - 1;
+
+        // fake gravity
+        item.bounds.anchor.y += 1;
+        
+        if (item.bounds.anchor.y + item.bounds.hh > 600) {
+          item.bounds.anchor.y = 600 - item.bounds.hh;
+        }
+
+      });
+
+
+      this.model.items.forEach(item => {
+
         let a = this.countIntersections(item);
-item.rotation = 0.2 + a * 0.3;
+        item.rotation = 0.2 + a * 0.3;
+
       });
 
       this.view.update();
