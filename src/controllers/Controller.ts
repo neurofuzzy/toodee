@@ -44,6 +44,10 @@ namespace Controllers {
 
     }
 
+    private countIntersections (item:Util.IRect) {
+      
+    }
+
     public update = () => {
 
       this.model.items.forEach(item => {

@@ -1,4 +1,4 @@
-/// <reference path="../util/AbstractItems.ts" />
+/// <reference path="../util/BaseItems.ts" />
 
 namespace Models {
 
