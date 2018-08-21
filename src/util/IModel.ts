@@ -1,8 +1,8 @@
 namespace Util {
 
-  export interface IModel<T> {
-    items:Array<T>;
-    init():IModel<T>;
+  export interface IModel<IModelItem> {
+    items:Array<IModelItem>;
+    init():IModel<IModelItem>;
   }
 
 }
