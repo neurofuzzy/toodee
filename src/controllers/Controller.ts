@@ -44,7 +44,18 @@ namespace Controllers {
 
     }
 
-    private countIntersections (item:Geom.IRect) {
+    private countIntersections (itemA:Models.Item):number {
+
+      let hits = 0;
+
+      this.model.items.forEach(itemB => {
+        //if (Geom.rectIntersectsRect(itemA, itemB)) {
+       //   hits++;
+        //}
+      })
+
+      return hits;
+
 
     }
 
