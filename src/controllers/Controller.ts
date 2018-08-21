@@ -22,13 +22,12 @@ namespace Controllers {
         var y = 100 + Math.random() * 400;
   
         var item = new Models.Item();
-        item.id = i;
         item.x = x;
         item.y = y;
         item.w = Math.random() * 10 + 10;
         item.h = Math.random() * 10 + 10;
   
-        this.model.items.push(item);
+        this.model.addItem(item);
   
       }
   

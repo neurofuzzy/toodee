@@ -11,6 +11,7 @@ namespace Models {
 
     constructor () {
 
+      this.id = Util.IdentityService.newIdentity();
       this.x = 0;
       this.y = 0;
       this.w = 0;
