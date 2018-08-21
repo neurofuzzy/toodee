@@ -1,11 +1,7 @@
 namespace Util {
 
-  export interface IRenderable {
-    x:number;
-    y:number;
-    w:number;
-    h:number;
-    r:number;
+  export interface IRenderable extends ISpatial {
+    color:number;
   }
 
 }

@@ -2,10 +2,10 @@ namespace Controllers {
 
   export class Controller implements Util.IController {
 
-    protected model:Util.IModel<Util.IRenderable>;
+    protected model:Util.IModel<Util.ISpatial>;
     protected view:Util.IView
 
-    public initWithModelAndView(model:Util.IModel<Util.IRenderable>, view:Util.IView):Controller {
+    public initWithModelAndView(model:Util.IModel<Util.ISpatial>, view:Util.IView):Controller {
 
       this.model = model;
       this.view = view;
@@ -16,17 +16,18 @@ namespace Controllers {
 
     protected build () {
 
-      for (let i = 0; i < 3000; i++) {
+      for (let i = 0; i < 100; i++) {
   
         var x = 200 + Math.random() * 400;
         var y = 100 + Math.random() * 400;
   
-        var item = new Models.Item();
-        item.x = x;
-        item.y = y;
-        item.w = Math.random() * 10 + 10;
-        item.h = Math.random() * 10 + 10;
-  
+        var item = new Models.Item().initWithPositionAndSize(
+          x, 
+          y, 
+          Math.random() * 10 + 10, 
+          Math.random() * 10 + 10
+        );
+
         this.model.addItem(item);
   
       }
@@ -46,9 +47,8 @@ namespace Controllers {
     public update = () => {
 
       this.model.items.forEach(item => {
-        item.r += 0.01;
-        item.x += Math.random() - 0.5;
-        item.y += Math.random() - 0.5;
+        item.position.x += Math.random() - 0.5;
+        item.position.y += Math.random() - 0.5;
       });
 
       this.view.update();

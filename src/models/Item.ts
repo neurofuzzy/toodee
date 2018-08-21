@@ -1,22 +1,16 @@
+/// <reference path="../util/AbstractItems.ts" />
+
 namespace Models {
 
-  export class Item implements Util.IModelItem, Util.IRenderable {
+  export class Item extends Util.SpatialItem implements Util.IModelItem {
 
     public id:number;
-    public x:number;
-    public y:number;
-    public w:number;
-    public h:number;
-    public r:number;
 
     constructor () {
 
+      super();
+
       this.id = Util.IdentityService.newIdentity();
-      this.x = 0;
-      this.y = 0;
-      this.w = 0;
-      this.h = 0;
-      this.r = 0;
 
     }
 
