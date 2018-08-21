@@ -1,4 +1,4 @@
-namespace Util {
+namespace Geom {
 
   export interface ISpatial {
     bounds:IRect;

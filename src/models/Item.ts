@@ -1,8 +1,8 @@
-/// <reference path="../util/BaseItems.ts" />
+/// <reference path="../geom/BaseSpatial.ts" />
 
 namespace Models {
 
-  export class Item extends Util.SpatialItem implements Util.IModelItem {
+  export class Item extends Geom.BaseSpatial implements Util.IModelItem {
 
     public id:number;
 

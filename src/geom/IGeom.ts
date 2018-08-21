@@ -1,4 +1,4 @@
-namespace Util {
+namespace Geom {
 
   export interface IPoint {
     x:number;

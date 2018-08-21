@@ -2,7 +2,7 @@ namespace Views {
 
   export class View implements Util.IView {
 
-    protected model:Util.IModel<Util.IModelItem & Util.ISpatial>;
+    protected model:Util.IModel<Util.IModelItem & Geom.ISpatial>;
     protected items:Array<PIXI.Graphics>;
     public pixi:PIXI.Application;
     private fps:HTMLElement;
@@ -18,7 +18,7 @@ namespace Views {
 
     }
 
-    public initWithModel (model:Util.IModel<Util.IModelItem & Util.ISpatial>):Util.IView {
+    public initWithModel (model:Util.IModel<Util.IModelItem & Geom.ISpatial>):Util.IView {
 
       this.model = model;
       this.items = [];

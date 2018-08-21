@@ -1,6 +1,6 @@
-namespace Util {
+namespace Geom {
 
-  export class SpatialItem implements ISpatial {
+  export class BaseSpatial implements ISpatial {
 
     public bounds:IRect;
     public position:IPoint;

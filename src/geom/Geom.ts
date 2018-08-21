@@ -1,6 +1,6 @@
-namespace Util {
+namespace Geom {
 
-  export class Geom {
+  export class Util {
 
     public static pointWithinRect(x:number, y:number, rect:IRect, tilescale:number = 1):boolean {
 
@@ -44,7 +44,7 @@ namespace Util {
 
     public static distanceBetween(x1:number, y1:number, x2:number, y2:number):number {
 
-      return Math.sqrt(Geom.distanceBetweenSquared(x1, y1, x2, y2));
+      return Math.sqrt(Util.distanceBetweenSquared(x1, y1, x2, y2));
 
     };
 
@@ -63,13 +63,13 @@ namespace Util {
 
     public static rotatePointDeg(pt:IPoint, deg:number):void {
 
-      Geom.rotatePoint(pt, deg * Math.PI / 180);
+      Util.rotatePoint(pt, deg * Math.PI / 180);
 
     };
 
     public static rotatePoint(pt:IPoint, angle:number):void {
 
-      angle = 0 - Geom.normalizeAngle(angle);
+      angle = 0 - Util.normalizeAngle(angle);
 
       var cos = Math.cos(angle);
       var sin = Math.sin(angle);
@@ -88,12 +88,12 @@ namespace Util {
 
     public static lerpDist(x1:number, y1:number, x2:number, y2:number, dist:number):IPoint {
 
-      var len = Geom.distanceBetween(x1, y1, x2, y2);
+      var len = Util.distanceBetween(x1, y1, x2, y2);
       var perc = dist / len;
 
       return {
-        x: Geom.lerp(x2, x1, perc),
-        y: Geom.lerp(y2, y1, perc)
+        x: Util.lerp(x2, x1, perc),
+        y: Util.lerp(y2, y1, perc)
       }
 
     };
@@ -131,7 +131,7 @@ namespace Util {
     };
 
     public static lineIntersectsLine(p1x:number, p1y:number, p2x:number, p2y:number, p3x:number, p3y:number, p4x:number, p4y:number):boolean {
-      var fn = Geom.ccw;
+      var fn = Util.ccw;
       return (
         fn(p1x, p1y, p3x, p3y, p4x, p4y) != fn(p2x, p2y, p3x, p3y, p4x, p4y) && 
         fn(p1x, p1y, p2x, p2y, p3x, p3y) != fn(p1x, p1y, p2x, p2y, p4x, p4y)
@@ -184,15 +184,15 @@ namespace Util {
 
       // edge check
 
-      var fn = Geom.lineIntersectsLine;
-      var fn2 = Geom.lineSide;
+      var fn = Util.lineIntersectsLine;
+      var fn2 = Util.lineSide;
 
       var hits = [];
 
       if (fn(ax, ay, bx, by, rx, ry, rx2, ry)) {
 
         if (isNaN(side) || fn2(ax, ay, rx, ry, rx2, ry) == side) {
-          hits.push(Geom.lineLineIntersect(ax, ay, bx, by, rx, ry, rx2, ry));
+          hits.push(Util.lineLineIntersect(ax, ay, bx, by, rx, ry, rx2, ry));
         }
 
       }
@@ -200,7 +200,7 @@ namespace Util {
       if (fn(ax, ay, bx, by, rx2, ry, rx2, ry2)) {
 
         if (isNaN(side) || fn2(ax, ay, rx2, ry, rx2, ry2) == side) {
-          hits.push(Geom.lineLineIntersect(ax, ay, bx, by, rx2, ry, rx2, ry2));
+          hits.push(Util.lineLineIntersect(ax, ay, bx, by, rx2, ry, rx2, ry2));
         }
 
       }
@@ -208,7 +208,7 @@ namespace Util {
       if (fn(ax, ay, bx, by, rx2, ry2, rx, ry2)) {
 
         if (isNaN(side) || fn2(ax, ay, rx2, ry2, rx, ry2) == side) {
-          hits.push(Geom.lineLineIntersect(ax, ay, bx, by, rx2, ry2, rx, ry2));
+          hits.push(Util.lineLineIntersect(ax, ay, bx, by, rx2, ry2, rx, ry2));
         }
 
       }
@@ -216,7 +216,7 @@ namespace Util {
       if (fn(ax, ay, bx, by, rx, ry2, rx, ry)) {
 
         if (isNaN(side) || fn2(ax, ay, rx, ry2, rx, ry) == side) {
-          hits.push(Geom.lineLineIntersect(ax, ay, bx, by, rx, ry2, rx, ry));
+          hits.push(Util.lineLineIntersect(ax, ay, bx, by, rx, ry2, rx, ry));
         }
 
       }
@@ -327,23 +327,23 @@ namespace Util {
 
       } else if (cx < rx1 && cy < ry1) {
 
-        delta = Geom.distanceBetween(cx, cy, rx1, ry1);
-        angle = Geom.angleBetween(cx, cy, rx1, ry1);
+        delta = Util.distanceBetween(cx, cy, rx1, ry1);
+        angle = Util.angleBetween(cx, cy, rx1, ry1);
 
       } else if (cx > rx2 && cy < ry1) {
 
-        delta = Geom.distanceBetween(cx, cy, rx2, ry1);
-        angle = Geom.angleBetween(cx, cy, rx2, ry1);
+        delta = Util.distanceBetween(cx, cy, rx2, ry1);
+        angle = Util.angleBetween(cx, cy, rx2, ry1);
 
       } else if (cx > rx2 && cy > ry2) {
 
-        delta = Geom.distanceBetween(cx, cy, rx2, ry2);
-        angle = Geom.angleBetween(cx, cy, rx2, ry2);
+        delta = Util.distanceBetween(cx, cy, rx2, ry2);
+        angle = Util.angleBetween(cx, cy, rx2, ry2);
 
       } else {
 
-        delta = Geom.distanceBetween(cx, cy, rx1, ry2);
-        angle = Geom.angleBetween(cx, cy, rx1, ry2);
+        delta = Util.distanceBetween(cx, cy, rx1, ry2);
+        angle = Util.angleBetween(cx, cy, rx1, ry2);
 
       }
 
@@ -380,7 +380,7 @@ namespace Util {
 
     public static polygonIsClockwise(pts:Array<number>):boolean {
 
-      return Geom.polygonArea(pts) > 0;
+      return Util.polygonArea(pts) > 0;
 
     };
 
@@ -396,7 +396,7 @@ namespace Util {
 
     public static closePolygon(pts:Array<number>):void {
 
-      if (pts.length >= 4 && !Geom.polygonIsClosed(pts)) {
+      if (pts.length >= 4 && !Util.polygonIsClosed(pts)) {
         pts.push(pts[0], pts[1]);
       }
 

@@ -1,4 +1,4 @@
-namespace Util {
+namespace Geom {
 
   export class Rect implements IRect {
 

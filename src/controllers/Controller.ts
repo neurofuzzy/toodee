@@ -2,10 +2,10 @@ namespace Controllers {
 
   export class Controller implements Util.IController {
 
-    protected model:Util.IModel<Util.ISpatial>;
+    protected model:Util.IModel<Geom.ISpatial>;
     protected view:Util.IView
 
-    public initWithModelAndView(model:Util.IModel<Util.ISpatial>, view:Util.IView):Controller {
+    public initWithModelAndView(model:Util.IModel<Geom.ISpatial>, view:Util.IView):Controller {
 
       this.model = model;
       this.view = view;
@@ -44,8 +44,8 @@ namespace Controllers {
 
     }
 
-    private countIntersections (item:Util.IRect) {
-      
+    private countIntersections (item:Geom.IRect) {
+
     }
 
     public update = () => {
