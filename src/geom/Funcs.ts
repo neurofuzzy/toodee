@@ -96,7 +96,7 @@ namespace Geom {
 
     var cx = circleb.anchor.x;
     var cy = circleb.anchor.y;
-    var radius = Math.min(circleb.hw, circleb.hh);
+    var radius = circleb.hw;
     var cx1 = cx - radius;
     var cy1 = cy - radius;
     var cx2 = cx + radius;

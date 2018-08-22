@@ -32,7 +32,7 @@ namespace Geom {
 
     pt.x = pt.y = 0;
 
-    var dist = Geom.distanceBetween(bA.anchor.x, bA.anchor.y, bB.anchor.x, bB.anchor.y) - Math.min(bA.hw, bA.hh) - Math.min(bB.hw, bB.hh);
+    var dist = Geom.distanceBetween(bA.anchor.x, bA.anchor.y, bB.anchor.x, bB.anchor.y) - bA.hw - bB.hw;
 
     if (dist < 0) {
 
@@ -105,10 +105,10 @@ namespace Geom {
     var deltaX = pt.x * 0.5;
     var deltaY = pt.y * 0.5;
 
-    bA.anchor.x += deltaX
-    bA.anchor.y += deltaY;
-    bB.anchor.x -= deltaX;
-    bB.anchor.y -= deltaY;
+    bA.anchor.x -= deltaX
+    bA.anchor.y -= deltaY;
+    bB.anchor.x += deltaX;
+    bB.anchor.y += deltaY;
 
   }
 
@@ -124,7 +124,7 @@ namespace Geom {
 
     var cx = circleb.anchor.x;
     var cy = circleb.anchor.y;
-    var radius = Math.min(circleb.hw, circleb.hh);
+    var radius = circleb.hw;
     var cx1 = cx - radius;
     var cy1 = cy - radius;
     var cx2 = cx + radius;
