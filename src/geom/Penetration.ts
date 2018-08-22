@@ -130,12 +130,12 @@ namespace Geom {
     var cx2 = cx + radius;
     var cy2 = cy + radius;
 
+    var rx = orthob.anchor.x;
+    var ry = orthob.anchor.y;
     var rx1 = orthob.anchor.x - orthob.hw;
     var ry1 = orthob.anchor.y - orthob.hh;
     var rx2 = orthob.anchor.x + orthob.hw;
     var ry2 = orthob.anchor.y + orthob.hh;
-    var rx = (rx1 + rx2) * 0.5;
-    var ry = (ry1 + ry2) * 0.5;
 
     // bounds check, early out
 
@@ -143,16 +143,22 @@ namespace Geom {
       return;
     }
 
+    var delta, angle;
+    var forceX = false;
+
     // if inside rect
 
     if (rx2 > cx && ry2 > cy && rx1 < cx && ry1 < cy) {
       
+      // if penetration is greater in the x direction
       
+      if (Math.abs(cx - rx) > Math.abs(cy - ry)) {
+        forceX = true;
+      }
+
     }
 
-    var delta, angle;
-
-    if (cx >= rx1 && cx <= rx2) {
+    if (!forceX && cx >= rx1 && cx <= rx2) {
 
       if (cy <= ry) {
         circleb.anchor.y = ry1 - radius;
@@ -198,8 +204,13 @@ namespace Geom {
 
       delta -= radius;
 
-      circleb.anchor.x += delta * Math.cos(angle);
-      circleb.anchor.y += delta * Math.sin(angle);
+      var deltaX = delta * Math.cos(angle);
+      var deltaY = delta * Math.sin(angle);
+
+      circleb.anchor.x += deltaX * 0.5;
+      circleb.anchor.y += deltaY * 0.5;
+      orthob.anchor.x -= deltaX * 0.5;
+      orthob.anchor.y -= deltaY * 0.5;
 
     }
 
