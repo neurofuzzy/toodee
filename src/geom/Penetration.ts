@@ -2,7 +2,7 @@ namespace Geom {
 
   var pt:Point = new Point();
 
-  export function getPenetrationBetweenBounds(bA:IBounds, bB:IBounds):IPoint {
+  function getPenetrationBetweenBounds(bA:IBounds, bB:IBounds):IPoint {
 
     pt.x = pt.y = 0;
 
@@ -28,43 +28,7 @@ namespace Geom {
 
   }
 
-  export function resolvePenetrationBetweenBounds(bA:IBounds, bB:IBounds):void {
-
-    let pt = Geom.getPenetrationBetweenBounds(bA, bB);
-
-    var aA = bA.anchor;
-    var aB = bB.anchor;
-
-    var hx = pt.x * 0.5;
-    var hy = pt.y * 0.5;
-
-    if (hx < hy) {
-
-      if (aA.x < aB.x) {
-        aA.x -= hx;
-        aB.x += hx;
-      } else {
-        aA.x += hx;
-        aB.x -= hx;       
-      }
-      pt.x = 0;
-
-    } else {
-
-      if (aA.y < aB.y) {
-        aA.y -= hy;
-        aB.y += hy;
-      } else {
-        aA.y += hy;
-        aB.y -= hy;       
-      }
-      pt.y = 0;
-
-    }
-
-  }
-
-  export function getPenetrationRoundRound(bA:IBounds, bB:IBounds):IPoint {
+  function getPenetrationRoundRound(bA:IBounds, bB:IBounds):IPoint {
 
     pt.x = pt.y = 0;
 
@@ -86,9 +50,57 @@ namespace Geom {
 
   }
 
-  export function resolvePenetrationRoundRound(bA:IBounds, bB:IBounds):void {
+  export function resolvePenetrationBetweenBounds(bA:IBounds, bB:IBounds, useShapes:boolean = false):void {
 
-    let pt = Geom.getPenetrationBetweenBounds(bA, bB);
+    if (!useShapes || (bA.shape == SHAPE_ORTHO && bB.shape == SHAPE_ORTHO)) {
+
+      let pt = getPenetrationBetweenBounds(bA, bB);
+
+      var aA = bA.anchor;
+      var aB = bB.anchor;
+
+      var hx = pt.x * 0.5;
+      var hy = pt.y * 0.5;
+
+      if (hx < hy) {
+
+        if (aA.x < aB.x) {
+          aA.x -= hx;
+          aB.x += hx;
+        } else {
+          aA.x += hx;
+          aB.x -= hx;       
+        }
+        pt.x = 0;
+
+      } else {
+
+        if (aA.y < aB.y) {
+          aA.y -= hy;
+          aB.y += hy;
+        } else {
+          aA.y += hy;
+          aB.y -= hy;       
+        }
+        pt.y = 0;
+
+      }
+
+    } else if (bA.shape == bB.shape) {
+
+      resolvePenetrationRoundRound(bA, bB);
+
+    } else {
+
+      resolvePenetrationOrthoRound(bA, bB);
+
+    }
+
+  }
+
+  function resolvePenetrationRoundRound(bA:IBounds, bB:IBounds):void {
+
+    let pt = getPenetrationRoundRound(bA, bB);
 
     var deltaX = pt.x * 0.5;
     var deltaY = pt.y * 0.5;
@@ -100,7 +112,7 @@ namespace Geom {
 
   }
 
-  export function resolvePenetrationOrthoRound(bA:IBounds, bB:IBounds):void {
+  function resolvePenetrationOrthoRound(bA:IBounds, bB:IBounds):void {
 
     var orthob = bA;
     var circleb = bB;
