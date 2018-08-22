@@ -20,13 +20,10 @@ namespace Controllers {
   
         var x = 100 + Math.random() * 600;
         var y = 100 + Math.random() * 400;
+
+        var b = new Geom.Bounds(x, y, 20, 20, Math.floor(Math.random() * 2 + 1));
   
-        var item = new Models.Item().initWithBounds(
-          x, 
-          y, 
-          Math.random() * 20 + 10, 
-          Math.random() * 20 + 10
-        );
+        var item = new Models.Item().initWithBounds(b, 0);
 
         this.model.addItem(item);
   
@@ -49,7 +46,7 @@ namespace Controllers {
       let hits = 0;
 
       this.model.items.forEach(itemB => {
-        if (Geom.boundsIntersect(itemA.bounds, itemB.bounds)) {
+        if (Geom.boundsIntersect(itemA.bounds, itemB.bounds, true)) {
           Geom.resolvePenetrationBetweenBounds(itemA.bounds, itemB.bounds)
           hits++;
         }
@@ -62,6 +59,7 @@ namespace Controllers {
 
     public update = () => {
 
+      /*
       this.model.items.forEach(item => {
 
         // fake gravity
@@ -72,6 +70,7 @@ namespace Controllers {
         }
 
       });
+      */
 
 
       this.model.items.forEach(item => {

@@ -8,14 +8,20 @@ namespace Geom {
     constructor () {
     }
 
-    public initWithBounds(x:number = 0, y:number = 0, hw:number = 0, hh:number = 0, r:number = 0):any {
+    public initWithBounds(bounds:IBounds, r:number = 0):any {
 
-      this.bounds = new Bounds(x, y, hw, hh);
+      this.bounds = bounds;
       this.rotation = r;
 
       return this;
 
     }
+
+  }
+
+  export class BaseBody extends BaseSpatial {
+
+
 
   }
 

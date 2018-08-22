@@ -5,12 +5,14 @@ namespace Geom {
     public anchor:IPoint;
     public hw:number;
     public hh:number;
+    public shape:number;
 
-    constructor (x:number = 0, y:number = 0, hw:number = 0, hh:number = 0) {
+    constructor (x:number = 0, y:number = 0, hw:number = 0, hh:number = 0, shape:number = SHAPE_ORTHO) {
 
       this.anchor = new Point(x, y);
       this.hw = hw;
       this.hh = hh;
+      this.shape = shape;
 
     }
 

@@ -37,8 +37,13 @@ namespace Views {
         var b = item.bounds;
         var gfx = new PIXI.Graphics()
           .beginFill(colors[idx % 4], 0.5)
-          .lineStyle(2, colors[idx % 4])
-          .drawRect(0 - b.hw, 0 - b.hh, b.hw * 2, b.hh * 2);
+          .lineStyle(2, colors[idx % 4]);
+
+        if (item.bounds.shape == Geom.SHAPE_ORTHO) {
+          gfx.drawRect(0 - b.hw, 0 - b.hh, b.hw * 2, b.hh * 2);
+        } else {
+          gfx.drawCircle(0, 0, Math.min(b.hw, b.hh));
+        }
   
         gfx.x = item.bounds.anchor.x;
         gfx.y = item.bounds.anchor.y;

@@ -27,17 +27,41 @@ namespace Geom {
 
   };
 
-  export function boundsIntersect(bA:IBounds, bB:IBounds):boolean {
-    
+  export function boundsIntersect(bA:IBounds, bB:IBounds, useShapes:boolean = false):boolean {
+
     var aA = bA.anchor;
     var aB = bB.anchor;
 
-    return (
+    var orthoIntersects = (
       aA.x + bA.hw >= aB.x - bB.hw &&
       aA.y + bA.hh >= aB.y - bB.hh &&
       aA.x - bA.hw <= aB.x + bB.hw &&
       aA.y - bA.hh <= aB.y + bB.hh
     );
+
+    if (!useShapes || (bA.shape == SHAPE_ORTHO && bB.shape == SHAPE_ORTHO)) {
+  
+      return orthoIntersects;
+
+    } else if (bA.shape == bB.shape) {
+
+      if (orthoIntersects) {
+      
+        return Geom.distanceBetweenSquared(bA.anchor.x, bA.anchor.y, bB.anchor.x, bB.anchor.y) < (bA.hw + bB.hw) * (bA.hh + bB.hh);
+      
+      }
+
+    } else {
+
+      if (orthoIntersects) {
+
+        return orthoRoundBoundsIntersect(bA, bB)
+
+      }
+
+    }
+
+    return false;
 
   };
 
@@ -59,6 +83,79 @@ namespace Geom {
     return Math.atan2(y2 - y1, x2 - x1);
 
   };
+
+  export function orthoRoundBoundsIntersect (bA:IBounds, bB:IBounds):boolean {
+
+    var orthob = bA;
+    var circleb = bB;
+
+    if (bA.shape > bB.shape) {
+      orthob = bB;
+      circleb = bA;
+    }
+
+    var cx = circleb.anchor.x;
+    var cy = circleb.anchor.y;
+    var radius = Math.min(circleb.hw, circleb.hh);
+    var cx1 = cx - radius;
+    var cy1 = cy - radius;
+    var cx2 = cx + radius;
+    var cy2 = cy + radius;
+
+    var rx1 = orthob.anchor.x - orthob.hw;
+    var ry1 = orthob.anchor.y - orthob.hh;
+    var rx2 = orthob.anchor.x + orthob.hw;
+    var ry2 = orthob.anchor.y + orthob.hh;
+
+    // bounds check, early out
+
+    if (rx2 < cx1 || ry2 < cy1 || rx1 > cx2 || ry1 > cy2) {
+      return false;
+    }
+
+    // if inside rect
+
+    if (rx2 > cx && ry2 > cy && rx1 < cx && ry1 < cy) {
+      return true;
+    }
+
+    var delta, angle;
+
+    if (cx >= rx1 && cx <= rx2) {
+
+      return true;
+
+    } else if (cy >= ry1 && cy <= ry2) {
+
+      return true;
+
+    } else if (cx < rx1 && cy < ry1) {
+
+      delta = Geom.distanceBetween(cx, cy, rx1, ry1);
+      angle = Geom.angleBetween(cx, cy, rx1, ry1);
+
+    } else if (cx > rx2 && cy < ry1) {
+
+      delta = Geom.distanceBetween(cx, cy, rx2, ry1);
+      angle = Geom.angleBetween(cx, cy, rx2, ry1);
+
+    } else if (cx > rx2 && cy > ry2) {
+
+      delta = Geom.distanceBetween(cx, cy, rx2, ry2);
+      angle = Geom.angleBetween(cx, cy, rx2, ry2);
+
+    } else {
+
+      delta = Geom.distanceBetween(cx, cy, rx1, ry2);
+      angle = Geom.angleBetween(cx, cy, rx1, ry2);
+
+    }
+
+    if (angle < 0) angle += Math.PI * 2;
+
+    return (delta < radius);
+    
+  }
 
   export function rotatePointDeg(pt:IPoint, deg:number):void {
 
@@ -249,117 +346,6 @@ namespace Geom {
     }
 
     return a;
-
-  }
-
-
-  export function resolvePenetrationCircleRect(centerPt:IPoint, radius:number, b:IBounds, tilescale:number):number {
-
-    var cx = centerPt.x;
-    var cy = centerPt.y;
-    var cx1 = cx - radius;
-    var cy1 = cy - radius;
-    var cx2 = cx + radius;
-    var cy2 = cy + radius;
-
-    tilescale = tilescale || 1;
-
-    var rx1 = b.anchor.x - b.hw;
-    var ry1 = b.anchor.y - b.hh;
-    var rx2 = rx1 + b.hw;
-    var ry2 = ry1 + b.hh;
-    var rx = (rx1 + rx2) * 0.5;
-    var ry = (ry1 + ry2) * 0.5;
-
-
-    // bounds check, early out
-
-    if (rx2 < cx1 || ry2 < cy1 || rx1 > cx2 || ry1 > cy2) {
-      return 0;
-    }
-
-    // if inside rect
-
-    if (rx2 > cx && ry2 > cy && rx1 < cx && ry1 < cy) {
-
-      console.log("INSIDE");
-      return -1;
-      /*
-              if (Math.abs(rx - cx) > Math.abs(ry - cy)) {
-                  if (cx > rx) {
-                      cx = centerPt.x = rx2 + radius;
-                  } else {
-                      cx = centerPt.x = rx1 - radius;
-                  }
-              } else {
-                  if (cy > ry) {
-                      cy = centerPt.y = ry2 + radius;
-                  } else {
-                      cy = centerPt.y = ry1 - radius;
-                  }
-              }
-      */
-
-      //return false;
-    }
-
-
-    var delta, angle;
-
-    if (cx >= rx1 && cx <= rx2) {
-
-      if (cy <= ry) {
-        centerPt.y = ry1 - radius;
-      } else {
-        centerPt.y = ry2 + radius;
-      }
-      return 1;
-
-    } else if (cy >= ry1 && cy <= ry2) {
-
-      if (cx <= rx) {
-        centerPt.x = rx1 - radius;
-      } else {
-        centerPt.x = rx2 + radius;
-      }
-      return 1;
-
-    } else if (cx < rx1 && cy < ry1) {
-
-      delta = Geom.distanceBetween(cx, cy, rx1, ry1);
-      angle = Geom.angleBetween(cx, cy, rx1, ry1);
-
-    } else if (cx > rx2 && cy < ry1) {
-
-      delta = Geom.distanceBetween(cx, cy, rx2, ry1);
-      angle = Geom.angleBetween(cx, cy, rx2, ry1);
-
-    } else if (cx > rx2 && cy > ry2) {
-
-      delta = Geom.distanceBetween(cx, cy, rx2, ry2);
-      angle = Geom.angleBetween(cx, cy, rx2, ry2);
-
-    } else {
-
-      delta = Geom.distanceBetween(cx, cy, rx1, ry2);
-      angle = Geom.angleBetween(cx, cy, rx1, ry2);
-
-    }
-
-    if (angle < 0) angle += Math.PI * 2;
-
-    if (delta < radius) {
-
-      delta -= radius;
-
-      centerPt.x += delta * Math.cos(angle);
-      centerPt.y += delta * Math.sin(angle);
-
-      return 1;
-
-    }
-
-    return 0;
 
   }
 
