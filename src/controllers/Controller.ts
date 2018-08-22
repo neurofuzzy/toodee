@@ -46,6 +46,9 @@ namespace Controllers {
       let hits = 0;
 
       this.model.items.forEach(itemB => {
+        if (itemA.id == itemB.id) {
+          return;
+        }
         if (Geom.boundsIntersect(itemA.bounds, itemB.bounds, true)) {
           Geom.resolvePenetrationBetweenBounds(itemA.bounds, itemB.bounds, true)
           hits++;
@@ -59,18 +62,18 @@ namespace Controllers {
 
     public update = () => {
 
-      /*
+      
       this.model.items.forEach(item => {
 
         // fake gravity
-        item.bounds.anchor.y += 1;
+        item.bounds.anchor.y += 4;
         
         if (item.bounds.anchor.y + item.bounds.hh > 600) {
           item.bounds.anchor.y = 600 - item.bounds.hh;
         }
 
       });
-      */
+      
 
 
       this.model.items.forEach(item => {
