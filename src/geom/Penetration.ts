@@ -146,7 +146,8 @@ namespace Geom {
     // if inside rect
 
     if (rx2 > cx && ry2 > cy && rx1 < cx && ry1 < cy) {
-      return;
+      
+      
     }
 
     var delta, angle;
