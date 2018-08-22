@@ -151,7 +151,7 @@ namespace Geom {
     if (rx2 > cx && ry2 > cy && rx1 < cx && ry1 < cy) {
       
       // if penetration is greater in the x direction
-      
+
       if (Math.abs(cx - rx) > Math.abs(cy - ry)) {
         forceX = true;
       }
@@ -161,19 +161,37 @@ namespace Geom {
     if (!forceX && cx >= rx1 && cx <= rx2) {
 
       if (cy <= ry) {
-        circleb.anchor.y = ry1 - radius;
+
+        delta = ry1 - cy - radius;
+        circleb.anchor.y += delta * 0.5;
+        orthob.anchor.y -= delta * 0.5;
+
       } else {
-        circleb.anchor.y = ry2 + radius;
+
+        delta = ry2 - cy + radius;
+        circleb.anchor.y += delta * 0.5;
+        orthob.anchor.y -= delta * 0.5;
+
       }
+
       return;
 
     } else if (cy >= ry1 && cy <= ry2) {
 
       if (cx <= rx) {
-        circleb.anchor.x = rx1 - radius;
+
+        delta = rx1 - cx - radius;
+        circleb.anchor.x += delta * 0.5;
+        orthob.anchor.x -= delta * 0.5;
+
       } else {
-        circleb.anchor.x = rx2 + radius;
+
+        delta = rx2 - cx + radius;
+        circleb.anchor.x += delta * 0.5;
+        orthob.anchor.x -= delta * 0.5;
+
       }
+
       return;
 
     } else if (cx < rx1 && cy < ry1) {
