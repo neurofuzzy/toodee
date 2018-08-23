@@ -55,7 +55,7 @@ namespace Controllers {
           return;
         }
         if (Geom.boundsIntersect(itemA.bounds, itemB.bounds, true)) {
-          Geom.resolvePenetrationBetweenBounds(itemA.bounds, itemB.bounds, true)
+          Geom.resolvePenetrationBetweenBounds(itemA.bounds, itemB.bounds, itemA.constraints, itemB.constraints, true)
           hits++;
         }
       })

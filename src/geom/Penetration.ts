@@ -50,7 +50,7 @@ namespace Geom {
 
   }
 
-  export function resolvePenetrationBetweenBounds(bA:IBounds, bB:IBounds, useShapes:boolean = false):void {
+  export function resolvePenetrationBetweenBounds(bA:IBounds, bB:IBounds, cA:IConstraints, cB:IConstraints, useShapes:boolean = false):void {
 
     if (!useShapes || (bA.shape == SHAPE_ORTHO && bB.shape == SHAPE_ORTHO)) {
 
@@ -88,17 +88,17 @@ namespace Geom {
 
     } else if (bA.shape == bB.shape) {
 
-      resolvePenetrationRoundRound(bA, bB);
+      resolvePenetrationRoundRound(bA, bB, cA, cB);
 
     } else {
 
-      resolvePenetrationOrthoRound(bA, bB);
+      resolvePenetrationOrthoRound(bA, bB, cA, cB);
 
     }
 
   }
 
-  function resolvePenetrationRoundRound(bA:IBounds, bB:IBounds):void {
+  function resolvePenetrationRoundRound(bA:IBounds, bB:IBounds, cA:IConstraints, cB:IConstraints):void {
 
     let pt = getPenetrationRoundRound(bA, bB);
 
@@ -112,7 +112,7 @@ namespace Geom {
 
   }
 
-  function resolvePenetrationOrthoRound(bA:IBounds, bB:IBounds):void {
+  function resolvePenetrationOrthoRound(bA:IBounds, bB:IBounds, cA:IConstraints, cB:IConstraints):void {
 
     var orthob = bA;
     var circleb = bB;
@@ -132,10 +132,10 @@ namespace Geom {
 
     var rx = orthob.anchor.x;
     var ry = orthob.anchor.y;
-    var rx1 = orthob.anchor.x - orthob.hw;
-    var ry1 = orthob.anchor.y - orthob.hh;
-    var rx2 = orthob.anchor.x + orthob.hw;
-    var ry2 = orthob.anchor.y + orthob.hh;
+    var rx1 = rx - orthob.hw;
+    var ry1 = ry - orthob.hh;
+    var rx2 = rx + orthob.hw;
+    var ry2 = ry + orthob.hh;
 
     // bounds check, early out
 
@@ -229,6 +229,51 @@ namespace Geom {
       circleb.anchor.y += deltaY * 0.5;
       orthob.anchor.x -= deltaX * 0.5;
       orthob.anchor.y -= deltaY * 0.5;
+
+    }
+
+  }
+
+  function doResolve (deltaX:number, deltaY:number, bA:IBounds, bB:IBounds, cA:IConstraints, cB:IConstraints):void {
+
+    var aA = bA.anchor;
+    var aB = bB.anchor;
+
+    if (deltaX != 0 && (cA.lockX == false || cB.lockX == false)) {
+
+      if (cA.lockX == cB.lockX) {
+
+        aA.x += deltaX * 0.5;
+        aB.x -= deltaX * 0.5;
+
+      } else if (cA.lockX) {
+
+        aB.x -= deltaX;
+
+      } else {
+
+        aA.x += deltaX;
+
+      }
+
+    }
+
+    if (deltaY != 0 && (cA.lockY == false || cB.lockY == false)) {
+
+      if (cA.lockY == cB.lockY) {
+
+        aA.y += deltaY * 0.5;
+        aB.y -= deltaY * 0.5;
+
+      } else if (cA.lockY) {
+
+        aB.y -= deltaY;
+
+      } else {
+
+        aA.y += deltaY;
+
+      }
 
     }
 
