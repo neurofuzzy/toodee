@@ -2,7 +2,7 @@ namespace Views {
 
   export class View implements Util.IView {
 
-    protected model:Util.IModel<Util.IModelItem & Geom.ISpatial>;
+    protected model:Util.IModel<Util.IModelItem & Geom.IBody>;
     protected items:Array<PIXI.Graphics>;
     public pixi:PIXI.Application;
     private fps:HTMLElement;
@@ -18,7 +18,7 @@ namespace Views {
 
     }
 
-    public initWithModel (model:Util.IModel<Util.IModelItem & Geom.ISpatial>):Util.IView {
+    public initWithModel (model:Util.IModel<Util.IModelItem & Geom.IBody>):Util.IView {
 
       this.model = model;
       this.items = [];
@@ -35,9 +35,13 @@ namespace Views {
       this.model.items.forEach((item, idx) => {
   
         var b = item.bounds;
+        var lineColor = colors[idx % 4];
+        if (item.constraints.lockX) {
+          lineColor = 0xffffff;
+        }
         var gfx = new PIXI.Graphics()
           .beginFill(colors[idx % 4], 0.5)
-          .lineStyle(2, colors[idx % 4]);
+          .lineStyle(2, lineColor);
 
         if (item.bounds.shape == Geom.SHAPE_ORTHO) {
           gfx.drawRect(0 - b.hw, 0 - b.hh, b.hw * 2, b.hh * 2);

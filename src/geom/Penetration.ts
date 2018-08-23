@@ -59,30 +59,24 @@ namespace Geom {
       var aA = bA.anchor;
       var aB = bB.anchor;
 
-      var hx = pt.x * 0.5;
-      var hy = pt.y * 0.5;
+      var hx = 0 - pt.x;
+      var hy = 0 - pt.y;
 
-      if (hx < hy) {
+      if (hx > hy) {
 
         if (aA.x < aB.x) {
-          aA.x -= hx;
-          aB.x += hx;
+          doResolve(hx, 0, bA, bB, cA, cB);
         } else {
-          aA.x += hx;
-          aB.x -= hx;       
+          doResolve(0 - hx, 0, bA, bB, cA, cB);  
         }
-        pt.x = 0;
 
       } else {
 
         if (aA.y < aB.y) {
-          aA.y -= hy;
-          aB.y += hy;
+          doResolve(0, hy, bA, bB, cA, cB);
         } else {
-          aA.y += hy;
-          aB.y -= hy;       
+          doResolve(0, 0 - hy, bA, bB, cA, cB);     
         }
-        pt.y = 0;
 
       }
 
@@ -106,10 +100,6 @@ namespace Geom {
     var deltaY = 0 - pt.y;
 
     doResolve(deltaX, deltaY, bA, bB, cA, cB);
-    //bA.anchor.x += deltaX
-    //bA.anchor.y += deltaY;
-    //bB.anchor.x -= deltaX;
-    //bB.anchor.y -= deltaY;
 
   }
 
@@ -172,9 +162,6 @@ namespace Geom {
       }
 
       doResolve(0, delta, circleb, orthob, circlec, orthoc);
-      //circleb.anchor.y += delta * 0.5;
-      //orthob.anchor.y -= delta * 0.5;
-
       return;
 
     } else if (cy >= ry1 && cy <= ry2) {
@@ -186,9 +173,6 @@ namespace Geom {
       }
 
       doResolve(delta, 0, circleb, orthob, circlec, orthoc);
-      //circleb.anchor.x += delta * 0.5;
-      //orthob.anchor.x -= delta * 0.5;
-
       return;
 
     } else if (cx < rx1 && cy < ry1) {
@@ -223,10 +207,6 @@ namespace Geom {
       var deltaY = delta * Math.sin(angle);
 
       doResolve(deltaX, deltaY, circleb, orthob, circlec, orthoc);
-      //circleb.anchor.x += deltaX * 0.5;
-      //circleb.anchor.y += deltaY * 0.5;
-      //orthob.anchor.x -= deltaX * 0.5;
-      //orthob.anchor.y -= deltaY * 0.5;
 
     }
 
@@ -278,4 +258,3 @@ namespace Geom {
   }
 
 }
-

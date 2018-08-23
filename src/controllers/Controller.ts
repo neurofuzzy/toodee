@@ -26,6 +26,8 @@ namespace Controllers {
 
         if (b.shape == Geom.SHAPE_ROUND) {
           c.lockX = c.lockY = false;
+        } else if (Math.random() * 2 > 1) {
+          c.lockX = c.lockY = false;
         }
   
         var item = new Models.Item().initWithBoundsAndConstraints(b, c);
