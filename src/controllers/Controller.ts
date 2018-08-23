@@ -2,10 +2,10 @@ namespace Controllers {
 
   export class Controller implements Util.IController {
 
-    protected model:Util.IModel<Util.IModelItem & Geom.ISpatial>;
+    protected model:Util.IModel<Util.IModelItem & Geom.IBody>;
     protected view:Util.IView
 
-    public initWithModelAndView(model:Util.IModel<Util.IModelItem & Geom.ISpatial>, view:Util.IView):Controller {
+    public initWithModelAndView(model:Util.IModel<Util.IModelItem & Geom.IBody>, view:Util.IView):Controller {
 
       this.model = model;
       this.view = view;
@@ -20,10 +20,15 @@ namespace Controllers {
   
         var x = 100 + Math.random() * 600;
         var y = 100 + Math.random() * 400;
-
+ 
         var b = new Geom.Bounds(x, y, 20, 20, Math.floor(Math.random() * 2 + 1));
+        var c = new Geom.Constraints();
+
+        if (b.shape == Geom.SHAPE_ROUND) {
+          c.lockX = c.lockY = false;
+        }
   
-        var item = new Models.Item().initWithBounds(b, 0);
+        var item = new Models.Item().initWithBoundsAndConstraints(b, c);
 
         this.model.addItem(item);
   

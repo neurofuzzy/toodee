@@ -6,12 +6,13 @@ namespace Geom {
     public rotation:number;
 
     constructor () {
+
     }
 
-    public initWithBounds(bounds:IBounds, r:number = 0):any {
+    public initWithBounds(bounds:IBounds):any {
 
       this.bounds = bounds;
-      this.rotation = r;
+      this.rotation = 0;
 
       return this;
 
@@ -21,7 +22,16 @@ namespace Geom {
 
   export class BaseBody extends BaseSpatial {
 
+    public constraints:IConstraints;
 
+    public initWithBoundsAndConstraints(bounds:IBounds, constraints:IConstraints):any {
+
+      this.bounds = bounds;
+      this.constraints = constraints;
+
+      return this;
+
+    }
 
   }
 

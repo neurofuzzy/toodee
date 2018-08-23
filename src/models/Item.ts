@@ -2,7 +2,7 @@
 
 namespace Models {
 
-  export class Item extends Geom.BaseSpatial implements Util.IModelItem {
+  export class Item extends Geom.BaseBody implements Util.IModelItem {
 
     public id:number;
 

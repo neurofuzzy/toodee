@@ -3,11 +3,12 @@ namespace Geom {
   export interface ISpatial {
     bounds:IBounds;
     rotation:number;
-    initWithBounds(bounds:IBounds, r:number):any;
+    initWithBounds(bounds:IBounds):any;
   }
 
   export interface IBody extends ISpatial {
-    rigid:boolean;
+    constraints:IConstraints;
+    initWithBoundsAndConstraints(bounds:IBounds, constraints:IConstraints):any;
   }
 
 }

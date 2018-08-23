@@ -1,6 +1,6 @@
 class App {
 
-  public model:Util.IModel<Util.IModelItem & Geom.ISpatial>
+  public model:Util.IModel<Util.IModelItem & Geom.IBody>
   public view:Util.IView;
   public controller:Util.IController;
 
