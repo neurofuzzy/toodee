@@ -71,10 +71,14 @@ namespace Controllers {
       this.model.items.forEach(item => {
 
         // fake gravity
-        item.bounds.anchor.y += 4;
-        
-        if (item.bounds.anchor.y + item.bounds.hh > 600) {
-          item.bounds.anchor.y = 600 - item.bounds.hh;
+        if (!item.constraints.lockY) {
+
+          item.bounds.anchor.y += 4;
+          
+          if (item.bounds.anchor.y + item.bounds.hh > 600) {
+            item.bounds.anchor.y = 600 - item.bounds.hh;
+          }
+
         }
 
       });

@@ -102,13 +102,14 @@ namespace Geom {
 
     let pt = getPenetrationRoundRound(bA, bB);
 
-    var deltaX = pt.x * 0.5;
-    var deltaY = pt.y * 0.5;
+    var deltaX = 0 - pt.x;
+    var deltaY = 0 - pt.y;
 
-    bA.anchor.x -= deltaX
-    bA.anchor.y -= deltaY;
-    bB.anchor.x += deltaX;
-    bB.anchor.y += deltaY;
+    doResolve(deltaX, deltaY, bA, bB, cA, cB);
+    //bA.anchor.x += deltaX
+    //bA.anchor.y += deltaY;
+    //bB.anchor.x -= deltaX;
+    //bB.anchor.y -= deltaY;
 
   }
 
@@ -116,10 +117,14 @@ namespace Geom {
 
     var orthob = bA;
     var circleb = bB;
+    var orthoc = cA;
+    var circlec = cB;
 
     if (bA.shape > bB.shape) {
       orthob = bB;
       circleb = bA;
+      orthoc = cB;
+      circlec = cA;
     }
 
     var cx = circleb.anchor.x;
@@ -161,36 +166,28 @@ namespace Geom {
     if (!forceX && cx >= rx1 && cx <= rx2) {
 
       if (cy <= ry) {
-
         delta = ry1 - cy - radius;
-        circleb.anchor.y += delta * 0.5;
-        orthob.anchor.y -= delta * 0.5;
-
       } else {
-
         delta = ry2 - cy + radius;
-        circleb.anchor.y += delta * 0.5;
-        orthob.anchor.y -= delta * 0.5;
-
       }
+
+      doResolve(0, delta, circleb, orthob, circlec, orthoc);
+      //circleb.anchor.y += delta * 0.5;
+      //orthob.anchor.y -= delta * 0.5;
 
       return;
 
     } else if (cy >= ry1 && cy <= ry2) {
 
       if (cx <= rx) {
-
         delta = rx1 - cx - radius;
-        circleb.anchor.x += delta * 0.5;
-        orthob.anchor.x -= delta * 0.5;
-
       } else {
-
         delta = rx2 - cx + radius;
-        circleb.anchor.x += delta * 0.5;
-        orthob.anchor.x -= delta * 0.5;
-
       }
+
+      doResolve(delta, 0, circleb, orthob, circlec, orthoc);
+      //circleb.anchor.x += delta * 0.5;
+      //orthob.anchor.x -= delta * 0.5;
 
       return;
 
@@ -225,10 +222,11 @@ namespace Geom {
       var deltaX = delta * Math.cos(angle);
       var deltaY = delta * Math.sin(angle);
 
-      circleb.anchor.x += deltaX * 0.5;
-      circleb.anchor.y += deltaY * 0.5;
-      orthob.anchor.x -= deltaX * 0.5;
-      orthob.anchor.y -= deltaY * 0.5;
+      doResolve(deltaX, deltaY, circleb, orthob, circlec, orthoc);
+      //circleb.anchor.x += deltaX * 0.5;
+      //circleb.anchor.y += deltaY * 0.5;
+      //orthob.anchor.x -= deltaX * 0.5;
+      //orthob.anchor.y -= deltaY * 0.5;
 
     }
 
