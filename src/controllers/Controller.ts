@@ -20,15 +20,14 @@ namespace Controllers {
 
       for (let i = 0; i < 1000; i++) {
   
-        var x = 20 + Math.random() * 2760;
+        var x = 20 + Math.random() * 1480;
         var y = 20 + Math.random() * 560;
  
         var b = new Geom.Bounds(x, y, 10, 10, Math.floor(Math.random() * 2 + 1));
         var c = new Geom.Constraints();
 
         if (b.shape == Geom.SHAPE_ORTHO) {
-          b.hw *= 4;
-          b.anchor.x = Math.floor(b.anchor.x / 80) * 80;
+          b.anchor.x = Math.floor(b.anchor.x / 20) * 20;
           b.anchor.y = Math.floor(b.anchor.y / 20) * 20;
         }
 
@@ -99,8 +98,9 @@ namespace Controllers {
 
     public update = () => {
 
+      var items = this.model.items;
       
-      this.model.items.forEach(item => {
+      items.forEach(item => {
 
         // fake gravity
         if (!item.constraints.lockY) {
@@ -115,18 +115,53 @@ namespace Controllers {
 
       });
       
-      this.model.items.forEach(item => {
+      items.forEach(item => {
         this.quadMap.updateItem(item);
       });
 
-      this.model.items.forEach(item => {
-
+      items.forEach(item => {
         let a = this.countIntersections(item);
         item.rotation = 0.2 + a * 0.3;
-
       });
 
-      this.model.items.forEach(item => {
+      
+      // reverse collision check
+      var ritem;
+      
+      for (let i = items.length - 1; i >= 0; i--) {
+        ritem = items[i];
+        let a = this.countIntersections(ritem);
+        ritem.rotation = 0.2 + a * 0.3;
+      };
+      
+
+      /*
+      // gravity sort
+
+      var gitems = items.concat();
+      gitems.sort((itemA, itemB) => {
+        if (itemA.bounds.anchor.y < itemB.bounds.anchor.y) {
+          return -1;
+        } else if (itemA.bounds.anchor.y > itemB.bounds.anchor.y) {
+          return 1;
+        }
+        return 0;
+      });
+
+      gitems.forEach(item => {
+        let a = this.countIntersections(item);
+        item.rotation = 0.2 + a * 0.3;
+      });
+
+      gitems.reverse();
+      gitems.forEach(item => {
+        let a = this.countIntersections(item);
+        item.rotation = 0.2 + a * 0.3;
+      });
+
+      */
+
+      items.forEach(item => {
         this.quadMap.updateItem(item);
       });
 
