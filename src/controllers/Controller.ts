@@ -4,11 +4,13 @@ namespace Controllers {
 
     protected model:Util.IModel<Util.IModelItem & Geom.IBody>;
     protected view:Util.IView
+    protected quadMap:Geom.QuadMap;
 
     public initWithModelAndView(model:Util.IModel<Util.IModelItem & Geom.IBody>, view:Util.IView):Controller {
 
       this.model = model;
       this.view = view;
+      this.quadMap = new Geom.QuadMap(100);
 
       return this;
 
@@ -16,17 +18,20 @@ namespace Controllers {
 
     protected build () {
 
-      for (let i = 0; i < 100; i++) {
+      for (let i = 0; i < 1000; i++) {
   
-        var x = 100 + Math.random() * 600;
-        var y = 100 + Math.random() * 400;
+        var x = 20 + Math.random() * 2760;
+        var y = 20 + Math.random() * 560;
  
-        var b = new Geom.Bounds(x, y, 20, 20, Math.floor(Math.random() * 2 + 1));
+        var b = new Geom.Bounds(x, y, 10, 10, Math.floor(Math.random() * 2 + 1));
         var c = new Geom.Constraints();
 
+        if (b.shape == Geom.SHAPE_ORTHO) {
+          b.anchor.x = Math.floor(b.anchor.x / 20) * 20;
+          b.anchor.y = Math.floor(b.anchor.y / 20) * 20;
+        }
+
         if (b.shape == Geom.SHAPE_ROUND) {
-          c.lockX = c.lockY = false;
-        } else if (Math.random() * 2 > 1) {
           c.lockX = c.lockY = false;
         }
   
@@ -35,6 +40,13 @@ namespace Controllers {
         this.model.addItem(item);
   
       }
+
+      // add items to quadmap
+      this.model.items.forEach(item => {
+        this.quadMap.addItem(item);
+      })
+
+
   
   
     }
@@ -52,6 +64,23 @@ namespace Controllers {
 
       let hits = 0;
 
+      let quads = this.quadMap.getSurroundingQuads(itemA);
+
+      quads.forEach(quad => {
+        if (quad != null) {
+          quad.forEach(item => {
+            var itemB = item as Models.Item;
+            if (itemA == itemB) {
+              return;
+            }
+            if (Geom.boundsIntersect(itemA.bounds, itemB.bounds, true)) {
+              Geom.resolvePenetrationBetweenBounds(itemA.bounds, itemB.bounds, itemA.constraints, itemB.constraints, true)
+              hits++;
+            }
+          });
+        }
+      });
+/*
       this.model.items.forEach(itemB => {
         if (itemA.id == itemB.id) {
           return;
@@ -61,7 +90,7 @@ namespace Controllers {
           hits++;
         }
       })
-
+*/
       return hits;
 
 
@@ -85,13 +114,19 @@ namespace Controllers {
 
       });
       
-
+      this.model.items.forEach(item => {
+        this.quadMap.updateItem(item);
+      });
 
       this.model.items.forEach(item => {
 
         let a = this.countIntersections(item);
         item.rotation = 0.2 + a * 0.3;
 
+      });
+
+      this.model.items.forEach(item => {
+        this.quadMap.updateItem(item);
       });
 
       this.view.update();
