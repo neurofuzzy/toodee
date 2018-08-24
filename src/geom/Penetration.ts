@@ -147,7 +147,9 @@ namespace Geom {
       
       // if penetration is greater in the x direction
 
-      if (Math.abs(cx - rx) > Math.abs(cy - ry)) {
+      var aspect = orthob.hh / orthob.hw;
+
+      if (Math.abs(cx - rx) * aspect > Math.abs(cy - ry) / aspect) {
         forceX = true;
       }
 

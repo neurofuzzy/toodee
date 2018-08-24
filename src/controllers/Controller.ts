@@ -27,7 +27,8 @@ namespace Controllers {
         var c = new Geom.Constraints();
 
         if (b.shape == Geom.SHAPE_ORTHO) {
-          b.anchor.x = Math.floor(b.anchor.x / 20) * 20;
+          b.hw *= 4;
+          b.anchor.x = Math.floor(b.anchor.x / 80) * 80;
           b.anchor.y = Math.floor(b.anchor.y / 20) * 20;
         }
 
