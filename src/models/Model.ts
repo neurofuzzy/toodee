@@ -3,6 +3,7 @@ namespace Models {
   export class Model implements Util.IModel<Util.IModelItem> {
 
     public items:Array<Item>;
+    public testRay:Geom.ISegment;
 
     constructor () {
 
@@ -19,6 +20,7 @@ namespace Models {
     public reset ():void {
 
       this.items = [];
+      this.testRay = new Geom.Segment(0, 0, 100, 100);
 
     }
 

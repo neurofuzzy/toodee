@@ -6,6 +6,7 @@ namespace Views {
     protected items:Array<PIXI.Graphics>;
     public pixi:PIXI.Application;
     private fps:HTMLElement;
+    private testRay:PIXI.Graphics;
 
     get ticker ():any {
       return this.pixi.ticker;
@@ -29,6 +30,9 @@ namespace Views {
     }
 
     protected build () {
+
+      this.pixi.stage.interactive = true;
+      this.pixi.stage.hitArea = new PIXI.Rectangle(0, 0, 800, 600);
 
       var colors = [0xff9900, 0x0099ff, 0x9900ff, 0x33ff33]
 
@@ -59,6 +63,16 @@ namespace Views {
         // makeDraggable(item, gfx);
   
       })
+
+      let m = this.model as Models.Model;
+
+      this.testRay = new PIXI.Graphics();
+      this.testRay.lineStyle(1, 0xffffff);
+      this.testRay.moveTo(m.testRay.ptA.x, m.testRay.ptA.y);
+      this.testRay.lineTo(m.testRay.ptB.x, m.testRay.ptB.y);
+      this.pixi.stage.addChild(this.testRay);
+
+      makeSegmentDraggable(m.testRay, this.testRay, this.pixi.stage);
   
     }
 
@@ -76,6 +90,13 @@ namespace Views {
         gfx.y = item.bounds.anchor.y;
         gfx.alpha = item.rotation;
       });
+
+      let m = this.model as Models.Model;
+
+      this.testRay.clear();
+      this.testRay.lineStyle(1, 0xffffff);
+      this.testRay.moveTo(m.testRay.ptA.x, m.testRay.ptA.y);
+      this.testRay.lineTo(m.testRay.ptB.x, m.testRay.ptB.y);
 
       this.fps.innerText = this.pixi.ticker.FPS.toString();
 
