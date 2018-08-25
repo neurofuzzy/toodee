@@ -222,6 +222,66 @@ namespace Geom {
 
   }
 
+  export function dot (ptA:IPoint, ptB:IPoint):number {
+
+    return ptA.x * ptB.x + ptA.y * ptB.y;
+
+  }
+
+  export function cross (ptA:IPoint, ptB:IPoint):number {
+
+    return ptA.x * ptB.y - ptA.y * ptB.x;
+
+  }
+
+  export function sub (ptA:IPoint, ptB:IPoint):IPoint {
+
+    return {
+      x: ptA.x - ptB.x,
+      y: ptA.y - ptB.y,
+    }
+
+  }  
+  
+  export function add (ptA:IPoint, ptB:IPoint):IPoint {
+
+    return {
+      x: ptA.x + ptB.x,
+      y: ptA.y + ptB.y,
+    }
+
+  }
+
+  export function closestPtPointLine (ptC:IPoint, ptA:IPoint, ptB:IPoint):IPtDist {
+
+    var res:IPtDist = {
+      pt:null,
+      dist: 0,
+    };
+
+    var ab = Geom.sub(ptB, ptA);
+    var ca = Geom.sub(ptC, ptA);
+    var t = Geom.dot(ca, ab);
+
+    if (t < 0) {
+      res.pt = ptA;
+    } else {
+      var denom = Geom.dot(ab, ab);
+      if (t >= denom) {
+        res.pt = ptB;
+      } else {
+        t /= denom;
+        // reuse ca
+        ca.x = ptA.x + t * ab.x;
+        ca.y = ptA.y + t * ab.y;
+        res.pt = ca;
+      }
+    }
+
+    return res;
+
+  }
+
   export function ccw(p1x:number, p1y:number, p2x:number, p2y:number, p3x:number, p3y:number):boolean {
     return (p3y - p1y) * (p2x - p1x) > (p2y - p1y) * (p3x - p1x);
   }

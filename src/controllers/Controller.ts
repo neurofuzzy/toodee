@@ -18,7 +18,7 @@ namespace Controllers {
 
     protected build () {
 
-      for (let i = 0; i < 1000; i++) {
+      for (let i = 0; i < 500; i++) {
   
         var x = 20 + Math.random() * 1480;
         var y = 20 + Math.random() * 560;
@@ -105,7 +105,7 @@ namespace Controllers {
         // fake gravity
         if (!item.constraints.lockY) {
 
-          item.bounds.anchor.y += 4;
+          //item.bounds.anchor.y += 4;
           
           if (item.bounds.anchor.y + item.bounds.hh > 600) {
             item.bounds.anchor.y = 600 - item.bounds.hh;
