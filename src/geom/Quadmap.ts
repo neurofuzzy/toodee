@@ -116,6 +116,24 @@ namespace Geom {
 
     }
 
+    public getQuadsFromCoords (coords:Array<IPoint>, removeDupes:boolean = false) {
+
+      var matchingQuads:Array<IQuad> = [];
+
+      coords.forEach(coord => {
+        var idx = this.getQuadIndex(coord.x, coord.y);
+        var quad = this.quads[idx];
+        if (quad != null) {
+          if (!removeDupes || matchingQuads.indexOf(quad) == -1) {
+            matchingQuads.push(quad);
+          }
+        }
+      });
+
+      return matchingQuads;
+
+    }
+
   }
 
 }

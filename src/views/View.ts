@@ -99,11 +99,11 @@ namespace Views {
       this.testRay.moveTo(m.testRay.ptA.x, m.testRay.ptA.y);
       this.testRay.lineTo(m.testRay.ptB.x, m.testRay.ptB.y);
 
-      let quads = Geom.gridPointsAlongLine(m.testRay.ptA.x, m.testRay.ptA.y, m.testRay.ptB.x, m.testRay.ptB.y, 100);
+      let quads = Geom.gridPointsAlongLineWithThickness(m.testRay.ptA.x, m.testRay.ptA.y, m.testRay.ptB.x, m.testRay.ptB.y, 100, 20);
       //console.log(quads.length);
       quads.forEach(pt => {
-        this.testRay.moveTo(pt.x, pt.y);
-        this.testRay.drawRect(pt.x, pt.y, 100, 100);
+        //this.testRay.moveTo(pt.x * 100, pt.y * 100);
+        //this.testRay.drawRect(pt.x * 100, pt.y * 100, 100, 100);
       });
       
 

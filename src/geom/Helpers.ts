@@ -381,9 +381,9 @@ namespace Geom {
 
   }
 
-  export function gridPointsAlongLine(x0:number, y0:number, x1:number, y1:number, gridSize:number = 20):Array<IPoint> {
+  export function gridPointsAlongLine(x0:number, y0:number, x1:number, y1:number, gridSize:number = 20, intoArr?:Array<IPoint>):Array<IPoint> {
 
-    var a = [];
+    intoArr = intoArr || [];
     var minx = Math.floor(Math.min(x0, x1) / gridSize);
     var maxx = Math.floor(Math.max(x0, x1) / gridSize);
     var miny = Math.floor(Math.min(y0, y1) / gridSize);
@@ -407,14 +407,50 @@ namespace Geom {
       for (var i = minx; i <= maxx; i++) {
 
         if (Math.abs(sides[j][i] + sides[j][i + 1] + sides[j + 1][i + 1] + sides[j + 1][i]) != 4) {
-          a.push(new Point(i * gridSize, j * gridSize));
+          intoArr.push(new Point(i, j));
         }
 
       }
 
     }
 
-    return a;
+    return intoArr;
+
+  }
+
+  export function gridPointsAlongLineWithThickness (x0:number, y0:number, x1:number, y1:number, gridSize:number = 20, thickness:number = 0):Array<IPoint> {
+
+    if (thickness == 0) {
+
+      return gridPointsAlongLine(x0, y0, x1, y1, gridSize);
+
+    } else {
+
+      let intoArr = gridPointsAlongLine(x0, y0, x1, y1, gridSize);
+
+      let ang = Geom.angleBetween(x0, y0, x1, y1);
+
+      let sinang = Math.sin(0 - ang);
+      let cosang = Math.cos(0 - ang);
+
+
+      x0 += sinang * thickness;
+      y0 += cosang * thickness;
+      x1 += sinang * thickness;
+      y1 += cosang * thickness;
+
+      intoArr = gridPointsAlongLine(x0, y0, x1, y1, gridSize, intoArr);
+
+      x0 -= sinang * thickness * 2;
+      y0 -= cosang * thickness * 2;
+      x1 -= sinang * thickness * 2;
+      y1 -= cosang * thickness * 2;
+
+      intoArr = gridPointsAlongLine(x0, y0, x1, y1, gridSize, intoArr);
+
+      return intoArr;
+
+    }
 
   }
 

@@ -169,6 +169,16 @@ namespace Controllers {
 
       //Geom.gridPointsAlongLine(ray.ptA.x, ray.ptA.y, ray.ptB.x, ray.ptB.y);
 
+      let coords = Geom.gridPointsAlongLineWithThickness(m.testRay.ptA.x, m.testRay.ptA.y, m.testRay.ptB.x, m.testRay.ptB.y, 100, 20);
+
+      let quads = this.quadMap.getQuadsFromCoords(coords, true);
+
+      quads.forEach(quad => {
+        quad.forEach(item => {
+          item.rotation = 1;
+        })
+      })
+
       items.forEach(item => {
         this.quadMap.updateItem(item);
       });
