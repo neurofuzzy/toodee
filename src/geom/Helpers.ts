@@ -252,33 +252,30 @@ namespace Geom {
 
   }
 
-  export function closestPtPointLine (ptC:IPoint, ptA:IPoint, ptB:IPoint):IPtDist {
+  export function closestPtPointLine (ptC:IPoint, ptA:IPoint, ptB:IPoint):IPoint {
 
-    var res:IPtDist = {
-      pt:null,
-      dist: 0,
-    };
+    var pt;
 
     var ab = Geom.sub(ptB, ptA);
     var ca = Geom.sub(ptC, ptA);
     var t = Geom.dot(ca, ab);
 
     if (t < 0) {
-      res.pt = ptA;
+      pt = ptA;
     } else {
       var denom = Geom.dot(ab, ab);
       if (t >= denom) {
-        res.pt = ptB;
+        pt = ptB;
       } else {
         t /= denom;
         // reuse ca
         ca.x = ptA.x + t * ab.x;
         ca.y = ptA.y + t * ab.y;
-        res.pt = ca;
+        pt = ca;
       }
     }
 
-    return res;
+    return pt;
 
   }
 
@@ -428,11 +425,10 @@ namespace Geom {
 
       let intoArr = gridPointsAlongLine(x0, y0, x1, y1, gridSize);
 
-      let ang = Geom.angleBetween(x0, y0, x1, y1);
+      let angle = Geom.angleBetween(x0, y0, x1, y1);
 
-      let sinang = Math.sin(0 - ang);
-      let cosang = Math.cos(0 - ang);
-
+      let sinang = Math.sin(0 - angle);
+      let cosang = Math.cos(0 - angle);
 
       x0 += sinang * thickness;
       y0 += cosang * thickness;

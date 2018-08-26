@@ -214,6 +214,24 @@ namespace Geom {
 
   }
 
+  export function resolvePenetrationSegmentRound (segPtA:IPoint, segPtB:IPoint, b:IBounds):void {
+
+    var a = b.anchor;
+    let closestPt:IPoint = Geom.closestPtPointLine(a, segPtA, segPtB);
+
+    let delta = Geom.distanceBetween(a.x, a.y, closestPt.x, closestPt.y);
+    delta -= b.hw;
+    
+    if (delta < 0) {
+
+      let angle = Geom.angleBetween(a.x, a.y, closestPt.x, closestPt.y);
+      a.x += delta * Math.sin(Math.PI * 0.5 - angle);
+      a.y += delta * Math.cos(Math.PI * 0.5 - angle);
+
+    }
+
+  }
+
   function doResolve (deltaX:number, deltaY:number, bA:IBounds, bB:IBounds, cA:IConstraints, cB:IConstraints):void {
 
     var aA = bA.anchor;

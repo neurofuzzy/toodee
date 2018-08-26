@@ -26,14 +26,17 @@ namespace Controllers {
         var b = new Geom.Bounds(x, y, 10, 10, Math.floor(Math.random() * 2 + 1));
         var c = new Geom.Constraints();
 
+        b.shape = Geom.SHAPE_ROUND;
+        c.lockX = c.lockY = false;
+
+        /*
         if (b.shape == Geom.SHAPE_ORTHO) {
           b.anchor.x = Math.floor(b.anchor.x / 20) * 20;
           b.anchor.y = Math.floor(b.anchor.y / 20) * 20;
-        }
+        } else {
 
-        if (b.shape == Geom.SHAPE_ROUND) {
-          c.lockX = c.lockY = false;
         }
+        */
   
         var item = new Models.Item().initWithBoundsAndConstraints(b, c);
 
@@ -176,8 +179,20 @@ namespace Controllers {
       quads.forEach(quad => {
         quad.forEach(item => {
           item.rotation = 1;
-        })
-      })
+          Geom.resolvePenetrationSegmentRound(ray.ptA, ray.ptB, item.bounds);
+        });
+      });
+
+      for (let j = quads.length - 1; j >= 0; j--) {
+
+        let items = quads[j];
+
+        for (let i = items.length - 1; i >= 0; i--) {
+          ritem = items[i];
+          Geom.resolvePenetrationSegmentRound(ray.ptA, ray.ptB, ritem.bounds);
+        };
+
+      }
 
       items.forEach(item => {
         this.quadMap.updateItem(item);
