@@ -121,7 +121,8 @@ namespace Controllers {
 
       items.forEach(item => {
         let a = this.countIntersections(item);
-        item.rotation = 0.2 + a * 0.3;
+        //item.rotation = 0.2 + a * 0.3;
+        item.rotation = 0.2;
       });
 
       
@@ -131,7 +132,7 @@ namespace Controllers {
       for (let i = items.length - 1; i >= 0; i--) {
         ritem = items[i];
         let a = this.countIntersections(ritem);
-        ritem.rotation = 0.2 + a * 0.3;
+        //ritem.rotation = 0.2 + a * 0.3;
       };
       
 
@@ -160,6 +161,13 @@ namespace Controllers {
       });
 
       */
+
+      // test ray
+
+      var m = this.model as Models.Model;
+      var ray = m.testRay;
+
+      //Geom.gridPointsAlongLine(ray.ptA.x, ray.ptA.y, ray.ptB.x, ray.ptB.y);
 
       items.forEach(item => {
         this.quadMap.updateItem(item);

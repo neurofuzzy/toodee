@@ -381,28 +381,37 @@ namespace Geom {
 
   }
 
-  export function gridPointsAlongLine(x0:number, y0:number, x1:number, y1:number):Array<number> {
+  export function gridPointsAlongLine(x0:number, y0:number, x1:number, y1:number, gridSize:number = 20):Array<IPoint> {
 
     var a = [];
+    var minx = Math.floor(Math.min(x0, x1) / gridSize);
+    var maxx = Math.floor(Math.max(x0, x1) / gridSize);
+    var miny = Math.floor(Math.min(y0, y1) / gridSize);
+    var maxy = Math.floor(Math.max(y0, y1) / gridSize);
+    var sides = [];
 
-    var dx = Math.abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
-    var dy = Math.abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
-    var err = (dx > dy ? dx : -dy) / 2;
+    for (var j = miny; j <= maxy + 1; j++) {
 
-    var i = 0;
+      sides[j] = [];
 
-    while (true) {
-      a.push(x0);
-      a.push(y0);
-      if (x0 === x1 && y0 === y1) break;
-      var e2 = err;
-      if (e2 > -dx) { err -= dy; x0 += sx; }
-      if (e2 < dy) { err += dx; y0 += sy; }
-      i++;
-      if (i > 512) {
-        console.log(a);
-        break;
+      for (var i = minx; i <= maxx + 1; i++) {
+
+        sides[j][i] = Geom.lineSide(i * gridSize, j * gridSize, x0, y0, x1, y1);
+
       }
+
+    }
+
+    for (var j = miny; j <= maxy; j++) {
+
+      for (var i = minx; i <= maxx; i++) {
+
+        if (Math.abs(sides[j][i] + sides[j][i + 1] + sides[j + 1][i + 1] + sides[j + 1][i]) != 4) {
+          a.push(new Point(i * gridSize, j * gridSize));
+        }
+
+      }
+
     }
 
     return a;

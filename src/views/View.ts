@@ -70,6 +70,7 @@ namespace Views {
       this.testRay.lineStyle(1, 0xffffff);
       this.testRay.moveTo(m.testRay.ptA.x, m.testRay.ptA.y);
       this.testRay.lineTo(m.testRay.ptB.x, m.testRay.ptB.y);
+
       this.pixi.stage.addChild(this.testRay);
 
       makeSegmentDraggable(m.testRay, this.testRay, this.pixi.stage);
@@ -97,6 +98,14 @@ namespace Views {
       this.testRay.lineStyle(1, 0xffffff);
       this.testRay.moveTo(m.testRay.ptA.x, m.testRay.ptA.y);
       this.testRay.lineTo(m.testRay.ptB.x, m.testRay.ptB.y);
+
+      let quads = Geom.gridPointsAlongLine(m.testRay.ptA.x, m.testRay.ptA.y, m.testRay.ptB.x, m.testRay.ptB.y, 100);
+      //console.log(quads.length);
+      quads.forEach(pt => {
+        this.testRay.moveTo(pt.x, pt.y);
+        this.testRay.drawRect(pt.x, pt.y, 100, 100);
+      });
+      
 
       this.fps.innerText = this.pixi.ticker.FPS.toString();
 
