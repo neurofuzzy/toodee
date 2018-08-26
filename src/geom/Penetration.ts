@@ -224,6 +224,10 @@ namespace Geom {
     
     if (delta < 0) {
 
+      if (delta < 0 - b.hw) {
+        delta += b.hw * 2;
+      }
+
       let angle = Geom.angleBetween(a.x, a.y, closestPt.x, closestPt.y);
       a.x += delta * Math.sin(Math.PI * 0.5 - angle);
       a.y += delta * Math.cos(Math.PI * 0.5 - angle);

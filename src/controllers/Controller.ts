@@ -5,6 +5,7 @@ namespace Controllers {
     protected model:Util.IModel<Util.IModelItem & Geom.IBody>;
     protected view:Util.IView
     protected quadMap:Geom.QuadMap;
+    protected rayForward:boolean;
 
     public initWithModelAndView(model:Util.IModel<Util.IModelItem & Geom.IBody>, view:Util.IView):Controller {
 
@@ -49,6 +50,9 @@ namespace Controllers {
         this.quadMap.addItem(item);
       })
 
+      var m = this.model as Models.Model;
+      m.testRay.ptB.x = 880;
+      m.testRay.ptB.y = 660;
 
   
   
@@ -111,7 +115,7 @@ namespace Controllers {
           //item.bounds.anchor.y += 4;
           
           if (item.bounds.anchor.y + item.bounds.hh > 600) {
-            item.bounds.anchor.y = 600 - item.bounds.hh;
+         //   item.bounds.anchor.y = 600 - item.bounds.hh;
           }
 
         }
@@ -128,49 +132,24 @@ namespace Controllers {
         item.rotation = 0.2;
       });
 
-      
-      // reverse collision check
-      var ritem;
-      
-      for (let i = items.length - 1; i >= 0; i--) {
-        ritem = items[i];
-        let a = this.countIntersections(ritem);
-        //ritem.rotation = 0.2 + a * 0.3;
-      };
-      
-
-      /*
-      // gravity sort
-
-      var gitems = items.concat();
-      gitems.sort((itemA, itemB) => {
-        if (itemA.bounds.anchor.y < itemB.bounds.anchor.y) {
-          return -1;
-        } else if (itemA.bounds.anchor.y > itemB.bounds.anchor.y) {
-          return 1;
-        }
-        return 0;
-      });
-
-      gitems.forEach(item => {
-        let a = this.countIntersections(item);
-        item.rotation = 0.2 + a * 0.3;
-      });
-
-      gitems.reverse();
-      gitems.forEach(item => {
-        let a = this.countIntersections(item);
-        item.rotation = 0.2 + a * 0.3;
-      });
-
-      */
-
       // test ray
 
       var m = this.model as Models.Model;
       var ray = m.testRay;
-
-      //Geom.gridPointsAlongLine(ray.ptA.x, ray.ptA.y, ray.ptB.x, ray.ptB.y);
+      
+      if (this.rayForward) {
+        if (ray.ptB.x < 880) {
+          ray.ptB.x+=5;
+        } else {
+          this.rayForward = false;
+        }
+      } else {
+        if (ray.ptB.x > 0) {
+          ray.ptB.x-=5;
+        } else {
+          this.rayForward = true;
+        }
+      }
 
       let coords = Geom.gridPointsAlongLineWithThickness(m.testRay.ptA.x, m.testRay.ptA.y, m.testRay.ptB.x, m.testRay.ptB.y, 100, 20);
 
@@ -182,6 +161,17 @@ namespace Controllers {
           Geom.resolvePenetrationSegmentRound(ray.ptA, ray.ptB, item.bounds);
         });
       });
+
+      
+      // reverse collision check
+
+      var ritem;
+      
+      for (let i = items.length - 1; i >= 0; i--) {
+        ritem = items[i];
+        let a = this.countIntersections(ritem);
+        //ritem.rotation = 0.2 + a * 0.3;
+      };
 
       for (let j = quads.length - 1; j >= 0; j--) {
 
