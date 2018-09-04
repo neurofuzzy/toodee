@@ -381,6 +381,7 @@ namespace Geom {
   export function gridPointsAlongLine(x0:number, y0:number, x1:number, y1:number, gridSize:number = 20, intoArr?:Array<IPoint>):Array<IPoint> {
 
     intoArr = intoArr || [];
+
     var minx = Math.floor(Math.min(x0, x1) / gridSize);
     var maxx = Math.floor(Math.max(x0, x1) / gridSize);
     var miny = Math.floor(Math.min(y0, y1) / gridSize);
@@ -415,15 +416,15 @@ namespace Geom {
 
   }
 
-  export function gridPointsAlongLineWithThickness (x0:number, y0:number, x1:number, y1:number, gridSize:number = 20, thickness:number = 0):Array<IPoint> {
+  export function gridPointsAlongLineWithThickness (x0:number, y0:number, x1:number, y1:number, gridSize:number = 20, thickness:number = 0, intoArr?:Array<IPoint>):Array<IPoint> {
 
     if (thickness == 0) {
 
-      return gridPointsAlongLine(x0, y0, x1, y1, gridSize);
+      return gridPointsAlongLine(x0, y0, x1, y1, gridSize, intoArr);
 
     } else {
 
-      let intoArr = gridPointsAlongLine(x0, y0, x1, y1, gridSize);
+      intoArr = gridPointsAlongLine(x0, y0, x1, y1, gridSize, intoArr);
 
       let angle = Geom.angleBetween(x0, y0, x1, y1);
 
@@ -447,6 +448,22 @@ namespace Geom {
       return intoArr;
 
     }
+
+  }
+
+  export function gridPointsContainingPolygon (poly:IPolygon, gridSize:number, padding:number = 0):Array<IPoint> {
+    
+    let intoArr:Array<IPoint> = [];
+    let plen = poly.segments.length;
+
+    for (let i = 0; i < plen; i++) {
+
+      let seg = poly.segments[i];
+      gridPointsAlongLineWithThickness(seg.ptA.x, seg.ptA.y, seg.ptB.y, seg.ptB.y, gridSize, padding, intoArr);
+
+    }
+
+    return intoArr;
 
   }
 

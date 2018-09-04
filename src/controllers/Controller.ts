@@ -11,7 +11,7 @@ namespace Controllers {
 
       this.model = model;
       this.view = view;
-      this.quadMap = new Geom.QuadMap(100);
+      this.quadMap = new Geom.QuadMap(100).init();;
 
       return this;
 
@@ -50,12 +50,6 @@ namespace Controllers {
         this.quadMap.addItem(item);
       })
 
-      var m = this.model as Models.Model;
-      m.testRay.ptB.x = 880;
-      m.testRay.ptB.y = 660;
-
-  
-  
     }
 
     public start () {

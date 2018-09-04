@@ -1,44 +1,19 @@
+/// <reference path="../util/BaseModel.ts" />
+
 namespace Models {
 
-  export class Model implements Util.IModel<Util.IModelItem> {
+  export class Model extends Util.BaseModel<Geom.IBody> {
 
-    public items:Array<Item>;
-    public testRay:Geom.ISegment;
-
+    public boundary:Geom.IPolygon;
+ 
     constructor () {
-
-      this.reset();
-
+      super();
     }
 
-    public init ():Model {
-
-      return this;
-
-    }
-
-    public reset ():void {
-
-      this.items = [];
-      this.testRay = new Geom.Segment(0, 0, 100, 100);
-
-    }
-
-    public addItem (item:Item):boolean {
-
-      if (item.id < 0 || this.items[item.id] != undefined) {
-        return false;
-      }
-
-      this.items[item.id] = item;
+    public init ():any {
       
-      return true;
-
-    }
-
-    public removeItem (item:Item):boolean {
-
-      return false;
+      super.init();
+      return this;
 
     }
 

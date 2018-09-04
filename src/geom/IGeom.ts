@@ -21,8 +21,7 @@ namespace Geom {
   }
 
   export interface IPolygon {
-    points:Array<IPoint>;
-    isClosed:boolean;
+    segments:Array<ISegment>
   }
 
   export interface ISegment {

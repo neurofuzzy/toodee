@@ -4,7 +4,7 @@ namespace Geom {
 
   }
 
-  export class QuadMap {
+  export class QuadMap implements Util.IModel<Util.IModelItem & ISpatial> {
 
     protected quadSize:number;
     protected itemsQuadIndexes:Array<number>;
@@ -16,10 +16,32 @@ namespace Geom {
     constructor (quadSize:number = 100) {
 
       this.quadSize = quadSize;
+
+    }
+
+    public init ():any {
+
+      this.reset();
+      return this;
+
+    }
+
+    public reset ():void {
+
       this.itemsQuadIndexes = [];
       this.quads = [];
       this.bufferPt = new Point();
-      this.bufferArr = [];
+      this.bufferArr = []; 
+
+    }
+
+    public get items ():Array<Util.IModelItem & ISpatial> {
+
+      var outArr:Array<Util.IModelItem & ISpatial> = [];
+
+      // TODO: return items if necessary
+
+      return outArr;
 
     }
 
@@ -48,7 +70,7 @@ namespace Geom {
 
     }
 
-    public addItem (item:(ISpatial & Util.IModelItem)) {
+    public addItem (item:(Util.IModelItem & ISpatial)):boolean {
       
       if (this.itemsQuadIndexes[item.id] == null) {
 
@@ -62,12 +84,15 @@ namespace Geom {
         this.itemsQuadIndexes[item.id] = qidx;
         this.quads[qidx].push(item);
 
+        return true;
+
       }
 
+      return false;
 
     }
 
-    public removeItem (item:(ISpatial & Util.IModelItem)) {
+    public removeItem (item:(Util.IModelItem & ISpatial)):boolean {
 
       if (this.itemsQuadIndexes[item.id] != null) {
 
@@ -76,11 +101,15 @@ namespace Geom {
         quad.splice(quad.indexOf(item), 1);
         this.itemsQuadIndexes[item.id] = null;
 
+        return true;
+
       }
+
+      return false;
       
     }
 
-    public updateItem (item:(ISpatial & Util.IModelItem)) {
+    public updateItem (item:(Util.IModelItem & ISpatial)) {
 
       var qcoords = this.getQuadCoords(item);
       var qidx = this.getQuadIndex(qcoords.x, qcoords.y);
@@ -92,7 +121,7 @@ namespace Geom {
 
     }
 
-    public getSurroundingQuads (item:(ISpatial & Util.IModelItem)):Array<IQuad> {
+    public getSurroundingQuads (item:(Util.IModelItem & ISpatial)):Array<IQuad> {
 
       var pt = this.getQuadCoords(item);
       var arr = this.bufferArr;
@@ -116,7 +145,7 @@ namespace Geom {
 
     }
 
-    public getQuadsFromCoords (coords:Array<IPoint>, removeDupes:boolean = false) {
+    public getQuadsFromCoords (coords:Array<IPoint>, removeDupes:boolean = false):Array<IQuad> {
 
       var matchingQuads:Array<IQuad> = [];
 
