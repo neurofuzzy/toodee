@@ -34,13 +34,41 @@ namespace Geom {
 
   export class Segment implements ISegment {
 
+    public parentID:number;
     public ptA:IPoint;
     public ptB:IPoint;
 
-    constructor (xA:number = 0, yA:number = 0, xB:number = 0, yB:number = 0) {
+    constructor (ptA:IPoint, ptB:IPoint, parentID:number = -1) {
 
-      this.ptA = new Point(xA, yA);
-      this.ptB = new Point(xB, yB);
+      this.ptA = ptA;
+      this.ptB = ptB;
+      this.parentID = parentID;
+
+    }
+
+  }
+
+  export class Polygon implements IPolygon {
+
+    public segments:Array<ISegment>
+
+    constructor (vertices?:Array<IPoint>) {
+
+      this.segments = [];
+
+      if (vertices != null) {
+
+        for (var i = 0; i < vertices.length; i++) {
+
+          let ptA = vertices[i];
+          let ptB = vertices[(i + 1) % vertices.length];
+          let seg = new Segment(ptA, ptB);
+
+          this.segments.push(seg);
+
+        }
+
+      }
 
     }
 

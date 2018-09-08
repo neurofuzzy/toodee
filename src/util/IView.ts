@@ -1,8 +1,8 @@
 namespace Util {
 
-  export interface IView {
+  export interface IView<T> {
 
-    initWithModel(model:IModel<Util.IModelItem & Geom.ISpatial>):IView;
+    initWithModel(model:T):any;
     ticker:any;
     update();
 

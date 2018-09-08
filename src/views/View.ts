@@ -1,6 +1,6 @@
 namespace Views {
 
-  export class View implements Util.IView {
+  export class View implements Util.IView<Models.Model> {
 
     protected model:Models.Model;
     protected items:Array<PIXI.Graphics>;
@@ -19,8 +19,8 @@ namespace Views {
 
     }
 
-    public initWithModel (model:Models.Model):Util.IView {
-
+    public initWithModel (model:Models.Model):any {
+ 
       this.model = model;
       this.items = [];
       this.fps =document.getElementById("fps");
@@ -36,7 +36,7 @@ namespace Views {
 
       var colors = [0xff9900, 0x0099ff, 0x9900ff, 0x33ff33]
 
-      this.model.items.forEach((item, idx) => {
+      this.model.bodies.items.forEach((item, idx) => {
   
         var b = item.bounds;
         var lineColor = colors[idx % 4];
@@ -66,6 +66,7 @@ namespace Views {
 
       let m = this.model as Models.Model;
 
+      /*
       this.testRay = new PIXI.Graphics();
       this.testRay.lineStyle(1, 0xffffff);
       this.testRay.moveTo(m.testRay.ptA.x, m.testRay.ptA.y);
@@ -74,6 +75,7 @@ namespace Views {
       this.pixi.stage.addChild(this.testRay);
 
       makeSegmentDraggable(m.testRay, this.testRay, this.pixi.stage);
+      */
   
     }
 
@@ -85,13 +87,14 @@ namespace Views {
       }
       
       // view update
-      this.model.items.forEach((item, idx) => {
+      this.model.bodies.items.forEach((item, idx) => {
         let gfx = this.items[item.id];
         gfx.x = item.bounds.anchor.x;
         gfx.y = item.bounds.anchor.y;
         gfx.alpha = item.rotation;
       });
 
+    /*
       let m = this.model as Models.Model;
 
       this.testRay.clear();
@@ -105,6 +108,7 @@ namespace Views {
         //this.testRay.moveTo(pt.x * 100, pt.y * 100);
         //this.testRay.drawRect(pt.x * 100, pt.y * 100, 100, 100);
       });
+      */
       
 
       this.fps.innerText = this.pixi.ticker.FPS.toString();

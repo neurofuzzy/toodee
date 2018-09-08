@@ -1,18 +1,15 @@
-/// <reference path="../util/BaseModel.ts" />
-
 namespace Models {
 
-  export class Model extends Util.BaseModel<Geom.IBody> {
+  export class Model {
 
-    public boundary:Geom.IPolygon;
+    public bodies:Util.BaseModel<Geom.IBody>;
+    public boundaries:Util.BaseModel<Geom.IPolygon>;
  
-    constructor () {
-      super();
-    }
-
     public init ():any {
       
-      super.init();
+      this.boundaries = new Util.BaseModel();
+      this.bodies = new Util.BaseModel();
+
       return this;
 
     }

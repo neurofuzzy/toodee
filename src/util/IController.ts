@@ -1,8 +1,8 @@
 namespace Util {
 
-  export interface IController {
+  export interface IController<M, V> {
 
-    initWithModelAndView(model:IModel<any>, view:IView):IController;
+    initWithModelAndView(model:M, view:V):any;
     start();
     update();
     stop();

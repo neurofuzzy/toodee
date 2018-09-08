@@ -1,17 +1,17 @@
 namespace Controllers {
 
-  export class Controller implements Util.IController {
+  export class Controller implements Util.IController<Models.Model, Views.View> {
 
-    protected model:Util.IModel<Util.IModelItem & Geom.IBody>;
-    protected view:Util.IView
+    protected model:Models.Model;
+    protected view:Views.View;
     protected quadMap:Geom.QuadMap;
     protected rayForward:boolean;
 
-    public initWithModelAndView(model:Util.IModel<Util.IModelItem & Geom.IBody>, view:Util.IView):Controller {
+    public initWithModelAndView(model:Models.Model, view:Views.View):Controller {
 
       this.model = model;
       this.view = view;
-      this.quadMap = new Geom.QuadMap(100).init();;
+      this.quadMap = new Geom.QuadMap(100).init();
 
       return this;
 
@@ -41,12 +41,12 @@ namespace Controllers {
   
         var item = new Models.Item().initWithBoundsAndConstraints(b, c);
 
-        this.model.addItem(item);
+        this.model.bodies.addItem(item);
   
       }
 
       // add items to quadmap
-      this.model.items.forEach(item => {
+      this.model.bodies.items.forEach(item => {
         this.quadMap.addItem(item);
       })
 
@@ -99,7 +99,7 @@ namespace Controllers {
 
     public update = () => {
 
-      var items = this.model.items;
+      var items = this.model.bodies.items;
       
       items.forEach(item => {
 
@@ -125,6 +125,8 @@ namespace Controllers {
         //item.rotation = 0.2 + a * 0.3;
         item.rotation = 0.2;
       });
+
+      /*
 
       // test ray
 
@@ -155,6 +157,7 @@ namespace Controllers {
           Geom.resolvePenetrationSegmentRound(ray.ptA, ray.ptB, item.bounds);
         });
       });
+      */
 
       
       // reverse collision check
@@ -167,6 +170,7 @@ namespace Controllers {
         //ritem.rotation = 0.2 + a * 0.3;
       };
 
+      /*
       for (let j = quads.length - 1; j >= 0; j--) {
 
         let items = quads[j];
@@ -177,6 +181,7 @@ namespace Controllers {
         };
 
       }
+      */
 
       items.forEach(item => {
         this.quadMap.updateItem(item);

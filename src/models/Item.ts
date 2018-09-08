@@ -1,5 +1,3 @@
-/// <reference path="../geom/BaseSpatial.ts" />
-
 namespace Models {
 
   export class Item extends Geom.BaseBody implements Util.IModelItem {

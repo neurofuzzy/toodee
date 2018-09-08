@@ -20,13 +20,14 @@ namespace Geom {
     shape:number;
   }
 
-  export interface IPolygon {
-    segments:Array<ISegment>
-  }
-
   export interface ISegment {
+    parentID:number;
     ptA:IPoint;
     ptB:IPoint;
+  }
+
+  export interface IPolygon {
+    segments:Array<ISegment>;
   }
 
   export interface IRay {

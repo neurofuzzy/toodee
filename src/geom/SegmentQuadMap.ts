@@ -4,7 +4,7 @@ namespace Geom {
 
   }
 
-  export class SegmentQuadMap implements Util.IModel<Util.IModelItem & ISegment> {
+  export class PolygonQuadMap implements Util.IModel<Util.IModelItem & IPolygon> {
 
     protected quadSize:number;
     protected segmentThickness:number;
@@ -36,9 +36,9 @@ namespace Geom {
 
     }
 
-    public get items ():Array<Util.IModelItem & ISegment> {
+    public get items ():Array<Util.IModelItem & IPolygon> {
 
-      var outArr:Array<Util.IModelItem & ISegment> = [];
+      var outArr:Array<Util.IModelItem & IPolygon> = [];
 
       // TODO: return items if necessary
 
@@ -66,58 +66,76 @@ namespace Geom {
 
     }
 
-    public addItem (item:(Util.IModelItem & ISegment)):boolean {
+    public addItem (item:(Util.IModelItem & IPolygon)):boolean {
+
+      var success = true;
+
+      item.segments.forEach(seg => { 
       
-      if (this.itemsQuadIndexes[item.id] == null) {
+        if (this.itemsQuadIndexes[item.id] == null) {
 
-        var qcoords = this.getQuadCoords(item);
+          var qcoords = this.getQuadCoords(seg);
 
-        qcoords.forEach(qcoord => {
+          qcoords.forEach(qcoord => {
 
-          var qidx = this.getQuadIndex(qcoord.x, qcoord.y);
+            var qidx = this.getQuadIndex(qcoord.x, qcoord.y);
 
-          if (this.quads[qidx] == null) {
-            this.quads[qidx] = [];
-          }
+            if (this.quads[qidx] == null) {
+              this.quads[qidx] = [];
+            }
 
-          if (this.itemsQuadIndexes[item.id] == null) {
-            this.itemsQuadIndexes[item.id] = [];
-          }
+            if (this.itemsQuadIndexes[item.id] == null) {
+              this.itemsQuadIndexes[item.id] = [];
+            }
 
-          this.itemsQuadIndexes[item.id].push(qidx);
-          this.quads[qidx].push(item);
+            this.itemsQuadIndexes[item.id].push(qidx);
+            this.quads[qidx].push(seg);
 
-        });
+          });
 
-        return true;
+        } else {
 
-      }
+          success = false;
 
-      return false;
+        }
+
+      })
+
+      return success;
 
     }
 
-    public removeItem (item:(Util.IModelItem & ISegment)):boolean {
+    public removeItem (item:(Util.IModelItem & IPolygon)):boolean {
 
-      if (this.itemsQuadIndexes[item.id] != null) {
+      var success = true;
 
-        var qidxs = this.itemsQuadIndexes[item.id];
+      item.segments.forEach(seg => { 
 
-        qidxs.forEach(qidx => {
-          var quad = this.quads[qidx];
-          quad.splice(quad.indexOf(item), 1);
-          this.itemsQuadIndexes[item.id] = null;
-        });
+        if (this.itemsQuadIndexes[item.id] != null) {
 
-        return true;
+          var qidxs = this.itemsQuadIndexes[item.id];
 
-      }
+          qidxs.forEach(qidx => {
+            var quad = this.quads[qidx];
+            quad.splice(quad.indexOf(seg), 1);
+            this.itemsQuadIndexes[item.id] = null;
+          });
 
-      return false;
+          return true;
+
+        } else {
+
+          success = false;
+
+        }
+
+      });
+
+      return success;
       
     }
 
-    public updateItem (item:(Util.IModelItem & ISegment)) {
+    public updateItem (item:(Util.IModelItem & IPolygon)) {
 
       this.removeItem(item);
       this.addItem(item);

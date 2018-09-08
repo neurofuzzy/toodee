@@ -1,8 +1,8 @@
 class App {
 
-  public model:Util.IModel<Util.IModelItem & Geom.IBody>
-  public view:Util.IView;
-  public controller:Util.IController;
+  public model:Models.Model;
+  public view:Views.View;
+  public controller:Controllers.Controller;
 
   constructor () {
 
