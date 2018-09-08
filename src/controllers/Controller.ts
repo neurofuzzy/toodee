@@ -184,6 +184,18 @@ namespace Controllers {
       });
       */
 
+      // check collisions with boundaries
+
+      items.forEach(item => {
+        let quad = this.boundaryQuadMap.getQuadFromPoint(item.bounds.anchor);
+
+        if (quad) {
+          quad.forEach(seg => {
+            Geom.resolvePenetrationSegmentRound(seg.ptA, seg.ptB, item.bounds);
+          })
+        }
+      });
+
       
       // reverse collision check
 

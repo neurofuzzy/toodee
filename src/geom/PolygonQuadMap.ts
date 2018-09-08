@@ -17,6 +17,7 @@ namespace Geom {
     constructor (quadSize:number = 100, segmentThickness:number = 0) {
 
       this.quadSize = quadSize;
+      this.segmentThickness = segmentThickness;
 
     }
 
@@ -68,13 +69,14 @@ namespace Geom {
 
     public addItem (item:(Util.IModelItem & IPolygon)):boolean {
 
-      var success = true;
+      if (this.itemsQuadIndexes[item.id] == null) {
 
-      item.segments.forEach(seg => { 
+        this.itemsQuadIndexes[item.id] = [];
+
+        item.segments.forEach(seg => { 
       
-        if (this.itemsQuadIndexes[item.id] == null) {
-
           var qcoords = this.getQuadCoords(seg);
+          console.log(qcoords);
 
           qcoords.forEach(qcoord => {
 
@@ -84,54 +86,44 @@ namespace Geom {
               this.quads[qidx] = [];
             }
 
-            if (this.itemsQuadIndexes[item.id] == null) {
-              this.itemsQuadIndexes[item.id] = [];
-            }
-
             this.itemsQuadIndexes[item.id].push(qidx);
             this.quads[qidx].push(seg);
 
           });
 
-        } else {
+        });
 
-          success = false;
+        return true;
 
-        }
+      }
 
-      })
+      return false;
 
-      return success;
 
     }
 
     public removeItem (item:(Util.IModelItem & IPolygon)):boolean {
 
-      var success = true;
+      if (this.itemsQuadIndexes[item.id] != null) {
 
-      item.segments.forEach(seg => { 
-
-        if (this.itemsQuadIndexes[item.id] != null) {
+        item.segments.forEach(seg => { 
 
           var qidxs = this.itemsQuadIndexes[item.id];
 
           qidxs.forEach(qidx => {
             var quad = this.quads[qidx];
             quad.splice(quad.indexOf(seg), 1);
-            this.itemsQuadIndexes[item.id] = null;
           });
 
-          return true;
+        });
 
-        } else {
+        this.itemsQuadIndexes[item.id] = null;
 
-          success = false;
+        return true;
 
-        }
+      }
 
-      });
-
-      return success;
+      return false;
       
     }
 
@@ -142,9 +134,9 @@ namespace Geom {
 
     }
 
-    public getQuadFromPoint (pt:IPoint, removeDupes:boolean = false):ISegmentQuad {
+    public getQuadFromPoint (pt:IPoint):ISegmentQuad {
 
-      var idx = this.getQuadIndex(pt.x, pt.y);
+      var idx = this.getQuadIndex(Math.floor(pt.x / this.quadSize), Math.floor(pt.y / this.quadSize));
       return this.quads[idx];
       
     }
