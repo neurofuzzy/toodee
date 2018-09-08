@@ -77,11 +77,11 @@ namespace Views {
 
           for (let i = 1; i < bs.length; i++) {
 
-            gfx.lineTo(bs[i].ptA.x, bs[i].ptB.y);
+            gfx.lineTo(bs[i].ptA.x, bs[i].ptA.y);
 
           }
 
-          gfx.lineTo(bs[0].ptA.x, bs[0].ptB.y);
+          gfx.lineTo(bs[0].ptA.x, bs[0].ptA.y);
 
         }
 
