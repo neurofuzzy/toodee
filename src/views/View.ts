@@ -3,10 +3,10 @@ namespace Views {
   export class View implements Util.IView<Models.Model> {
 
     protected model:Models.Model;
-    protected items:Array<PIXI.Graphics>;
+    protected bodies:Array<PIXI.Graphics>;
+    protected boundaries:Array<PIXI.Graphics>;
     public pixi:PIXI.Application;
     private fps:HTMLElement;
-    private testRay:PIXI.Graphics;
 
     get ticker ():any {
       return this.pixi.ticker;
@@ -22,8 +22,9 @@ namespace Views {
     public initWithModel (model:Models.Model):any {
  
       this.model = model;
-      this.items = [];
-      this.fps =document.getElementById("fps");
+      this.bodies = [];
+      this.boundaries = [];
+      this.fps = document.getElementById("fps");
 
       return this;
 
@@ -38,12 +39,12 @@ namespace Views {
 
       this.model.bodies.items.forEach((item, idx) => {
   
-        var b = item.bounds;
-        var lineColor = colors[idx % 4];
+        let b = item.bounds;
+        let lineColor = colors[idx % 4];
         if (item.constraints.lockX) {
           lineColor = 0xffffff;
         }
-        var gfx = new PIXI.Graphics()
+        let gfx = new PIXI.Graphics()
           .beginFill(colors[idx % 4], 0.5)
           .lineStyle(2, lineColor);
 
@@ -58,37 +59,50 @@ namespace Views {
 
         // Add to the stage
         this.pixi.stage.addChild(gfx);
-        this.items.push(gfx);
+        this.bodies.push(gfx);
 
         // makeDraggable(item, gfx);
   
       })
 
-      let m = this.model as Models.Model;
+      this.model.boundaries.items.forEach((boundary, idx) => {
 
-      /*
-      this.testRay = new PIXI.Graphics();
-      this.testRay.lineStyle(1, 0xffffff);
-      this.testRay.moveTo(m.testRay.ptA.x, m.testRay.ptA.y);
-      this.testRay.lineTo(m.testRay.ptB.x, m.testRay.ptB.y);
+        let gfx = new PIXI.Graphics().lineStyle(2, 0xffffff, 0.5);
 
-      this.pixi.stage.addChild(this.testRay);
+        let bs = boundary.segments;
 
-      makeSegmentDraggable(m.testRay, this.testRay, this.pixi.stage);
-      */
+        if (bs.length > 0) {
+
+          gfx.moveTo(bs[0].ptA.x, bs[0].ptA.y);
+
+          for (let i = 1; i < bs.length; i++) {
+
+            gfx.lineTo(bs[i].ptA.x, bs[i].ptB.y);
+
+          }
+
+          gfx.lineTo(bs[0].ptA.x, bs[0].ptB.y);
+
+        }
+
+        // Add to the stage
+        this.pixi.stage.addChild(gfx);
+        this.boundaries.push(gfx);
+
+      });
   
     }
 
     public update () {
 
       // temp
-      if (this.items.length == 0) {
+      if (this.bodies.length == 0) {
         this.build();
       }
       
       // view update
       this.model.bodies.items.forEach((item, idx) => {
-        let gfx = this.items[item.id];
+        let gfx = this.bodies[item.id];
         gfx.x = item.bounds.anchor.x;
         gfx.y = item.bounds.anchor.y;
         gfx.alpha = item.rotation;

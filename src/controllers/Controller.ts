@@ -4,14 +4,16 @@ namespace Controllers {
 
     protected model:Models.Model;
     protected view:Views.View;
-    protected quadMap:Geom.SpatialQuadMap;
+    protected bodyQuadMap:Geom.SpatialQuadMap;
+    protected boundaryQuadMap:Geom.PolygonQuadMap;
     protected rayForward:boolean;
 
     public initWithModelAndView(model:Models.Model, view:Views.View):Controller {
 
       this.model = model;
       this.view = view;
-      this.quadMap = new Geom.SpatialQuadMap(100).init();
+      this.bodyQuadMap = new Geom.SpatialQuadMap(100).init();
+      this.boundaryQuadMap = new Geom.PolygonQuadMap(100, 20).init();
 
       return this;
 
@@ -47,8 +49,31 @@ namespace Controllers {
 
       // add items to quadmap
       this.model.bodies.items.forEach(item => {
-        this.quadMap.addItem(item);
-      })
+        this.bodyQuadMap.addItem(item);
+      });
+
+      // make a boundary
+
+      let vertices:Array<Geom.IPoint> = [];
+      let len = 12;
+      let radius = 200;
+      let cenX = 400;
+      let cenY = 300;
+
+      for (let i = 0; i < len; i++) {
+
+        let ang = i * (360 / len) * Math.PI / 180; 
+        let x = radius * Math.sin(ang);
+        let y = radius * Math.cos(ang);
+        vertices.push(new Geom.Point(x + cenX, y + cenY));
+
+      }
+
+      let bnd = new Models.Boundary(vertices);
+
+      this.model.boundaries.addItem(bnd);
+      this.boundaryQuadMap.addItem(bnd);
+
 
     }
 
@@ -65,7 +90,7 @@ namespace Controllers {
 
       let hits = 0;
 
-      let quads = this.quadMap.getSurroundingQuads(itemA);
+      let quads = this.bodyQuadMap.getSurroundingQuads(itemA);
 
       quads.forEach(quad => {
         if (quad != null) {
@@ -117,7 +142,7 @@ namespace Controllers {
       });
       
       items.forEach(item => {
-        this.quadMap.updateItem(item);
+        this.bodyQuadMap.updateItem(item);
       });
 
       items.forEach(item => {
@@ -184,7 +209,7 @@ namespace Controllers {
       */
 
       items.forEach(item => {
-        this.quadMap.updateItem(item);
+        this.bodyQuadMap.updateItem(item);
       });
 
       this.view.update();
