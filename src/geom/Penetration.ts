@@ -233,14 +233,12 @@ namespace Geom {
       let dx = delta * Math.sin(Math.PI * 0.5 - angle);
       let dy = delta * Math.cos(Math.PI * 0.5 - angle);
 
-      /*
-      let lsOld = lineSide(a.x, a.y, segPtA.x, segPtA.y, segPtB.x, segPtB.y);
       let lsNew = lineSide(a.x + dx, a.y + dy, segPtA.x, segPtA.y, segPtB.x, segPtB.y);
 
-      if (lsOld != lsNew) {
-        console.log("TUNNELLED!")
+      if (lsNew != 1) {
+        dx = 0 - dx;
+        dy = 0 - dy;
       }
-      */
 
       a.x += dx;
       a.y += dy;

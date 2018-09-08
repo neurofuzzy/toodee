@@ -21,7 +21,7 @@ namespace Controllers {
 
     protected build () {
 
-      for (let i = 0; i < 500; i++) {
+      for (let i = 0; i < 200; i++) {
   
         var x = 20 + Math.random() * 1480;
         var y = 20 + Math.random() * 560;
@@ -32,14 +32,15 @@ namespace Controllers {
         b.shape = Geom.SHAPE_ROUND;
         c.lockX = c.lockY = false;
 
-        /*
+        if (Math.random() > 0.75) {
+          b.shape = Geom.SHAPE_ORTHO;
+        }
+        
         if (b.shape == Geom.SHAPE_ORTHO) {
           b.anchor.x = Math.floor(b.anchor.x / 20) * 20;
           b.anchor.y = Math.floor(b.anchor.y / 20) * 20;
-        } else {
-
+          c.lockX = c.lockY = true;
         }
-        */
   
         var item = new Models.Item().initWithBoundsAndConstraints(b, c);
 
@@ -144,11 +145,13 @@ namespace Controllers {
       // check collisions with boundaries
 
       items.forEach(item => {
-        let quad = this.boundaryQuadMap.getQuadFromPoint(item.bounds.anchor);
-        if (quad) {
-          quad.forEach(seg => {
-            Geom.resolvePenetrationSegmentRound(seg.ptA, seg.ptB, item.bounds);
-          })
+        if (item.bounds.shape == Geom.SHAPE_ROUND) {
+          let quad = this.boundaryQuadMap.getQuadFromPoint(item.bounds.anchor);
+          if (quad) {
+            quad.forEach(seg => {
+              Geom.resolvePenetrationSegmentRound(seg.ptA, seg.ptB, item.bounds);
+            })
+          }
         }
       });
       
@@ -180,11 +183,13 @@ namespace Controllers {
 
       for (let i = items.length - 1; i >= 0; i--) {
         ritem = items[i];
-        let quad = this.boundaryQuadMap.getQuadFromPoint(ritem.bounds.anchor);
-        if (quad && quad.length > 0) {
-          for (let j = quad.length - 1; j >= 0; j--) {
-            let rseg = quad[j];
-            Geom.resolvePenetrationSegmentRound(rseg.ptA, rseg.ptB, ritem.bounds);
+        if (ritem.bounds.shape == Geom.SHAPE_ROUND) {
+          let quad = this.boundaryQuadMap.getQuadFromPoint(ritem.bounds.anchor);
+          if (quad && quad.length > 0) {
+            for (let j = quad.length - 1; j >= 0; j--) {
+              let rseg = quad[j];
+              Geom.resolvePenetrationSegmentRound(rseg.ptA, rseg.ptB, ritem.bounds);
+            }
           }
         }
       }
