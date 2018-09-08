@@ -1,17 +1,17 @@
 namespace Geom {
 
-  export interface IQuad extends Array<ISpatial> {
+  export interface ISpatialQuad extends Array<ISpatial> {
 
   }
 
-  export class QuadMap implements Util.IModel<Util.IModelItem & ISpatial> {
+  export class SpatialQuadMap implements Util.IModel<Util.IModelItem & ISpatial> {
 
     protected quadSize:number;
     protected itemsQuadIndexes:Array<number>;
-    protected quads:Array<IQuad>;
+    protected quads:Array<ISpatialQuad>;
 
     protected bufferPt:IPoint;
-    protected bufferArr:Array<IQuad>;
+    protected bufferArr:Array<ISpatialQuad>;
 
     constructor (quadSize:number = 100) {
 
@@ -64,7 +64,7 @@ namespace Geom {
 
     }
 
-    protected getQuad (x:number, y:number):IQuad {
+    protected getQuad (x:number, y:number):ISpatialQuad {
 
       return this.quads[this.getQuadIndex(x, y)];
 
@@ -121,7 +121,7 @@ namespace Geom {
 
     }
 
-    public getSurroundingQuads (item:(Util.IModelItem & ISpatial)):Array<IQuad> {
+    public getSurroundingQuads (item:(Util.IModelItem & ISpatial)):Array<ISpatialQuad> {
 
       var pt = this.getQuadCoords(item);
       var arr = this.bufferArr;
@@ -145,9 +145,9 @@ namespace Geom {
 
     }
 
-    public getQuadsFromCoords (coords:Array<IPoint>, removeDupes:boolean = false):Array<IQuad> {
+    public getQuadsFromCoords (coords:Array<IPoint>, removeDupes:boolean = false):Array<ISpatialQuad> {
 
-      var matchingQuads:Array<IQuad> = [];
+      var matchingQuads:Array<ISpatialQuad> = [];
 
       coords.forEach(coord => {
         var idx = this.getQuadIndex(coord.x, coord.y);

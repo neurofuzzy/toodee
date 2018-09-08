@@ -4,14 +4,14 @@ namespace Controllers {
 
     protected model:Models.Model;
     protected view:Views.View;
-    protected quadMap:Geom.QuadMap;
+    protected quadMap:Geom.SpatialQuadMap;
     protected rayForward:boolean;
 
     public initWithModelAndView(model:Models.Model, view:Views.View):Controller {
 
       this.model = model;
       this.view = view;
-      this.quadMap = new Geom.QuadMap(100).init();
+      this.quadMap = new Geom.SpatialQuadMap(100).init();
 
       return this;
 
@@ -106,10 +106,10 @@ namespace Controllers {
         // fake gravity
         if (!item.constraints.lockY) {
 
-          //item.bounds.anchor.y += 4;
+          item.bounds.anchor.y += 1;
           
           if (item.bounds.anchor.y + item.bounds.hh > 600) {
-         //   item.bounds.anchor.y = 600 - item.bounds.hh;
+            item.bounds.anchor.y = 600 - item.bounds.hh;
           }
 
         }
@@ -122,8 +122,8 @@ namespace Controllers {
 
       items.forEach(item => {
         let a = this.countIntersections(item);
-        //item.rotation = 0.2 + a * 0.3;
-        item.rotation = 0.2;
+        item.rotation = 0.2 + a * 0.3;
+        //item.rotation = 0.2;
       });
 
       /*
