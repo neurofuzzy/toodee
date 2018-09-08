@@ -76,7 +76,6 @@ namespace Geom {
         item.segments.forEach(seg => { 
       
           var qcoords = this.getQuadCoords(seg);
-          console.log(qcoords);
 
           qcoords.forEach(qcoord => {
 

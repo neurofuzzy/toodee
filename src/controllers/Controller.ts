@@ -63,8 +63,9 @@ namespace Controllers {
       for (let i = 0; i < len; i++) {
 
         let ang = i * (360 / len) * Math.PI / 180; 
-        let x = radius * Math.sin(ang);
-        let y = radius * Math.cos(ang);
+        let rr = radius + Math.random() * 300 - 100;
+        let x = rr * Math.sin(ang);
+        let y = rr * Math.cos(ang);
         vertices.push(new Geom.Point(x + cenX, y + cenY));
 
       }
@@ -106,17 +107,7 @@ namespace Controllers {
           });
         }
       });
-/*
-      this.model.items.forEach(itemB => {
-        if (itemA.id == itemB.id) {
-          return;
-        }
-        if (Geom.boundsIntersect(itemA.bounds, itemB.bounds, true)) {
-          Geom.resolvePenetrationBetweenBounds(itemA.bounds, itemB.bounds, itemA.constraints, itemB.constraints, true)
-          hits++;
-        }
-      })
-*/
+
       return hits;
 
 
@@ -148,77 +139,56 @@ namespace Controllers {
       items.forEach(item => {
         let a = this.countIntersections(item);
         item.rotation = 0.2 + a * 0.3;
-        //item.rotation = 0.2;
       });
-
-      /*
-
-      // test ray
-
-      var m = this.model as Models.Model;
-      var ray = m.testRay;
-      
-      if (this.rayForward) {
-        if (ray.ptB.x < 880) {
-          ray.ptB.x+=5;
-        } else {
-          this.rayForward = false;
-        }
-      } else {
-        if (ray.ptB.x > 0) {
-          ray.ptB.x-=5;
-        } else {
-          this.rayForward = true;
-        }
-      }
-
-      let coords = Geom.gridPointsAlongLineWithThickness(m.testRay.ptA.x, m.testRay.ptA.y, m.testRay.ptB.x, m.testRay.ptB.y, 100, 20);
-
-      let quads = this.quadMap.getQuadsFromCoords(coords, true);
-
-      quads.forEach(quad => {
-        quad.forEach(item => {
-          item.rotation = 1;
-          Geom.resolvePenetrationSegmentRound(ray.ptA, ray.ptB, item.bounds);
-        });
-      });
-      */
 
       // check collisions with boundaries
 
       items.forEach(item => {
         let quad = this.boundaryQuadMap.getQuadFromPoint(item.bounds.anchor);
-
         if (quad) {
           quad.forEach(seg => {
             Geom.resolvePenetrationSegmentRound(seg.ptA, seg.ptB, item.bounds);
           })
         }
       });
-
       
       // reverse collision check
+
+      items.forEach(item => {
+
+        // fake gravity
+        if (!item.constraints.lockY) {
+
+          item.bounds.anchor.y += 1;
+          
+          if (item.bounds.anchor.y + item.bounds.hh > 600) {
+            item.bounds.anchor.y = 600 - item.bounds.hh;
+          }
+
+        }
+
+      });
 
       var ritem;
       
       for (let i = items.length - 1; i >= 0; i--) {
         ritem = items[i];
         let a = this.countIntersections(ritem);
-        //ritem.rotation = 0.2 + a * 0.3;
+        ritem.rotation = 0.2 + a * 0.3;
       };
 
-      /*
-      for (let j = quads.length - 1; j >= 0; j--) {
 
-        let items = quads[j];
-
-        for (let i = items.length - 1; i >= 0; i--) {
-          ritem = items[i];
-          Geom.resolvePenetrationSegmentRound(ray.ptA, ray.ptB, ritem.bounds);
-        };
-
+      for (let i = items.length - 1; i >= 0; i--) {
+        ritem = items[i];
+        let quad = this.boundaryQuadMap.getQuadFromPoint(ritem.bounds.anchor);
+        if (quad && quad.length > 0) {
+          for (let j = quad.length - 1; j >= 0; j--) {
+            let rseg = quad[j];
+            Geom.resolvePenetrationSegmentRound(rseg.ptA, rseg.ptB, ritem.bounds);
+          }
+        }
       }
-      */
+      
 
       items.forEach(item => {
         this.bodyQuadMap.updateItem(item);
