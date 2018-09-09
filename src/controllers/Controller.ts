@@ -21,7 +21,7 @@ namespace Controllers {
 
     protected build () {
 
-      for (let i = 0; i < 200; i++) {
+      for (let i = 0; i < 400; i++) {
   
         var x = 20 + Math.random() * 1480;
         var y = 20 + Math.random() * 560;
@@ -72,6 +72,27 @@ namespace Controllers {
       }
 
       let bnd = new Models.Boundary(vertices);
+
+      this.model.boundaries.addItem(bnd);
+      this.boundaryQuadMap.addItem(bnd);
+
+      // smaller inverted poly
+
+      vertices = [];
+      len = 8;
+      radius = 100;
+
+      for (let i = 0; i < len; i++) {
+
+        let ang = 0 - (i * (360 / len) * Math.PI / 180); 
+        let rr = radius + Math.random() * 100 - 50;
+        let x = rr * Math.sin(ang);
+        let y = rr * Math.cos(ang);
+        vertices.push(new Geom.Point(x + cenX, y + cenY));
+
+      }
+
+      bnd = new Models.Boundary(vertices);
 
       this.model.boundaries.addItem(bnd);
       this.boundaryQuadMap.addItem(bnd);
