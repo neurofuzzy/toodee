@@ -97,6 +97,10 @@ namespace Controllers {
       this.model.boundaries.addItem(bnd);
       this.boundaryQuadMap.addItem(bnd);
 
+      // test ray
+      let ro = this.model.ray.origin;
+      ro.x = 400;
+      ro.y = 400;
 
     }
 

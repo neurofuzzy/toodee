@@ -1,18 +1,15 @@
 namespace Geom {
 
-  export interface ISegmentQuad extends Array<ISegment> {
-
+  export interface ISegmentQuad extends Geom.IQuad<ISegment> {
+ 
   }
 
-  export class PolygonQuadMap implements Util.IModel<Util.IModelItem & IPolygon> {
+  export class PolygonQuadMap implements IQuadMap<IPolygon>, Util.IModel<Util.IModelItem & IPolygon> {
 
     protected quadSize:number;
     protected segmentThickness:number;
     protected itemsQuadIndexes:Array<Array<number>>;
     protected quads:Array<ISegmentQuad>;
-
-    protected bufferPt:IPoint;
-    protected bufferArr:Array<ISegmentQuad>;
 
     constructor (quadSize:number = 100, segmentThickness:number = 0) {
 
@@ -32,8 +29,6 @@ namespace Geom {
 
       this.itemsQuadIndexes = [];
       this.quads = [];
-      this.bufferPt = new Point();
-      this.bufferArr = []; 
 
     }
 
@@ -138,6 +133,24 @@ namespace Geom {
       var idx = this.getQuadIndex(Math.floor(pt.x / this.quadSize), Math.floor(pt.y / this.quadSize));
       return this.quads[idx];
       
+    }
+
+    public getQuadsFromCoords (coords:Array<IPoint>, removeDupes:boolean = false):Array<ISegmentQuad> {
+
+      var matchingQuads:Array<ISegmentQuad> = [];
+
+      coords.forEach(coord => {
+        var idx = this.getQuadIndex(coord.x, coord.y);
+        var quad = this.quads[idx];
+        if (quad != null) {
+          if (!removeDupes || matchingQuads.indexOf(quad) == -1) {
+            matchingQuads.push(quad);
+          }
+        }
+      });
+
+      return matchingQuads;
+
     }
 
   }

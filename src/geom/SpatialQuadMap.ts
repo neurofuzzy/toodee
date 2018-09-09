@@ -1,6 +1,6 @@
 namespace Geom {
 
-  export interface ISpatialQuad extends Array<ISpatial> {
+  export interface ISpatialQuad extends Geom.IQuad<ISpatial> {
 
   }
 
@@ -143,6 +143,13 @@ namespace Geom {
 
       return arr;
 
+    }
+
+    public getQuadFromPoint (pt:IPoint):ISpatialQuad {
+
+      var idx = this.getQuadIndex(Math.floor(pt.x / this.quadSize), Math.floor(pt.y / this.quadSize));
+      return this.quads[idx];
+      
     }
 
     public getQuadsFromCoords (coords:Array<IPoint>, removeDupes:boolean = false):Array<ISpatialQuad> {

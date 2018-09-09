@@ -79,7 +79,7 @@ namespace Geom {
     public origin:IPoint;
     public angle:number;
 
-    constructor (ox:number = 0, oy:number = 0, angle:number) {
+    constructor (ox:number = 0, oy:number = 0, angle:number = 0) {
 
       this.origin = new Point(ox, oy);
       this.angle = angle;
