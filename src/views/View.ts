@@ -5,6 +5,8 @@ namespace Views {
     protected model:Models.Model;
     protected bodies:Array<PIXI.Graphics>;
     protected boundaries:Array<PIXI.Graphics>;
+    protected ray:PIXI.Graphics;
+
     public pixi:PIXI.Application;
     private fps:HTMLElement;
 
@@ -37,6 +39,8 @@ namespace Views {
 
       var colors = [0xff9900, 0x0099ff, 0x9900ff, 0x33ff33]
 
+      // bodies 
+
       this.model.bodies.items.forEach((item, idx) => {
   
         let b = item.bounds;
@@ -65,6 +69,8 @@ namespace Views {
   
       })
 
+      // boundaries
+
       this.model.boundaries.items.forEach((boundary, idx) => {
 
         let gfx = new PIXI.Graphics().lineStyle(2, 0xffffff, 0.5);
@@ -90,7 +96,19 @@ namespace Views {
         this.boundaries.push(gfx);
 
       });
-  
+
+      // ray 
+
+      this.ray = new PIXI.Graphics().lineStyle(2, 0x00ff66, 0.5);
+
+      let r = this.model.ray;
+
+      this.ray.moveTo(r.origin.x, r.origin.y);
+      this.ray.lineTo(r.endPt.x, r.endPt.y);
+
+      // Add to the stage
+      this.pixi.stage.addChild(this.ray);
+
     }
 
     public update () {
@@ -108,21 +126,12 @@ namespace Views {
         gfx.alpha = item.rotation;
       });
 
-    /*
-      let m = this.model as Models.Model;
+      let r = this.model.ray;
 
-      this.testRay.clear();
-      this.testRay.lineStyle(1, 0xffffff);
-      this.testRay.moveTo(m.testRay.ptA.x, m.testRay.ptA.y);
-      this.testRay.lineTo(m.testRay.ptB.x, m.testRay.ptB.y);
-
-      let quads = Geom.gridPointsAlongLineWithThickness(m.testRay.ptA.x, m.testRay.ptA.y, m.testRay.ptB.x, m.testRay.ptB.y, 100, 20);
-      //console.log(quads.length);
-      quads.forEach(pt => {
-        //this.testRay.moveTo(pt.x * 100, pt.y * 100);
-        //this.testRay.drawRect(pt.x * 100, pt.y * 100, 100, 100);
-      });
-      */
+      this.ray.clear();
+      this.ray.lineStyle(2, 0x00ff66, 0.5);
+      this.ray.moveTo(r.origin.x, r.origin.y);
+      this.ray.lineTo(r.endPt.x, r.endPt.y);
       
 
       this.fps.innerText = this.pixi.ticker.FPS.toString();

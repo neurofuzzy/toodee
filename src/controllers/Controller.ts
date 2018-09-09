@@ -21,7 +21,7 @@ namespace Controllers {
 
     protected build () {
 
-      for (let i = 0; i < 400; i++) {
+      for (let i = 0; i < 600; i++) {
   
         var x = 20 + Math.random() * 1480;
         var y = 20 + Math.random() * 560;
@@ -98,9 +98,11 @@ namespace Controllers {
       this.boundaryQuadMap.addItem(bnd);
 
       // test ray
-      let ro = this.model.ray.origin;
+      let r = this.model.ray;
+      let ro = r.origin;
       ro.x = 400;
       ro.y = 400;
+      r.endPt = r.project(200);
 
     }
 
@@ -109,6 +111,7 @@ namespace Controllers {
       console.log("starting...");
       this.build();
 
+      this.view.ticker.add(this.update);
       this.view.ticker.add(this.update);
 
     }
@@ -223,6 +226,30 @@ namespace Controllers {
       items.forEach(item => {
         this.bodyQuadMap.updateItem(item);
       });
+
+      let r = this.model.ray;
+      r.angle += 1 * Math.PI / 180;
+      r.endPt = r.project(200);
+
+      let qcoords = Geom.gridPointsAlongLineWithThickness(r.origin.x, r.origin.y, r.endPt.x, r.endPt.y, 100, 20);
+
+      let quads = this.boundaryQuadMap.getQuadsFromCoords(qcoords, true);
+      let hitPts:Array<Geom.IPointHit> = [];
+
+      quads.forEach(quad => {
+        quad.forEach(seg => {
+          let intPt = Geom.lineLineIntersect(r.origin.x, r.origin.y, r.endPt.x, r.endPt.y, seg.ptA.x, seg.ptA.y, seg.ptB.x, seg.ptB.y);
+
+          if (intPt != null) {
+            hitPts.push(new Geom.PointHit(r.origin, intPt))
+          }
+        });
+      });
+
+      if (hitPts.length > 0) {
+        Geom.PointHit.sort(hitPts);
+        r.endPt = hitPts[0].pt;
+      }
 
       this.view.update();
 

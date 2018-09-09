@@ -50,23 +50,21 @@ namespace Geom {
 
   export class Polygon implements IPolygon {
 
+    public vertices:Array<IPoint>
     public segments:Array<ISegment>
 
-    constructor (vertices?:Array<IPoint>) {
+    constructor (vertices:Array<IPoint>) {
 
+      this.vertices = vertices;
       this.segments = [];
 
-      if (vertices != null) {
+      for (var i = 0; i < vertices.length; i++) {
 
-        for (var i = 0; i < vertices.length; i++) {
+        let ptA = vertices[i];
+        let ptB = vertices[(i + 1) % vertices.length];
+        let seg = new Segment(ptA, ptB);
 
-          let ptA = vertices[i];
-          let ptB = vertices[(i + 1) % vertices.length];
-          let seg = new Segment(ptA, ptB);
-
-          this.segments.push(seg);
-
-        }
+        this.segments.push(seg);
 
       }
 
@@ -84,6 +82,44 @@ namespace Geom {
       this.origin = new Point(ox, oy);
       this.angle = angle;
 
+    }
+
+    public project (len:number):IPoint {
+
+      let pt = new Point();
+
+      pt.x = this.origin.x + len * Math.sin(this.angle);
+      pt.y = this.origin.y + len * Math.cos(this.angle);
+
+      return pt;
+
+    }
+
+  }
+
+  export class PointHit implements IPointHit {
+
+    public pt:IPoint;
+    public angle:number;
+    public dist:number;
+
+    constructor (origin:IPoint, hitPoint:IPoint) {
+
+      this.pt = hitPoint;
+      this.angle = angleBetween(origin.x, origin.y, hitPoint.x, hitPoint.y);
+      this.dist = distanceBetween(origin.x, origin.y, hitPoint.x, hitPoint.y);
+
+    }
+
+    static sort (ptHits:Array<PointHit>) {
+      ptHits.sort(function (a, b) {
+        if (a.dist > b.dist) {
+          return 1;
+        } else if (a.dist < b.dist) {
+          return -1;
+        }
+        return 0;
+      })
     }
 
   }

@@ -27,12 +27,20 @@ namespace Geom {
   }
 
   export interface IPolygon {
+    vertices:Array<IPoint>;
     segments:Array<ISegment>;
   }
 
   export interface IRay {
     origin:IPoint;
     angle:number;
+    project(len:number):IPoint;
+  }
+
+  export interface IPointHit {
+    pt:IPoint;
+    angle:number;
+    dist:number;
   }
 
 }
