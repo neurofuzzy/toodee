@@ -214,7 +214,7 @@ namespace Geom {
 
   }
 
-  export function resolvePenetrationSegmentRound (segPtA:IPoint, segPtB:IPoint, b:IBounds):void {
+  export function resolvePenetrationSegmentRound (segPtA:IPoint, segPtB:IPoint, b:IBounds):boolean {
 
     var a = b.anchor;
     let closestPt:IPoint = Geom.closestPtPointLine(a, segPtA, segPtB);
@@ -243,7 +243,11 @@ namespace Geom {
       a.x += dx;
       a.y += dy;
 
+      return true;
+
     }
+
+    return false;
 
   }
 
