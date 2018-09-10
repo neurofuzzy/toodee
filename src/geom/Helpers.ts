@@ -318,12 +318,78 @@ namespace Geom {
     return (x - x1) * (y2 - y1) - (y - y1) * (x2 - x1) > 0 ? 1 : -1;
   }
 
-  export function rectIntersectsLine(b:IBounds, ax:number, ay:number, bx:number, by:number, side?:number):Array<IPoint> {
+  export function boundsLineIntersect(b:IBounds, segPtA:IPoint, segPtB:IPoint):Array<IPoint> {
 
+    if (b.shape == SHAPE_ROUND) {
+      return circleLineIntersect(b, segPtA, segPtB);
+    } else {
+      return rectLineIntersect(b, segPtA, segPtB);
+    }
+
+  }
+
+  export function circleLineIntersect (bnds:IBounds, segPtA:IPoint, segPtB:IPoint):Array<IPoint> {
+      
+    let intPts:Array<IPoint> = [];
+
+    var cx = bnds.anchor.x;
+    var cy = bnds.anchor.y;
+    var r = bnds.hw;
+    var x1 = segPtA.x;
+    var y1 = segPtA.y;
+    var x2 = segPtB.x;
+    var y2 = segPtB.y;
+
+    var a = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+    var b = 2 * ((x2 - x1) * (x1 - cx) + (y2 - y1) * (y1 - cy));
+    var cc = cx * cx + cy * cy + x1 * x1 + y1 * y1 - 2 * (cx * x1 + cy * y1) - r * r;
+    var d = b * b - 4 * a * cc;
+    
+    if (d > 0) {
+
+      var e = Math.sqrt(d);
+      var u1 = (-b + e) / (2 * a);
+      var u2 = (-b - e) / (2 * a);
+
+      if ((u1 < 0 || u1 > 1) && (u2 < 0 || u2 > 1)) {
+
+       // do nothing
+
+      } else {
+
+        if (0 <= u2 && u2 <= 1) {
+
+          intPts.push({
+            x: lerp(x1, x2, u2),
+            y: lerp(y1, y2, u2)
+          });
+
+        }
+
+        if (0 <= u1 && u1 <= 1) {
+          intPts.push({
+            x: lerp(x1, x2, u1),
+            y: lerp(y1, y2, u1)
+          });
+        }
+
+      }
+    }
+
+    return intPts
+
+  };
+
+  export function rectLineIntersect(b:IBounds, segPtA:IPoint, segPtB:IPoint, side?:number):Array<IPoint> {
+
+    var ax = segPtA.x;
+    var ay = segPtA.y;
+    var bx = segPtB.x;
+    var by = segPtB.y;
     var rx = b.anchor.x - b.hw;
     var ry = b.anchor.y - b.hh;
-    var rx2 = rx + b.hw;
-    var ry2 = ry + b.hh;
+    var rx2 = rx + b.hw * 2;
+    var ry2 = ry + b.hh * 2;
 
     // bounds check, early out
 

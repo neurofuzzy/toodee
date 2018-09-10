@@ -21,7 +21,7 @@ namespace Controllers {
 
     protected build () {
 
-      for (let i = 0; i < 600; i++) {
+      for (let i = 0; i < 300; i++) {
   
         var x = 20 + Math.random() * 1480;
         var y = 20 + Math.random() * 560;
@@ -78,6 +78,7 @@ namespace Controllers {
 
       // smaller inverted poly
 
+      
       vertices = [];
       len = 8;
       radius = 100;
@@ -96,6 +97,7 @@ namespace Controllers {
 
       this.model.boundaries.addItem(bnd);
       this.boundaryQuadMap.addItem(bnd);
+      
 
       // test ray
       let r = this.model.ray;
@@ -151,10 +153,10 @@ namespace Controllers {
         // fake gravity
         if (!item.constraints.lockY) {
 
-          item.bounds.anchor.y += 1;
+         // item.bounds.anchor.y += 1;
           
           if (item.bounds.anchor.y + item.bounds.hh > 600) {
-            item.bounds.anchor.y = 600 - item.bounds.hh;
+         //   item.bounds.anchor.y = 600 - item.bounds.hh;
           }
 
         }
@@ -190,10 +192,10 @@ namespace Controllers {
         // fake gravity
         if (!item.constraints.lockY) {
 
-          item.bounds.anchor.y += 1;
+          //item.bounds.anchor.y += 1;
           
           if (item.bounds.anchor.y + item.bounds.hh > 600) {
-            item.bounds.anchor.y = 600 - item.bounds.hh;
+         //   item.bounds.anchor.y = 600 - item.bounds.hh;
           }
 
         }
@@ -229,22 +231,40 @@ namespace Controllers {
 
       let r = this.model.ray;
       r.angle += 1 * Math.PI / 180;
-      r.endPt = r.project(200);
+      r.endPt = r.project(400);
+
+      let hitPts:Array<Geom.IPointHit> = [];
 
       let qcoords = Geom.gridPointsAlongLineWithThickness(r.origin.x, r.origin.y, r.endPt.x, r.endPt.y, 100, 20);
 
-      let quads = this.boundaryQuadMap.getQuadsFromCoords(qcoords, true);
-      let hitPts:Array<Geom.IPointHit> = [];
-
-      quads.forEach(quad => {
+      let boundaryQuads = this.boundaryQuadMap.getQuadsFromCoords(qcoords, true);
+      
+      boundaryQuads.forEach(quad => {
         quad.forEach(seg => {
           let intPt = Geom.lineLineIntersect(r.origin.x, r.origin.y, r.endPt.x, r.endPt.y, seg.ptA.x, seg.ptA.y, seg.ptB.x, seg.ptB.y);
 
           if (intPt != null) {
-            hitPts.push(new Geom.PointHit(r.origin, intPt))
+            hitPts.push(new Geom.PointHit(r.origin, intPt, seg.parentID))
           }
         });
       });
+
+      let bodyQuads = this.bodyQuadMap.getQuadsFromCoords(qcoords, true);
+
+      bodyQuads.forEach(quad => {
+        quad.forEach(body => {
+
+          let intPts = Geom.boundsLineIntersect(body.bounds, r.origin, r.endPt);
+
+          if (intPts && intPts.length) {
+            intPts.forEach(intPt => {
+              let item = body as Models.Item;
+              hitPts.push(new Geom.PointHit(r.origin, intPt, item.id));
+            })
+          }
+
+        })
+      })
 
       if (hitPts.length > 0) {
         Geom.PointHit.sort(hitPts);

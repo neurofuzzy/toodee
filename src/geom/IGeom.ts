@@ -38,6 +38,7 @@ namespace Geom {
   }
 
   export interface IPointHit {
+    parentID:number;
     pt:IPoint;
     angle:number;
     dist:number;

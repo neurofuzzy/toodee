@@ -99,15 +99,17 @@ namespace Geom {
 
   export class PointHit implements IPointHit {
 
+    public parentID:number;
     public pt:IPoint;
     public angle:number;
     public dist:number;
 
-    constructor (origin:IPoint, hitPoint:IPoint) {
+    constructor (origin:IPoint, hitPoint:IPoint, parentID:number = -1) {
 
       this.pt = hitPoint;
       this.angle = angleBetween(origin.x, origin.y, hitPoint.x, hitPoint.y);
       this.dist = distanceBetween(origin.x, origin.y, hitPoint.x, hitPoint.y);
+      this.parentID = parentID;
 
     }
 
