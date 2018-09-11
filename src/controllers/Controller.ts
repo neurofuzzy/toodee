@@ -37,9 +37,18 @@ namespace Controllers {
           b.anchor.x = Math.floor(b.anchor.x / 20) * 20;
           b.anchor.y = Math.floor(b.anchor.y / 20) * 20;
           c.lockX = c.lockY = true;
+
         }
   
-        var item = new Models.Item().initWithBoundsAndConstraints(b, c);
+        var item:Models.Item = new Models.Item().initWithBoundsAndConstraints(b, c);
+
+        // give a random velocity
+        if (b.shape == Geom.SHAPE_ROUND) {
+
+          item.velocity.x = Math.random() - 0.5;
+          item.velocity.y = Math.random() - 0.5;
+
+        }
 
         this.model.bodies.addItem(item);
   

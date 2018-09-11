@@ -50,7 +50,7 @@ namespace Geom {
 
   }
 
-  export function resolvePenetrationBetweenBounds(bA:IBounds, bB:IBounds, cA:IConstraints, cB:IConstraints, useShapes:boolean = false):void {
+  export function resolvePenetrationBetweenBounds(bA:IBounds, bB:IBounds, cA:IConstraints, cB:IConstraints, useShapes:boolean = false):IPoint {
 
     if (!useShapes || (bA.shape == SHAPE_ORTHO && bB.shape == SHAPE_ORTHO)) {
 
@@ -66,33 +66,37 @@ namespace Geom {
 
         if (aA.x < aB.x) {
           doResolve(hx, 0, bA, bB, cA, cB);
+          return { x: hx, y: 0 };
         } else {
-          doResolve(0 - hx, 0, bA, bB, cA, cB);  
+          doResolve(0 - hx, 0, bA, bB, cA, cB);
+          return { x: 0 - hx, y: 0 };
         }
 
       } else {
 
         if (aA.y < aB.y) {
           doResolve(0, hy, bA, bB, cA, cB);
+          return { x: 0, y: hy };
         } else {
-          doResolve(0, 0 - hy, bA, bB, cA, cB);     
+          doResolve(0, 0 - hy, bA, bB, cA, cB);
+          return { x: 0, y: 0 - hy }; 
         }
 
       }
 
     } else if (bA.shape == bB.shape) {
 
-      resolvePenetrationRoundRound(bA, bB, cA, cB);
+      return resolvePenetrationRoundRound(bA, bB, cA, cB);
 
     } else {
 
-      resolvePenetrationOrthoRound(bA, bB, cA, cB);
+      return resolvePenetrationOrthoRound(bA, bB, cA, cB);
 
     }
 
   }
 
-  function resolvePenetrationRoundRound(bA:IBounds, bB:IBounds, cA:IConstraints, cB:IConstraints):void {
+  function resolvePenetrationRoundRound(bA:IBounds, bB:IBounds, cA:IConstraints, cB:IConstraints):IPoint {
 
     let pt = getPenetrationRoundRound(bA, bB);
 
@@ -101,9 +105,11 @@ namespace Geom {
 
     doResolve(deltaX, deltaY, bA, bB, cA, cB);
 
+    return { x: deltaX, y: deltaY };
+
   }
 
-  function resolvePenetrationOrthoRound(bA:IBounds, bB:IBounds, cA:IConstraints, cB:IConstraints):void {
+  function resolvePenetrationOrthoRound(bA:IBounds, bB:IBounds, cA:IConstraints, cB:IConstraints):IPoint {
 
     var orthob = bA;
     var circleb = bB;
@@ -164,7 +170,7 @@ namespace Geom {
       }
 
       doResolve(0, delta, circleb, orthob, circlec, orthoc);
-      return;
+      return { x: 0, y: delta };
 
     } else if (cy >= ry1 && cy <= ry2) {
 
@@ -175,7 +181,7 @@ namespace Geom {
       }
 
       doResolve(delta, 0, circleb, orthob, circlec, orthoc);
-      return;
+      return { x: delta, y: 0 };
 
     } else if (cx < rx1 && cy < ry1) {
 
@@ -209,12 +215,13 @@ namespace Geom {
       var deltaY = delta * Math.sin(angle);
 
       doResolve(deltaX, deltaY, circleb, orthob, circlec, orthoc);
+      return { x: deltaX, y: deltaY };
 
     }
 
   }
 
-  export function resolvePenetrationSegmentRound (segPtA:IPoint, segPtB:IPoint, b:IBounds):boolean {
+  export function resolvePenetrationSegmentRound (segPtA:IPoint, segPtB:IPoint, b:IBounds):IPoint {
 
     var a = b.anchor;
     let closestPt:IPoint = Geom.closestPtPointLine(a, segPtA, segPtB);
@@ -243,11 +250,11 @@ namespace Geom {
       a.x += dx;
       a.y += dy;
 
-      return true;
+      return { x: dx, y: dy };
 
     }
 
-    return false;
+    return null;
 
   }
 

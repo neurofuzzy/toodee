@@ -17,27 +17,6 @@ namespace Physics {
 
     }
 
-    static fromContact (contact:IContact<IBody, any>):Array<IForce> {
-
-      let a = contact.itemA;
-
-      if (contact instanceof BodyBodyContact) {
-
-        let forceA = new Force();
-        let forceB = new Force();
-
-      }
-
-      if (contact instanceof BodyBoundaryContact) {
-
-        let b = contact.itemB as Geom.ISegment;
-
-      }
-
-      return null;
-
-    }
-
   }
 
 }

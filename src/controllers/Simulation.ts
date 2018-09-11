@@ -47,8 +47,11 @@ namespace Controllers {
 
       if (Geom.boundsIntersect(itemA.bounds, itemB.bounds, true)) {
 
-        Geom.resolvePenetrationBetweenBounds(itemA.bounds, itemB.bounds, itemA.constraints, itemB.constraints, true);
-        this.bodyBodyContacts.push(new Physics.BodyBodyContact(itemA, itemB));
+        let penetration = Geom.resolvePenetrationBetweenBounds(itemA.bounds, itemB.bounds, itemA.constraints, itemB.constraints, true);
+
+        if (penetration && !isNaN(penetration.x) && !isNaN(penetration.y)) {
+          this.bodyBodyContacts.push(new Physics.BodyBodyContact(penetration, itemA, itemB));
+        }
 
       }
 
@@ -56,9 +59,11 @@ namespace Controllers {
 
     private getBodyBoundaryContacts (item:Models.Item, seg:Geom.ISegment):void {
 
-      if (Geom.resolvePenetrationSegmentRound(seg.ptA, seg.ptB, item.bounds)) {
+      let penetration = Geom.resolvePenetrationSegmentRound(seg.ptA, seg.ptB, item.bounds);
+
+      if (penetration) {
       
-        this.bodyBoundaryContacts.push(new Physics.BodyBoundaryContact(item, seg));
+        this.bodyBoundaryContacts.push(new Physics.BodyBoundaryContact(penetration, item, seg));
 
       }
 
@@ -70,7 +75,13 @@ namespace Controllers {
       this.bodyBoundaryContacts = [];
 
       var items = this.model.bodies.items;
+
+      items.forEach(item => {
+        item.bounds.anchor.x += item.velocity.x;
+        item.bounds.anchor.y += item.velocity.y;
+      });
       
+      /*
       items.forEach(item => {
 
         // fake gravity
@@ -85,6 +96,7 @@ namespace Controllers {
         }
 
       });
+      */
 
       // update quads
       
@@ -129,9 +141,16 @@ namespace Controllers {
           }
         }
       });
+
+      this.bodyBodyContacts.forEach(contact => {
+        Physics.resolveContact(contact);
+      })
+      
+      return;
       
       // REVERSE STEP 
 
+      /*
       items.forEach(item => {
 
         // fake gravity
@@ -146,6 +165,7 @@ namespace Controllers {
         }
 
       });
+      */
             
       items.forEach(item => {
         this.bodyQuadMap.updateItem(item);

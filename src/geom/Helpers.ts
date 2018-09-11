@@ -194,6 +194,19 @@ namespace Geom {
 
   }
 
+  export function normalizePoint(pt:IPoint):void {
+
+    let len = distanceBetween(0, 0, pt.x, pt.y);
+
+    if (len != 0) {
+
+      pt.x /= len;
+      pt.y /= len;
+
+    }
+
+  }
+
   export function normalizeAngle(ang:number):number {
 
     while (ang < 0 - Math.PI) {

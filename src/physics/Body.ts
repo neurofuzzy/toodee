@@ -2,6 +2,7 @@ namespace Physics {
 
   export interface IBody extends Geom.ISpatial {
     constraints:Geom.IConstraints;
+    velocity:Geom.IPoint;
     initWithBoundsAndConstraints(bounds:Geom.IBounds, constraints:Geom.IConstraints):any;
   }
 
