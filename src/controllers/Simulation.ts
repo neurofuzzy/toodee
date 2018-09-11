@@ -6,8 +6,8 @@ namespace Controllers {
     protected bodyQuadMap:Geom.SpatialQuadMap;
     protected boundaryQuadMap:Geom.PolygonQuadMap;
 
-    protected bodyBodyContacts:Array<BodyBodyContact>;
-    protected bodyBoundaryContacts:Array<BodyBoundaryContact>;
+    protected bodyBodyContacts:Array<Physics.BodyBodyContact>;
+    protected bodyBoundaryContacts:Array<Physics.BodyBoundaryContact>;
 
     public initWithModelAndView(model:Models.Model):any {
 
@@ -48,7 +48,7 @@ namespace Controllers {
       if (Geom.boundsIntersect(itemA.bounds, itemB.bounds, true)) {
 
         Geom.resolvePenetrationBetweenBounds(itemA.bounds, itemB.bounds, itemA.constraints, itemB.constraints, true);
-        this.bodyBodyContacts.push(new BodyBodyContact(itemA, itemB));
+        this.bodyBodyContacts.push(new Physics.BodyBodyContact(itemA, itemB));
 
       }
 
@@ -58,7 +58,7 @@ namespace Controllers {
 
       if (Geom.resolvePenetrationSegmentRound(seg.ptA, seg.ptB, item.bounds)) {
       
-        this.bodyBoundaryContacts.push(new BodyBoundaryContact(item, seg));
+        this.bodyBoundaryContacts.push(new Physics.BodyBoundaryContact(item, seg));
 
       }
 
@@ -94,8 +94,9 @@ namespace Controllers {
 
       // forward collision check
 
-      items.forEach(itemA => {
+      items.forEach(item => {
 
+        let itemA = item as Models.Item;
         let quads = this.bodyQuadMap.getSurroundingQuads(itemA);
 
         quads.forEach(quad => {
@@ -119,10 +120,11 @@ namespace Controllers {
 
       items.forEach(item => {
         if (item.bounds.shape == Geom.SHAPE_ROUND) {
+          let itemA = item as Models.Item;
           let quad = this.boundaryQuadMap.getQuadFromPoint(item.bounds.anchor);
           if (quad) {
             quad.forEach(seg => {
-              this.getBodyBoundaryContacts(item, seg);
+              this.getBodyBoundaryContacts(itemA, seg);
             })
           }
         }

@@ -6,9 +6,4 @@ namespace Geom {
     initWithBounds(bounds:IBounds):any;
   }
 
-  export interface IBody extends ISpatial {
-    constraints:IConstraints;
-    initWithBoundsAndConstraints(bounds:IBounds, constraints:IConstraints):any;
-  }
-
 }

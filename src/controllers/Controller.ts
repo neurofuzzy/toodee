@@ -104,7 +104,7 @@ namespace Controllers {
       this.simulation.start();
 
       this.view.ticker.add(this.update);
-      this.view.ticker.add(this.update);
+      //this.view.ticker.add(this.update);
 
     }
 

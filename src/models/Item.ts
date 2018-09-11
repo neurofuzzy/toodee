@@ -1,6 +1,8 @@
+/// <reference path="../physics/Body.ts" />
+
 namespace Models {
 
-  export class Item extends Geom.BaseBody implements Util.IModelItem {
+  export class Item extends Physics.BaseBody implements Util.IModelItem {
 
     public id:number;
 

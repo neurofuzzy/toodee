@@ -20,19 +20,4 @@ namespace Geom {
 
   }
 
-  export class BaseBody extends BaseSpatial {
-
-    public constraints:IConstraints;
-
-    public initWithBoundsAndConstraints(bounds:IBounds, constraints:IConstraints):any {
-
-      this.bounds = bounds;
-      this.constraints = constraints;
-
-      return this;
-
-    }
-
-  }
-
 }

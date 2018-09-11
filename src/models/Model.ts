@@ -2,7 +2,7 @@ namespace Models {
 
   export class Model {
 
-    public bodies:Util.BaseModel<Geom.IBody>;
+    public bodies:Util.BaseModel<Physics.IBody>;
     public boundaries:Util.BaseModel<Geom.IPolygon>;
     public ray:ProjectedRay;
  
