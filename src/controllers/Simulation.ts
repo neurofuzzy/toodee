@@ -62,7 +62,7 @@ namespace Controllers {
       let penetration = Geom.resolvePenetrationSegmentRound(seg.ptA, seg.ptB, item.bounds);
 
       if (penetration) {
-      
+   
         this.bodyBoundaryContacts.push(new Physics.BodyBoundaryContact(penetration, item, seg));
 
       }
@@ -143,6 +143,10 @@ namespace Controllers {
       });
 
       this.bodyBodyContacts.forEach(contact => {
+        Physics.resolveContact(contact);
+      });
+
+      this.bodyBoundaryContacts.forEach(contact => {
         Physics.resolveContact(contact);
       })
       

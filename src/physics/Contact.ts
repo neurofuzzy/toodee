@@ -35,18 +35,19 @@ namespace Physics {
 
   export function resolveContact (contact:IContact<IBody | Geom.ISegment>):void {
 
+    let pen = contact.penetration;
+
+    let iA = contact.itemA;
+    let vA = iA.velocity;
+    let vAx = vA.x;
+    let vAy = vA.y;
+
     if (contact instanceof BodyBodyContact) {
 
-      let pen = contact.penetration;
-
-      let iA = contact.itemA;
       let iB = contact.itemB;
 
-      let vA = iA.velocity;
       let vB = iB.velocity;
 
-      let vAx = vA.x;
-      let vAy = vA.y;
       let vBx = vB.x;
       let vBy = vB.y;
 
@@ -82,14 +83,16 @@ namespace Physics {
 
       }
 
-
-      
-
     }
-
+    
     if (contact instanceof BodyBoundaryContact) {
 
-     // contact.itemB.
+      let iB = contact.itemB;
+      let angle = Geom.angleBetween(iB.ptA.x, iB.ptA.y, iB.ptB.x, iB.ptB.y);
+
+      Geom.rotatePoint(vA, angle);
+      vA.y = 0 - vA.y;
+      Geom.rotatePoint(vA, 0 - angle);
 
     }
 

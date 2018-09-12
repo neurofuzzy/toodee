@@ -18,7 +18,7 @@ namespace Controllers {
 
     protected build () {
 
-      for (let i = 0; i < 300; i++) {
+      for (let i = 0; i < 200; i++) {
   
         var x = 20 + Math.random() * 1480;
         var y = 20 + Math.random() * 560;
@@ -30,7 +30,7 @@ namespace Controllers {
         c.lockX = c.lockY = false;
 
         if (Math.random() > 0.75) {
-          b.shape = Geom.SHAPE_ORTHO;
+          //b.shape = Geom.SHAPE_ORTHO;
         }
         
         if (b.shape == Geom.SHAPE_ORTHO) {
@@ -45,8 +45,8 @@ namespace Controllers {
         // give a random velocity
         if (b.shape == Geom.SHAPE_ROUND) {
 
-          item.velocity.x = Math.random() - 0.5;
-          item.velocity.y = Math.random() - 0.5;
+          item.velocity.x = (Math.random() - 0.5) * 5;
+          item.velocity.y = (Math.random() - 0.5) * 5;
 
         }
 
