@@ -94,22 +94,24 @@ namespace Controllers {
         item.bounds.anchor.y += item.velocity.y;
       });
       
-      /*
+      
       items.forEach(item => {
 
         // fake gravity
         if (!item.constraints.lockY) {
 
-         item.bounds.anchor.y += 1;
+        // item.velocity.y += 0.3;
+        // item.velocity.x *= 0.9;
+       //  item.velocity.y *= 0.9;
           
           if (item.bounds.anchor.y + item.bounds.hh > 600) {
-            item.bounds.anchor.y = 600 - item.bounds.hh;
+        //    item.bounds.anchor.y = 600 - item.bounds.hh;
           }
 
         }
 
       });
-      */
+      
 
       // update quads
       
@@ -163,81 +165,13 @@ namespace Controllers {
         Physics.resolveContact(contact);
       })
       
-      return;
-      
-      // REVERSE STEP 
-
-      /*
-      items.forEach(item => {
-
-        // fake gravity
-        if (!item.constraints.lockY) {
-
-          item.bounds.anchor.y += 1;
-          
-          if (item.bounds.anchor.y + item.bounds.hh > 600) {
-            item.bounds.anchor.y = 600 - item.bounds.hh;
-          }
-
-        }
-
-      });
-      */
-            
-      items.forEach(item => {
-        this.bodyQuadMap.updateItem(item);
-      });
-
-      // reverse collision check
-
-      var ritemA;
-      
-      for (let i = items.length - 1; i >= 0; i--) {
-
-        ritemA = items[i];
-
-        let quads = this.bodyQuadMap.getSurroundingQuads(ritemA);
-
-        quads.forEach(quad => {
-  
-          if (quad != null) {
-
-            for (let j = quad.length - 1; j >= 0; j--) {
-  
-              var ritemB = quad[j] as Models.Item;
-              this.getBodyBodyContacts(ritemA, ritemB);
-
-            }
-
-          }
-
-        });
-
-      }
-
-      // reverse collision check with boundaries
-
-      for (let i = items.length - 1; i >= 0; i--) {
-
-        ritemA = items[i];
-
-        if (ritemA.bounds.shape == Geom.SHAPE_ROUND) {
-          let quad = this.boundaryQuadMap.getQuadFromPoint(ritemA.bounds.anchor);
-          if (quad && quad.length > 0) {
-            for (let j = quad.length - 1; j >= 0; j--) {
-              let rseg = quad[j];
-              this.getBodyBoundaryContacts(ritemA, rseg);
-            }
-          }
-        }
-
-      }
-      
       // update quads
 
       items.forEach(item => {
         this.bodyQuadMap.updateItem(item);
       });
+
+      // ray check
 
       let r = this.model.ray;
       r.angle += 1 * Math.PI / 180;
@@ -280,6 +214,8 @@ namespace Controllers {
         Geom.PointHit.sort(hitPts);
         r.endPt = hitPts[0].pt;
       }
+
+      // end ray check
 
     }
 

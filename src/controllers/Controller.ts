@@ -18,7 +18,7 @@ namespace Controllers {
 
     protected build () {
 
-      for (let i = 0; i < 400; i++) {
+      for (let i = 0; i < 600; i++) {
   
         var x = 20 + Math.random() * 1480;
         var y = 20 + Math.random() * 560;
