@@ -39,37 +39,40 @@ namespace Physics {
 
     let iA = contact.itemA;
     let vA = iA.velocity;
-    let vAx = vA.x;
-    let vAy = vA.y;
 
     if (contact instanceof BodyBodyContact) {
 
       let iB = contact.itemB;
-
       let vB = iB.velocity;
-
-      let vBx = vB.x;
-      let vBy = vB.y;
 
       if (iA.bounds.shape == Geom.SHAPE_ROUND && iB.bounds.shape == Geom.SHAPE_ROUND) {
 
-        vA.x = vBx;
-        vA.y = vBy;
-        vB.x = vAx;
-        vB.y = vAy;
+        let aA = iA.bounds.anchor;
+        let aB = iB.bounds.anchor;
+
+        let angle = Geom.angleBetween(aA.x, aA.y, aB.x, aB.y);
+
+        Geom.rotatePoint(vA, angle);
+        Geom.rotatePoint(vB, angle);
+
+        let vt = vA.x;
+        vA.x = 0 - vB.x;
+        vB.x = vt;
+        
+        Geom.rotatePoint(vA, 0 - angle);
+        Geom.rotatePoint(vB, 0 - angle);
 
       } else if (iA.bounds.shape == Geom.SHAPE_ROUND && iB.bounds.shape == Geom.SHAPE_ORTHO) {
 
+        let vAx = vA.x;
+        let vAy = vA.y;
+
         if (pen.x == 0) {
-
           vA.y = 0 - vAy;
-
         } 
         
         if (pen.y == 0) {
-
           vA.x = 0 - vAx;
-
         } 
         
         if (pen.x != 0 && pen.y != 0) {

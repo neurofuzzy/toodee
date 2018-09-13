@@ -18,19 +18,20 @@ namespace Controllers {
 
     protected build () {
 
-      for (let i = 0; i < 200; i++) {
+      for (let i = 0; i < 100; i++) {
   
         var x = 20 + Math.random() * 1480;
         var y = 20 + Math.random() * 560;
+        var wh = Math.random() * 15 + 5
  
-        var b = new Geom.Bounds(x, y, 10, 10, Math.floor(Math.random() * 2 + 1));
+        var b = new Geom.Bounds(x, y, wh, wh, Math.floor(Math.random() * 2 + 1));
         var c = new Geom.Constraints();
 
         b.shape = Geom.SHAPE_ROUND;
         c.lockX = c.lockY = false;
 
         if (Math.random() > 0.75) {
-          //b.shape = Geom.SHAPE_ORTHO;
+          b.shape = Geom.SHAPE_ORTHO;
         }
         
         if (b.shape == Geom.SHAPE_ORTHO) {
@@ -58,7 +59,7 @@ namespace Controllers {
 
       let vertices:Array<Geom.IPoint> = [];
       let len = 12;
-      let radius = 200;
+      let radius = 350;
       let cenX = 400;
       let cenY = 300;
 
