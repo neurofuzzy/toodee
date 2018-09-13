@@ -45,12 +45,22 @@ namespace Controllers {
         return;
       }
 
+      let contactPairIdx = Util.Pairing.cantorPair(itemA.id, itemB.id);
+
+      if (itemA.bounds.shape == Geom.SHAPE_ORTHO) {
+        return;
+      }
+
+      if (this.bodyBodyContacts[contactPairIdx] != null) {
+        return;
+      }
+
       if (Geom.boundsIntersect(itemA.bounds, itemB.bounds, true)) {
 
         let penetration = Geom.resolvePenetrationBetweenBounds(itemA.bounds, itemB.bounds, itemA.constraints, itemB.constraints, true);
 
         if (penetration && !isNaN(penetration.x) && !isNaN(penetration.y)) {
-          this.bodyBodyContacts.push(new Physics.BodyBodyContact(penetration, itemA, itemB));
+          this.bodyBodyContacts[contactPairIdx] = new Physics.BodyBodyContact(penetration, itemA, itemB);
         }
 
       }
