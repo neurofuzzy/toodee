@@ -18,11 +18,11 @@ namespace Controllers {
 
     protected build () {
 
-      for (let i = 0; i < 100; i++) {
+      for (let i = 0; i < 400; i++) {
   
         var x = 20 + Math.random() * 1480;
         var y = 20 + Math.random() * 560;
-        var wh = Math.random() * 15 + 5
+        var wh = Math.random() * 10 + 5
  
         var b = new Geom.Bounds(x, y, wh, wh, Math.floor(Math.random() * 2 + 1));
         var c = new Geom.Constraints();

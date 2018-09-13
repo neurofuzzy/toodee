@@ -7,6 +7,7 @@ namespace Controllers {
     protected boundaryQuadMap:Geom.PolygonQuadMap;
 
     protected bodyBodyContacts:Array<Physics.BodyBodyContact>;
+    protected bodyBodyContactIndices:Array<boolean>;
     protected bodyBoundaryContacts:Array<Physics.BodyBoundaryContact>;
 
     public initWithModelAndView(model:Models.Model):any {
@@ -51,7 +52,7 @@ namespace Controllers {
         return;
       }
 
-      if (this.bodyBodyContacts[contactPairIdx] != null) {
+      if (this.bodyBodyContacts[contactPairIdx]) {
         return;
       }
 
@@ -60,7 +61,8 @@ namespace Controllers {
         let penetration = Geom.resolvePenetrationBetweenBounds(itemA.bounds, itemB.bounds, itemA.constraints, itemB.constraints, true);
 
         if (penetration && !isNaN(penetration.x) && !isNaN(penetration.y)) {
-          this.bodyBodyContacts[contactPairIdx] = new Physics.BodyBodyContact(penetration, itemA, itemB);
+          this.bodyBodyContactIndices[contactPairIdx] = true;
+          this.bodyBodyContacts.push(new Physics.BodyBodyContact(penetration, itemA, itemB));
         }
 
       }
@@ -83,6 +85,7 @@ namespace Controllers {
 
       this.bodyBodyContacts = [];
       this.bodyBoundaryContacts = [];
+      this.bodyBodyContactIndices = [];
 
       var items = this.model.bodies.items;
 
