@@ -579,41 +579,24 @@ namespace Geom {
 
   }
 
-  export function polygonArea(pts:Array<number>):number {
+  export function polygonArea(pts:Array<IPoint>):number {
 
     let area = 0;
 
-    for (let i = 0; i < pts.length; i += 2) {
-      let j = (i + 2) % pts.length;
-      area += pts[i] * pts[j + 1];
-      area -= pts[j] * pts[i + 1];
+    for (let i = 0; i < pts.length; i++) {
+      let ptA = pts[i];
+      let ptB = pts[(i + 1) % pts.length];
+      area += ptA.x * ptB.y;
+      area -= ptB.x * ptA.y;
     }
 
     return area / 2;
 
   }
 
-  export function polygonIsClockwise(pts:Array<number>):boolean {
+  export function polygonIsClockwise(pts:Array<IPoint>):boolean {
 
     return Geom.polygonArea(pts) > 0;
-
-  }
-
-  export function polygonIsClosed(pts:Array<number>):boolean {
-
-    return (
-      pts.length >= 6 && 
-      pts[0] == pts[pts.length - 2] && 
-      pts[1] == pts[pts.length - 1]
-    );
-
-  }
-
-  export function closePolygon(pts:Array<number>):void {
-
-    if (pts.length >= 4 && !Geom.polygonIsClosed(pts)) {
-      pts.push(pts[0], pts[1]);
-    }
 
   }
 

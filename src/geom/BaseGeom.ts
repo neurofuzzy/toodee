@@ -53,6 +53,8 @@ namespace Geom {
     public vertices:Array<IPoint>
     public segments:Array<ISegment>
     public boundingBox:IRectangle;
+    public area:number;
+    public inverted:boolean;
 
     constructor (vertices:Array<IPoint>) {
 
@@ -76,6 +78,9 @@ namespace Geom {
         b.y2 = Math.max(ptA.y, b.y2);
 
       }
+
+      this.area = Math.abs(polygonArea(this.vertices));
+      this.inverted = polygonIsClockwise(this.vertices);
 
     }
 

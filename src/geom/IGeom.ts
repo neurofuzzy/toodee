@@ -37,6 +37,8 @@ namespace Geom {
     vertices:Array<IPoint>;
     segments:Array<ISegment>;
     boundingBox:IRectangle;
+    area:number;
+    inverted:boolean;
   }
 
   export interface IRay {
