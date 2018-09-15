@@ -52,11 +52,15 @@ namespace Geom {
 
     public vertices:Array<IPoint>
     public segments:Array<ISegment>
+    public boundingBox:IRectangle;
 
     constructor (vertices:Array<IPoint>) {
 
       this.vertices = vertices;
       this.segments = [];
+      this.boundingBox = { x1: 100000, x2: -100000, y1: 100000, y2: -100000 }
+
+      let b = this.boundingBox;
 
       for (var i = 0; i < vertices.length; i++) {
 
@@ -65,6 +69,11 @@ namespace Geom {
         let seg = new Segment(ptA, ptB);
 
         this.segments.push(seg);
+
+        b.x1 = Math.min(ptA.x, b.x1);
+        b.x2 = Math.max(ptA.x, b.x2);
+        b.y1 = Math.min(ptA.y, b.y1);
+        b.y2 = Math.max(ptA.y, b.y2);
 
       }
 

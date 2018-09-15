@@ -2,16 +2,16 @@ namespace Geom {
 
   export function pointWithinBounds(x:number, y:number, b:IBounds):boolean {
 
-      var a = b.anchor;
+    var a = b.anchor;
 
-      return (
-        x >= a.x - b.hw &&
-        y >= a.y - b.hh &&
-        x <= a.x + b.hw &&
-        y <= a.y + b.hh
-      );
+    return (
+      x >= a.x - b.hw &&
+      y >= a.y - b.hh &&
+      x <= a.x + b.hw &&
+      y <= a.y + b.hh
+    );
 
-    };
+  };
 
   export function boundsWithinBounds(bA:IBounds, bB:IBounds):boolean {
 
@@ -62,6 +62,39 @@ namespace Geom {
     }
 
     return false;
+
+  };
+
+  export function pointWithinRectangle(x:number, y:number, rect:IRectangle, tilescale:number = 1):boolean {
+
+    return (
+      x >= rect.x1 &&
+      y >= rect.y1 &&
+      x <= rect.x2 &&
+      y <= rect.y2
+    );
+
+  };
+
+  export function rectangleWithinRectangle(rectA:IRectangle, rectB:IRectangle):boolean {
+
+    return (
+      rectA.x1 >= rectB.x1 &&
+      rectA.y1 >= rectB.y1 &&
+      rectA.x2 <= rectB.x2 &&
+      rectA.y2 <= rectB.y2
+    );
+
+  };
+
+  export function rectIntersectsRect(rectA:IRectangle, rectB:IRectangle):boolean {
+
+    return (
+      rectA.x2 >= rectB.x1 &&
+      rectA.y2 >= rectB.y1 &&
+      rectA.x1 <= rectB.x2 &&
+      rectA.y1 <= rectB.y2
+    );
 
   };
 
@@ -581,6 +614,39 @@ namespace Geom {
     if (pts.length >= 4 && !Geom.polygonIsClosed(pts)) {
       pts.push(pts[0], pts[1]);
     }
+
+  }
+
+  export function linePolygonIntersect (linePtA:IPoint, linePtB:IPoint, poly:IPolygon):Array<IPoint> {
+
+    let pts:Array<IPoint> = [];
+
+    poly.segments.forEach(seg => {
+
+      let intPt = Geom.lineLineIntersect(linePtA.x, linePtA.y, linePtB.x, linePtB.y, seg.ptA.x, seg.ptA.y, seg.ptB.x, seg.ptB.y);
+
+      if (intPt != null) {
+        pts.push(intPt);
+      }
+
+    });
+
+    return pts;
+
+  }
+
+  export function pointInPolygon (pt:IPoint, poly:IPolygon) {
+
+    // early out
+    if (!pointWithinRectangle(pt.x, pt.y, poly.boundingBox)) {
+      return;
+    }
+
+    let startPt:IPoint = { x: poly.boundingBox.x1 - 100, y: poly.boundingBox.y1 - 100 };
+
+    let pts = linePolygonIntersect(startPt, pt, poly);
+
+    return !(pts.length % 2 == 0);
 
   }
 

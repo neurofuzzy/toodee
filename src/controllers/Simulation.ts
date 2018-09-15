@@ -171,6 +171,17 @@ namespace Controllers {
         this.bodyQuadMap.updateItem(item);
       });
 
+      // check parent poly
+
+      let boundaries = this.model.boundaries.items;
+
+      items.forEach(item => {
+        boundaries.forEach(boundary => {
+          let isInPoly = Geom.pointInPolygon(item.bounds.anchor, boundary);
+          item.rotation = isInPoly ? 0 : 0.5;
+        })
+      });
+
       // ray check
 
       let r = this.model.ray;

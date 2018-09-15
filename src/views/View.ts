@@ -123,7 +123,7 @@ namespace Views {
         let gfx = this.bodies[item.id];
         gfx.x = item.bounds.anchor.x;
         gfx.y = item.bounds.anchor.y;
-        gfx.alpha = 1;
+        gfx.alpha = 1 - item.rotation;
       });
 
       let r = this.model.ray;

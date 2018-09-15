@@ -20,6 +20,13 @@ namespace Geom {
     shape:number;
   }
 
+  export interface IRectangle {
+    x1:number;
+    y1:number;
+    x2:number;
+    y2:number;
+  }
+
   export interface ISegment {
     parentID:number;
     ptA:IPoint;
@@ -29,6 +36,7 @@ namespace Geom {
   export interface IPolygon {
     vertices:Array<IPoint>;
     segments:Array<ISegment>;
+    boundingBox:IRectangle;
   }
 
   export interface IRay {
