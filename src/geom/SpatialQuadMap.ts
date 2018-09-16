@@ -4,7 +4,7 @@ namespace Geom {
 
   }
 
-  export class SpatialQuadMap implements Util.IModel<Util.IModelItem & ISpatial> {
+  export class SpatialQuadMap<T extends Util.IModelItem & ISpatial> implements IQuadMap<T>, Util.IModel<T> {
 
     protected quadSize:number;
     protected itemsQuadIndexes:Array<number>;
@@ -35,9 +35,9 @@ namespace Geom {
 
     }
 
-    public get items ():Array<Util.IModelItem & ISpatial> {
+    public get items ():Array<T> {
 
-      var outArr:Array<Util.IModelItem & ISpatial> = [];
+      var outArr:Array<T> = [];
 
       // TODO: return items if necessary
 
@@ -70,7 +70,7 @@ namespace Geom {
 
     }
 
-    public addItem (item:(Util.IModelItem & ISpatial)):boolean {
+    public addItem (item:T):boolean {
       
       if (this.itemsQuadIndexes[item.id] == null) {
 
@@ -92,7 +92,7 @@ namespace Geom {
 
     }
 
-    public removeItem (item:(Util.IModelItem & ISpatial)):boolean {
+    public removeItem (item:(T)):boolean {
 
       if (this.itemsQuadIndexes[item.id] != null) {
 
@@ -109,7 +109,7 @@ namespace Geom {
       
     }
 
-    public updateItem (item:(Util.IModelItem & ISpatial)) {
+    public updateItem (item:(T)) {
 
       var qcoords = this.getQuadCoords(item);
       var qidx = this.getQuadIndex(qcoords.x, qcoords.y);
@@ -121,7 +121,7 @@ namespace Geom {
 
     }
 
-    public getSurroundingQuads (item:(Util.IModelItem & ISpatial)):Array<ISpatialQuad> {
+    public getSurroundingQuads (item:(T)):Array<ISpatialQuad> {
 
       var pt = this.getQuadCoords(item);
       var arr = this.bufferArr;

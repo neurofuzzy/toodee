@@ -3,8 +3,8 @@ namespace Controllers {
   export class Simulation implements Util.IController<Models.Model, null> {
 
     protected model:Models.Model;
-    protected bodyQuadMap:Geom.SpatialQuadMap;
-    protected boundaryQuadMap:Geom.PolygonQuadMap;
+    protected bodyQuadMap:Geom.SpatialQuadMap<Models.Item>;
+    protected boundaryQuadMap:Geom.PolygonQuadMap<Models.Boundary>;
     protected bodyBoundaryMap:Geom.SpatialPolygonMap<Models.Boundary, Models.Item>;
 
     protected bodyBodyContacts:Array<Physics.BodyBodyContact>;
@@ -48,6 +48,8 @@ namespace Controllers {
           }
         })
       });
+
+      // add boundaries to body-boundary map (map of which bodies are inside which boundaries)
 
       let bs = this.model.boundaries.items.filter(n => n); // get rid of empty values
       bs.forEach(boundary => {

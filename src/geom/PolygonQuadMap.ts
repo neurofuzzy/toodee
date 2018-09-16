@@ -4,7 +4,7 @@ namespace Geom {
  
   }
 
-  export class PolygonQuadMap implements IQuadMap<IPolygon>, Util.IModel<Util.IModelItem & IPolygon> {
+  export class PolygonQuadMap<T extends Util.IModelItem & IPolygon> implements IQuadMap<T>, Util.IModel<T> {
 
     protected quadSize:number;
     protected segmentThickness:number;
@@ -32,9 +32,9 @@ namespace Geom {
 
     }
 
-    public get items ():Array<Util.IModelItem & IPolygon> {
+    public get items ():Array<T> {
 
-      var outArr:Array<Util.IModelItem & IPolygon> = [];
+      var outArr:Array<T> = [];
 
       // TODO: return items if necessary
 
@@ -62,7 +62,7 @@ namespace Geom {
 
     }
 
-    public addItem (item:(Util.IModelItem & IPolygon)):boolean {
+    public addItem (item:T):boolean {
 
       if (this.itemsQuadIndexes[item.id] == null) {
 
@@ -96,7 +96,7 @@ namespace Geom {
 
     }
 
-    public removeItem (item:(Util.IModelItem & IPolygon)):boolean {
+    public removeItem (item:T):boolean {
 
       if (this.itemsQuadIndexes[item.id] != null) {
 
@@ -121,7 +121,7 @@ namespace Geom {
       
     }
 
-    public updateItem (item:(Util.IModelItem & IPolygon)) {
+    public updateItem (item:(T)) {
 
       this.removeItem(item);
       this.addItem(item);
