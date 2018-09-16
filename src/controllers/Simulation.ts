@@ -48,16 +48,19 @@ namespace Controllers {
         })
       });
 
-      this.boundariesSortedByArea = this.model.boundaries.items.concat();
+      
+      let bs = this.model.boundaries.items.filter(n => n); // get rid of empty values
 
-      this.boundariesSortedByArea.sort((a, b) => {
-        if (a.area < b.area) {
+      bs.sort((a, b) => {
+        if (a.area > b.area) {
           return 1;
-        } else if (a.area > b.area) {
+        } else if (a.area < b.area) {
           return -1;
         }
         return 0;
-      })
+      });
+
+      this.boundariesSortedByArea = bs;
 
     }
 
@@ -126,25 +129,6 @@ namespace Controllers {
         item.bounds.anchor.x += item.velocity.x;
         item.bounds.anchor.y += item.velocity.y;
       });
-      
-      
-      items.forEach(item => {
-
-        // fake gravity
-        if (!item.constraints.lockY) {
-
-        // item.velocity.y += 0.3;
-        // item.velocity.x *= 0.9;
-       //  item.velocity.y *= 0.9;
-          
-          if (item.bounds.anchor.y + item.bounds.hh > 600) {
-        //    item.bounds.anchor.y = 600 - item.bounds.hh;
-          }
-
-        }
-
-      });
-      
 
       // update quads
       
@@ -152,7 +136,7 @@ namespace Controllers {
         this.bodyQuadMap.updateItem(item);
       });
 
-      // forward collision check
+      // forward body collision check
 
       items.forEach(item => {
 
@@ -176,7 +160,7 @@ namespace Controllers {
 
       });
 
-      // forward collision check with boundaries
+      // forward boundary collision check
 
       items.forEach(item => {
         if (item.bounds.shape == Geom.SHAPE_ROUND) {
@@ -209,10 +193,18 @@ namespace Controllers {
       let boundaries = this.boundariesSortedByArea;
 
       items.forEach(item => {
-        boundaries.forEach(boundary => {
-          let isInPoly = Geom.pointInPolygon(item.bounds.anchor, boundary);
-          item.rotation = isInPoly ? 0 : 0.5;
-        })
+        item.rotation = 0;
+        for (let i = 0; i < boundaries.length; i++) {
+          let boundary = boundaries[i];
+          if (!boundary.inverted) {
+            let isInPoly = Geom.pointInPolygon(item.bounds.anchor, boundary);
+            if (isInPoly) {
+              item.velocity.x *= 1 - boundary.drag;
+              item.velocity.y *= 1 - boundary.drag;
+              break;
+            }
+          }
+        }
       });
 
       // ray check

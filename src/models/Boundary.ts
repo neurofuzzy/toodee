@@ -6,9 +6,9 @@ namespace Models {
 
     public id:number;
 
-    constructor (vertices?:Array<Geom.IPoint>) {
+    constructor (vertices?:Array<Geom.IPoint>, drag:number = 0) {
 
-      super(vertices);
+      super(vertices, drag);
 
       this.id = Util.IdentityService.newIdentity();
 

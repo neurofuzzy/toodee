@@ -77,7 +77,7 @@ namespace Controllers {
 
       this.model.boundaries.addItem(bnd);
 
-      // smaller inverted poly
+      // smaller sector poly
 
       vertices = [];
       len = 8;
@@ -86,10 +86,50 @@ namespace Controllers {
       for (let i = 0; i < len; i++) {
 
         let ang = (i * (360 / len) * Math.PI / 180); 
-        let rr = radius + Math.random() * 100 - 50;
+        let rr = radius * 1.5 + Math.random() * 100 - 50;
         let x = rr * Math.sin(ang);
         let y = rr * Math.cos(ang);
-        vertices.push(new Geom.Point(x + cenX, y + cenY));
+        vertices.push(new Geom.Point(x + cenX - 100, y + cenY));
+
+      }
+
+      bnd = new Models.Boundary(vertices, 0.1);
+
+      this.model.boundaries.addItem(bnd);
+
+      // even smaller sector poly
+
+      vertices = [];
+      len = 8;
+      radius = 100;
+
+      for (let i = 0; i < len; i++) {
+
+        let ang = (i * (360 / len) * Math.PI / 180); 
+        let rr = radius + Math.random() * 60 - 50;
+        let x = rr * Math.sin(ang);
+        let y = rr * Math.cos(ang);
+        vertices.push(new Geom.Point(x + cenX - 100, y + cenY));
+
+      }
+
+      bnd = new Models.Boundary(vertices, 0);
+
+      this.model.boundaries.addItem(bnd);
+
+      // smaller inverted poly
+
+      vertices = [];
+      len = 8;
+      radius = 100;
+
+      for (let i = 0; i < len; i++) {
+
+        let ang = 0 - (i * (360 / len) * Math.PI / 180); 
+        let rr = radius + Math.random() * 25 - 25;
+        let x = rr * Math.sin(ang);
+        let y = rr * Math.cos(ang);
+        vertices.push(new Geom.Point(x + cenX + 100, y + cenY));
 
       }
 
