@@ -22,6 +22,12 @@ namespace Util {
  
     }
 
+    public getItemByID (id:number):(IModelItem & T) {
+      
+      return this.items[id];
+
+    }
+
     public addItem (item:IModelItem & T):boolean {
 
       if (item.id < 0 || this.items[item.id] != undefined) {

@@ -1,6 +1,8 @@
+/// <reference path="../physics/PolygonBody.ts" />
+
 namespace Models {
 
-  export class Boundary extends Geom.Polygon implements Util.IModelItem {
+  export class Boundary extends Physics.PolygonBody implements Util.IModelItem {
 
     public id:number;
 

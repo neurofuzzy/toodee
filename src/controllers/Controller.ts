@@ -78,14 +78,14 @@ namespace Controllers {
       this.model.boundaries.addItem(bnd);
 
       // smaller inverted poly
-/*
+
       vertices = [];
       len = 8;
       radius = 100;
 
       for (let i = 0; i < len; i++) {
 
-        let ang = 0 - (i * (360 / len) * Math.PI / 180); 
+        let ang = (i * (360 / len) * Math.PI / 180); 
         let rr = radius + Math.random() * 100 - 50;
         let x = rr * Math.sin(ang);
         let y = rr * Math.cos(ang);
@@ -96,7 +96,7 @@ namespace Controllers {
       bnd = new Models.Boundary(vertices);
 
       this.model.boundaries.addItem(bnd);
-*/
+
       // test ray
       let r = this.model.ray;
       let ro = r.origin;

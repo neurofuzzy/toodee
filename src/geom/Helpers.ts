@@ -618,7 +618,7 @@ namespace Geom {
 
   }
 
-  export function pointInPolygon (pt:IPoint, poly:IPolygon) {
+  export function pointInPolygon (pt:IPoint, poly:IPolygon):boolean {
 
     // early out
     if (!pointWithinRectangle(pt.x, pt.y, poly.boundingBox)) {
@@ -630,6 +630,30 @@ namespace Geom {
     let pts = linePolygonIntersect(startPt, pt, poly);
 
     return !(pts.length % 2 == 0);
+
+  }
+
+  export function polygonInPolygon (polyA:IPolygon, polyB:IPolygon):boolean {
+
+    // early out
+    if (!rectIntersectsRect(polyA.boundingBox, polyB.boundingBox)) {
+      return;
+    }
+
+    let startPt:IPoint = { x: polyB.boundingBox.x1 - 100, y: polyB.boundingBox.y1 - 100 };
+
+    for (let i = 0; i < polyA.vertices.length; i++) {
+
+      let pt = polyA.vertices[i];
+      let pts = linePolygonIntersect(startPt, pt, polyB);
+
+      if (pts.length % 2 == 0)  {
+        return false;
+      }
+
+    }
+
+    return true;
 
   }
 

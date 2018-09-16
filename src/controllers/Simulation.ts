@@ -5,6 +5,7 @@ namespace Controllers {
     protected model:Models.Model;
     protected bodyQuadMap:Geom.SpatialQuadMap;
     protected boundaryQuadMap:Geom.PolygonQuadMap;
+    protected boundariesSortedByArea:Array<Physics.IPolygonBody>;
 
     protected bodyBodyContacts:Array<Physics.BodyBodyContact>;
     protected bodyBodyContactIndices:Array<boolean>;
@@ -28,8 +29,34 @@ namespace Controllers {
         this.bodyQuadMap.addItem(body);
       });
 
+      // add bounaries to quadmaps
+
       this.model.boundaries.items.forEach(boundary => {
         this.boundaryQuadMap.addItem(boundary);
+      });
+
+      // compare boundaries to find sectors (normal boundaries within normal boundaries)
+
+      this.model.boundaries.items.forEach(boundary => {
+        this.model.boundaries.items.forEach(otherBoundary => {
+          if (boundary != otherBoundary) {
+            if (!boundary.inverted && Geom.polygonInPolygon(boundary, otherBoundary)) {
+              boundary.isSector = true;
+              return;
+            }
+          }
+        })
+      });
+
+      this.boundariesSortedByArea = this.model.boundaries.items.concat();
+
+      this.boundariesSortedByArea.sort((a, b) => {
+        if (a.area < b.area) {
+          return 1;
+        } else if (a.area > b.area) {
+          return -1;
+        }
+        return 0;
       })
 
     }
@@ -70,6 +97,12 @@ namespace Controllers {
     }
 
     private getBodyBoundaryContacts (item:Models.Item, seg:Geom.ISegment):void {
+
+      let parentPoly = this.model.boundaries.getItemByID(seg.parentID);
+
+      if (parentPoly.isSector) {
+        return;
+      }
 
       let penetration = Geom.resolvePenetrationSegmentRound(seg.ptA, seg.ptB, item.bounds);
 
@@ -173,7 +206,7 @@ namespace Controllers {
 
       // check parent poly
 
-      let boundaries = this.model.boundaries.items;
+      let boundaries = this.boundariesSortedByArea;
 
       items.forEach(item => {
         boundaries.forEach(boundary => {
