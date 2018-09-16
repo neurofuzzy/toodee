@@ -5,7 +5,7 @@ namespace Controllers {
     protected model:Models.Model;
     protected bodyQuadMap:Geom.SpatialQuadMap;
     protected boundaryQuadMap:Geom.PolygonQuadMap;
-    protected boundariesSortedByArea:Array<Physics.IPolygonBody>;
+    protected bodyBoundaryMap:Geom.SpatialPolygonMap<Models.Boundary, Models.Item>;
 
     protected bodyBodyContacts:Array<Physics.BodyBodyContact>;
     protected bodyBodyContactIndices:Array<boolean>;
@@ -16,6 +16,7 @@ namespace Controllers {
       this.model = model;
       this.bodyQuadMap = new Geom.SpatialQuadMap(100).init();
       this.boundaryQuadMap = new Geom.PolygonQuadMap(100, 20).init();
+      this.bodyBoundaryMap = new Geom.SpatialPolygonMap().init();
 
       return this;
 
@@ -48,19 +49,10 @@ namespace Controllers {
         })
       });
 
-      
       let bs = this.model.boundaries.items.filter(n => n); // get rid of empty values
-
-      bs.sort((a, b) => {
-        if (a.area > b.area) {
-          return 1;
-        } else if (a.area < b.area) {
-          return -1;
-        }
-        return 0;
-      });
-
-      this.boundariesSortedByArea = bs;
+      bs.forEach(boundary => {
+        this.bodyBoundaryMap.addPolygon(boundary);
+      })
 
     }
 
@@ -182,30 +174,23 @@ namespace Controllers {
         Physics.resolveContact(contact);
       })
       
-      // update quads
+      // update quads and sectors
+      // apply sector properties to body
 
       items.forEach(item => {
+
         this.bodyQuadMap.updateItem(item);
-      });
+        this.bodyBoundaryMap.updateItem(item);
 
-      // check parent poly
+        let boundary = this.bodyBoundaryMap.getItemPolygon(item);
 
-      let boundaries = this.boundariesSortedByArea;
-
-      items.forEach(item => {
-        item.rotation = 0;
-        for (let i = 0; i < boundaries.length; i++) {
-          let boundary = boundaries[i];
-          if (!boundary.inverted) {
-            let isInPoly = Geom.pointInPolygon(item.bounds.anchor, boundary);
-            if (isInPoly) {
-              item.velocity.x *= 1 - boundary.drag;
-              item.velocity.y *= 1 - boundary.drag;
-              break;
-            }
-          }
+        if (boundary) {
+          item.velocity.x *= 1 - boundary.drag;
+          item.velocity.y *= 1 - boundary.drag;
         }
+
       });
+      
 
       // ray check
 

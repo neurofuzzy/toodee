@@ -13,7 +13,7 @@ namespace Physics {
 
     public initWithBoundsAndConstraints(bounds:Geom.IBounds, constraints:Geom.IConstraints):any {
 
-      this.bounds = bounds;
+      this.initWithBounds(bounds);
       this.constraints = constraints;
       this.velocity = new Geom.Point();
 

@@ -9,12 +9,13 @@ namespace Geom {
 
   }
 
-  export class SpatialPolygonMap implements IPolygonMap<ISpatial>, Util.IModel<Util.IModelItem & ISpatial> {
+  export class SpatialPolygonMap<T extends IPolygon & Util.IModelItem, K extends Util.IModelItem & ISpatial> implements IPolygonMap<K>, Util.IModel<K> {
 
-    public items:Array<Util.IModelItem & ISpatial>;
+    public items:Array<K>;
     protected itemsPolygonIDs:Array<number>;
-    protected containers:Array<Util.IContainer<ISpatial>>;
-    protected polygonsSortedByArea:Array<IPolygon & Util.IModelItem>;
+    protected containers:Array<Util.IContainer<K>>;
+    protected polygonsByID:Array<T>;
+    protected polygonsSortedByArea:Array<T>;
     
     public init ():any {
 
@@ -28,10 +29,12 @@ namespace Geom {
       this.items = [];
       this.itemsPolygonIDs = [];
       this.containers = [];
+      this.polygonsByID = [];
+      this.polygonsSortedByArea = [];
 
     }
 
-    public getPolygonFromPoint (pt:IPoint):(IPolygon & Util.IModelItem) {
+    public getPolygonFromPoint (pt:IPoint):T {
 
       for (let i = 0; i < this.polygonsSortedByArea.length; i++) {
 
@@ -64,7 +67,7 @@ namespace Geom {
 
     }
 
-    public getContainerFromPoint (pt:IPoint):Util.IContainer<ISpatial> {
+    public getContainerFromPoint (pt:IPoint):Util.IContainer<K> {
       
       let polygonId = this.getPolygonId(pt);
 
@@ -76,8 +79,9 @@ namespace Geom {
 
     }
 
-    public addPolygon (poly:(IPolygon & Util.IModelItem)):void {
+    public addPolygon (poly:T):void {
 
+      this.polygonsByID[poly.id] = poly;
       this.containers[poly.id] = []
 
       // keep sorted by area
@@ -102,9 +106,9 @@ namespace Geom {
       
     }
 
-    public addItem (item:(Util.IModelItem & ISpatial)):boolean {
-      
-      if (isNaN(this.itemsPolygonIDs[item.id])) {
+    public addItem (item:K):boolean {
+
+      if (this.itemsPolygonIDs[item.id] == null) {
 
         let polygonID = this.getPolygonId(item.bounds.anchor);
 
@@ -128,7 +132,7 @@ namespace Geom {
 
     }
 
-    public removeItem (item:(Util.IModelItem & ISpatial)):boolean {
+    public removeItem (item:K):boolean {
 
       if (!isNaN(this.itemsPolygonIDs[item.id])) {
 
@@ -153,13 +157,26 @@ namespace Geom {
       
     }
 
-    public updateItem (item:(Util.IModelItem & ISpatial)) {
+    public updateItem (item:K):boolean {
 
       let polygonID = this.getPolygonId(item.bounds.anchor);
       
       if (polygonID != this.itemsPolygonIDs[item.id]) {
         this.removeItem(item);
         this.addItem(item);
+        return true;
+      }
+
+      return false;
+
+    }
+
+    public getItemPolygon (item:K):T {
+
+      let polygonID = this.itemsPolygonIDs[item.id];
+
+      if (polygonID >= 0) {
+        return this.polygonsByID[polygonID];
       }
 
     }

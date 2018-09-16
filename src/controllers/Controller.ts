@@ -73,7 +73,7 @@ namespace Controllers {
 
       }
 
-      let bnd = new Models.Boundary(vertices);
+      let bnd = new Models.Boundary(vertices, 0);
 
       this.model.boundaries.addItem(bnd);
 
@@ -93,7 +93,7 @@ namespace Controllers {
 
       }
 
-      bnd = new Models.Boundary(vertices, 0);
+      bnd = new Models.Boundary(vertices, 0.1);
 
       this.model.boundaries.addItem(bnd);
 
