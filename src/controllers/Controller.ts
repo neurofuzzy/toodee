@@ -93,7 +93,7 @@ namespace Controllers {
 
       }
 
-      bnd = new Models.Boundary(vertices, 0.1);
+      bnd = new Models.Boundary(vertices, 0);
 
       this.model.boundaries.addItem(bnd);
 
