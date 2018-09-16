@@ -2,8 +2,8 @@ namespace Models {
 
   export class Model {
 
-    public bodies:Util.BaseModel<Physics.IBody>;
-    public boundaries:Util.BaseModel<Physics.IPolygonBody>;
+    public bodies:Util.BaseModel<Item>;
+    public boundaries:Util.BaseModel<Boundary>;
     public ray:ProjectedRay;
  
     public init ():any {

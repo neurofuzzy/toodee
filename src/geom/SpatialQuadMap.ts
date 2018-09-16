@@ -1,10 +1,10 @@
 namespace Geom {
 
-  export interface ISpatialQuad extends Geom.IQuad<ISpatial> {
+  export interface ISpatialQuad extends IQuad<ISpatial> {
 
   }
 
-  export class SpatialQuadMap<T extends Util.IModelItem & ISpatial> implements IQuadMap<T>, Util.IModel<T> {
+  export class SpatialQuadMap<T extends Util.Identifiable & ISpatial> implements IQuadMap<T>, Util.IModel<T> {
 
     protected quadSize:number;
     protected itemsQuadIndexes:Array<number>;

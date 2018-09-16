@@ -47,7 +47,7 @@ namespace Geom {
 
       if (orthoIntersects) {
       
-        return Geom.distanceBetweenSquared(bA.anchor.x, bA.anchor.y, bB.anchor.x, bB.anchor.y) < (bA.hw + bB.hw) * (bA.hh + bB.hh);
+        return distanceBetweenSquared(bA.anchor.x, bA.anchor.y, bB.anchor.x, bB.anchor.y) < (bA.hw + bB.hw) * (bA.hh + bB.hh);
       
       }
 
@@ -100,7 +100,7 @@ namespace Geom {
 
   export function distanceBetween(x1:number, y1:number, x2:number, y2:number):number {
 
-    return Math.sqrt(Geom.distanceBetweenSquared(x1, y1, x2, y2));
+    return Math.sqrt(distanceBetweenSquared(x1, y1, x2, y2));
 
   };
 
@@ -164,23 +164,23 @@ namespace Geom {
 
     } else if (cx < rx1 && cy < ry1) {
 
-      delta = Geom.distanceBetween(cx, cy, rx1, ry1);
-      angle = Geom.angleBetween(cx, cy, rx1, ry1);
+      delta = distanceBetween(cx, cy, rx1, ry1);
+      angle = angleBetween(cx, cy, rx1, ry1);
 
     } else if (cx > rx2 && cy < ry1) {
 
-      delta = Geom.distanceBetween(cx, cy, rx2, ry1);
-      angle = Geom.angleBetween(cx, cy, rx2, ry1);
+      delta = distanceBetween(cx, cy, rx2, ry1);
+      angle = angleBetween(cx, cy, rx2, ry1);
 
     } else if (cx > rx2 && cy > ry2) {
 
-      delta = Geom.distanceBetween(cx, cy, rx2, ry2);
-      angle = Geom.angleBetween(cx, cy, rx2, ry2);
+      delta = distanceBetween(cx, cy, rx2, ry2);
+      angle = angleBetween(cx, cy, rx2, ry2);
 
     } else {
 
-      delta = Geom.distanceBetween(cx, cy, rx1, ry2);
-      angle = Geom.angleBetween(cx, cy, rx1, ry2);
+      delta = distanceBetween(cx, cy, rx1, ry2);
+      angle = angleBetween(cx, cy, rx1, ry2);
 
     }
 
@@ -192,13 +192,13 @@ namespace Geom {
 
   export function rotatePointDeg(pt:IPoint, deg:number):void {
 
-    Geom.rotatePoint(pt, deg * Math.PI / 180);
+    rotatePoint(pt, deg * Math.PI / 180);
 
   };
 
   export function rotatePoint(pt:IPoint, angle:number):void {
 
-    angle = 0 - Geom.normalizeAngle(angle);
+    angle = 0 - normalizeAngle(angle);
 
     var cos = Math.cos(angle);
     var sin = Math.sin(angle);
@@ -217,12 +217,12 @@ namespace Geom {
 
   export function lerpDist(x1:number, y1:number, x2:number, y2:number, dist:number):IPoint {
 
-    var len = Geom.distanceBetween(x1, y1, x2, y2);
+    var len = distanceBetween(x1, y1, x2, y2);
     var perc = dist / len;
 
     return {
-      x: Geom.lerp(x2, x1, perc),
-      y: Geom.lerp(y2, y1, perc)
+      x: lerp(x2, x1, perc),
+      y: lerp(y2, y1, perc)
     }
 
   }
@@ -302,14 +302,14 @@ namespace Geom {
 
     var pt;
 
-    var ab = Geom.sub(ptB, ptA);
-    var ca = Geom.sub(ptC, ptA);
-    var t = Geom.dot(ca, ab);
+    var ab = sub(ptB, ptA);
+    var ca = sub(ptC, ptA);
+    var t = dot(ca, ab);
 
     if (t < 0) {
       pt = ptA;
     } else {
-      var denom = Geom.dot(ab, ab);
+      var denom = dot(ab, ab);
       if (t >= denom) {
         pt = ptB;
       } else {
@@ -330,7 +330,7 @@ namespace Geom {
   }
 
   export function lineIntersectsLine(p1x:number, p1y:number, p2x:number, p2y:number, p3x:number, p3y:number, p4x:number, p4y:number):boolean {
-    var fn = Geom.ccw;
+    var fn = ccw;
     return (
       fn(p1x, p1y, p3x, p3y, p4x, p4y) != fn(p2x, p2y, p3x, p3y, p4x, p4y) && 
       fn(p1x, p1y, p2x, p2y, p3x, p3y) != fn(p1x, p1y, p2x, p2y, p4x, p4y)
@@ -449,15 +449,15 @@ namespace Geom {
 
     // edge check
 
-    var fn = Geom.lineIntersectsLine;
-    var fn2 = Geom.lineSide;
+    var fn = lineIntersectsLine;
+    var fn2 = lineSide;
 
     var hits = [];
 
     if (fn(ax, ay, bx, by, rx, ry, rx2, ry)) {
 
       if (isNaN(side) || fn2(ax, ay, rx, ry, rx2, ry) == side) {
-        hits.push(Geom.lineLineIntersect(ax, ay, bx, by, rx, ry, rx2, ry));
+        hits.push(lineLineIntersect(ax, ay, bx, by, rx, ry, rx2, ry));
       }
 
     }
@@ -465,7 +465,7 @@ namespace Geom {
     if (fn(ax, ay, bx, by, rx2, ry, rx2, ry2)) {
 
       if (isNaN(side) || fn2(ax, ay, rx2, ry, rx2, ry2) == side) {
-        hits.push(Geom.lineLineIntersect(ax, ay, bx, by, rx2, ry, rx2, ry2));
+        hits.push(lineLineIntersect(ax, ay, bx, by, rx2, ry, rx2, ry2));
       }
 
     }
@@ -473,7 +473,7 @@ namespace Geom {
     if (fn(ax, ay, bx, by, rx2, ry2, rx, ry2)) {
 
       if (isNaN(side) || fn2(ax, ay, rx2, ry2, rx, ry2) == side) {
-        hits.push(Geom.lineLineIntersect(ax, ay, bx, by, rx2, ry2, rx, ry2));
+        hits.push(lineLineIntersect(ax, ay, bx, by, rx2, ry2, rx, ry2));
       }
 
     }
@@ -481,7 +481,7 @@ namespace Geom {
     if (fn(ax, ay, bx, by, rx, ry2, rx, ry)) {
 
       if (isNaN(side) || fn2(ax, ay, rx, ry2, rx, ry) == side) {
-        hits.push(Geom.lineLineIntersect(ax, ay, bx, by, rx, ry2, rx, ry));
+        hits.push(lineLineIntersect(ax, ay, bx, by, rx, ry2, rx, ry));
       }
 
     }
@@ -506,7 +506,7 @@ namespace Geom {
 
       for (var i = minx; i <= maxx + 1; i++) {
 
-        sides[j][i] = Geom.lineSide(i * gridSize, j * gridSize, x0, y0, x1, y1);
+        sides[j][i] = lineSide(i * gridSize, j * gridSize, x0, y0, x1, y1);
 
       }
 
@@ -538,7 +538,7 @@ namespace Geom {
 
       intoArr = gridPointsAlongLine(x0, y0, x1, y1, gridSize, intoArr);
 
-      let angle = Geom.angleBetween(x0, y0, x1, y1);
+      let angle = angleBetween(x0, y0, x1, y1);
 
       let sinang = Math.sin(0 - angle);
       let cosang = Math.cos(0 - angle);
@@ -596,7 +596,7 @@ namespace Geom {
 
   export function polygonIsClockwise(pts:Array<IPoint>):boolean {
 
-    return Geom.polygonArea(pts) > 0;
+    return polygonArea(pts) > 0;
 
   }
 
@@ -606,7 +606,7 @@ namespace Geom {
 
     poly.segments.forEach(seg => {
 
-      let intPt = Geom.lineLineIntersect(linePtA.x, linePtA.y, linePtB.x, linePtB.y, seg.ptA.x, seg.ptA.y, seg.ptB.x, seg.ptB.y);
+      let intPt = lineLineIntersect(linePtA.x, linePtA.y, linePtB.x, linePtB.y, seg.ptA.x, seg.ptA.y, seg.ptB.x, seg.ptB.y);
 
       if (intPt != null) {
         pts.push(intPt);

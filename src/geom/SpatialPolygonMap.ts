@@ -3,13 +3,13 @@ namespace Geom {
 
   export interface IPolygonMap<T> {
 
-    addPolygon(poly:(IPolygon & Util.IModelItem)):void;
-    getPolygonFromPoint (pt:IPoint):(IPolygon & Util.IModelItem);
+    addPolygon(poly:(IPolygon & Util.Identifiable)):void;
+    getPolygonFromPoint (pt:IPoint):(IPolygon & Util.Identifiable);
     getContainerFromPoint (pt:IPoint):Util.IContainer<T>;
 
   }
 
-  export class SpatialPolygonMap<T extends IPolygon & Util.IModelItem, K extends Util.IModelItem & ISpatial> implements IPolygonMap<K>, Util.IModel<K> {
+  export class SpatialPolygonMap<T extends IPolygon & Util.Identifiable, K extends Util.Identifiable & ISpatial> implements IPolygonMap<K>, Util.IModel<K> {
 
     public items:Array<K>;
     protected itemsPolygonIDs:Array<number>;

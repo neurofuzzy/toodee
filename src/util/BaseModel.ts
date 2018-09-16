@@ -1,8 +1,8 @@
 namespace Util {
 
-  export class BaseModel<T> implements Util.IModel<Util.IModelItem & T> {
+  export class BaseModel<T extends Util.Identifiable> implements Util.IModel<T> {
 
-    public items:Array<IModelItem & T>;
+    public items:Array<Identifiable & T>;
 
     constructor () {
 
@@ -22,13 +22,13 @@ namespace Util {
  
     }
 
-    public getItemByID (id:number):(IModelItem & T) {
-      
+    public getItemByID (id:number):T {
+
       return this.items[id];
 
     }
 
-    public addItem (item:IModelItem & T):boolean {
+    public addItem (item:T):boolean {
 
       if (item.id < 0 || this.items[item.id] != undefined) {
         return false;
@@ -40,7 +40,7 @@ namespace Util {
 
     }
 
-    public removeItem (item:IModelItem & T):boolean {
+    public removeItem (item:T):boolean {
 
       if (item.id >= 0 && this.items[item.id] != undefined) {
         this.items[item.id] = null;

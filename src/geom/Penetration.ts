@@ -6,7 +6,7 @@ namespace Geom {
 
     pt.x = pt.y = 0;
 
-    if (Geom.boundsIntersect(bA, bB)) {
+    if (boundsIntersect(bA, bB)) {
 
       var aA = bA.anchor;
       var aB = bB.anchor;
@@ -32,12 +32,12 @@ namespace Geom {
 
     pt.x = pt.y = 0;
 
-    var dist = Geom.distanceBetween(bA.anchor.x, bA.anchor.y, bB.anchor.x, bB.anchor.y) - bA.hw - bB.hw;
+    var dist = distanceBetween(bA.anchor.x, bA.anchor.y, bB.anchor.x, bB.anchor.y) - bA.hw - bB.hw;
 
     if (dist < 0) {
 
       var delta = 0 - dist;
-      var angle = Geom.angleBetween(bA.anchor.x, bA.anchor.y, bB.anchor.x, bB.anchor.y);
+      var angle = angleBetween(bA.anchor.x, bA.anchor.y, bB.anchor.x, bB.anchor.y);
 
       if (angle < 0) angle += Math.PI * 2;
 
@@ -185,23 +185,23 @@ namespace Geom {
 
     } else if (cx < rx1 && cy < ry1) {
 
-      delta = Geom.distanceBetween(cx, cy, rx1, ry1);
-      angle = Geom.angleBetween(cx, cy, rx1, ry1);
+      delta = distanceBetween(cx, cy, rx1, ry1);
+      angle = angleBetween(cx, cy, rx1, ry1);
 
     } else if (cx > rx2 && cy < ry1) {
 
-      delta = Geom.distanceBetween(cx, cy, rx2, ry1);
-      angle = Geom.angleBetween(cx, cy, rx2, ry1);
+      delta = distanceBetween(cx, cy, rx2, ry1);
+      angle = angleBetween(cx, cy, rx2, ry1);
 
     } else if (cx > rx2 && cy > ry2) {
 
-      delta = Geom.distanceBetween(cx, cy, rx2, ry2);
-      angle = Geom.angleBetween(cx, cy, rx2, ry2);
+      delta = distanceBetween(cx, cy, rx2, ry2);
+      angle = angleBetween(cx, cy, rx2, ry2);
 
     } else {
 
-      delta = Geom.distanceBetween(cx, cy, rx1, ry2);
-      angle = Geom.angleBetween(cx, cy, rx1, ry2);
+      delta = distanceBetween(cx, cy, rx1, ry2);
+      angle = angleBetween(cx, cy, rx1, ry2);
 
     }
 
@@ -224,9 +224,9 @@ namespace Geom {
   export function resolvePenetrationSegmentRound (segPtA:IPoint, segPtB:IPoint, b:IBounds):IPoint {
 
     var a = b.anchor;
-    let closestPt:IPoint = Geom.closestPtPointLine(a, segPtA, segPtB);
+    let closestPt:IPoint = closestPtPointLine(a, segPtA, segPtB);
 
-    let delta = Geom.distanceBetween(a.x, a.y, closestPt.x, closestPt.y);
+    let delta = distanceBetween(a.x, a.y, closestPt.x, closestPt.y);
     delta -= b.hw;
     
     if (delta < 0) {
@@ -235,7 +235,7 @@ namespace Geom {
       //  delta += b.hw * 2;
       }
 
-      let angle = Geom.angleBetween(a.x, a.y, closestPt.x, closestPt.y);
+      let angle = angleBetween(a.x, a.y, closestPt.x, closestPt.y);
 
       let dx = delta * Math.sin(Math.PI * 0.5 - angle);
       let dy = delta * Math.cos(Math.PI * 0.5 - angle);

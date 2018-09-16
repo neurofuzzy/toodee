@@ -2,7 +2,7 @@
 
 namespace Models {
 
-  export class Boundary extends Physics.PolygonBody implements Util.IModelItem {
+  export class Boundary extends Physics.PolygonBody implements Util.Identifiable {
 
     public id:number;
 

@@ -1,10 +1,10 @@
 namespace Geom {
 
-  export interface ISegmentQuad extends Geom.IQuad<ISegment> {
+  export interface ISegmentQuad extends IQuad<ISegment> {
  
   }
 
-  export class PolygonQuadMap<T extends Util.IModelItem & IPolygon> implements IQuadMap<T>, Util.IModel<T> {
+  export class PolygonQuadMap<T extends Util.Identifiable & IPolygon> implements IQuadMap<T>, Util.IModel<T> {
 
     protected quadSize:number;
     protected segmentThickness:number;
@@ -44,7 +44,7 @@ namespace Geom {
 
     protected getQuadCoords (item:ISegment):Array<IPoint> {
 
-      return Geom.gridPointsAlongLineWithThickness(item.ptA.x, item.ptA.y, item.ptB.x, item.ptB.y, this.quadSize, this.segmentThickness);
+      return gridPointsAlongLineWithThickness(item.ptA.x, item.ptA.y, item.ptB.x, item.ptB.y, this.quadSize, this.segmentThickness);
 
     }
 

@@ -2,7 +2,7 @@
 
 namespace Models {
 
-  export class Item extends Physics.BaseBody implements Util.IModelItem {
+  export class Item extends Physics.BaseBody implements Util.Identifiable {
 
     public id:number;
 
