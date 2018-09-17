@@ -32,6 +32,31 @@ namespace Geom {
 
   }
 
+  export class Ray implements IRay {
+
+    public origin:IPoint;
+    public angle:number;
+
+    constructor (ox:number = 0, oy:number = 0, angle:number = 0) {
+
+      this.origin = new Point(ox, oy);
+      this.angle = angle;
+
+    }
+
+    public project (len:number):IPoint {
+
+      let pt = new Point();
+
+      pt.x = this.origin.x + len * Math.sin(this.angle);
+      pt.y = this.origin.y + len * Math.cos(this.angle);
+
+      return pt;
+
+    }
+
+  }
+
   export class Segment implements ISegment {
 
     public parentID:number;
@@ -81,31 +106,6 @@ namespace Geom {
 
       this.area = Math.abs(polygonArea(this.vertices));
       this.inverted = polygonIsClockwise(this.vertices);
-
-    }
-
-  }
-
-  export class Ray implements IRay {
-
-    public origin:IPoint;
-    public angle:number;
-
-    constructor (ox:number = 0, oy:number = 0, angle:number = 0) {
-
-      this.origin = new Point(ox, oy);
-      this.angle = angle;
-
-    }
-
-    public project (len:number):IPoint {
-
-      let pt = new Point();
-
-      pt.x = this.origin.x + len * Math.sin(this.angle);
-      pt.y = this.origin.y + len * Math.cos(this.angle);
-
-      return pt;
 
     }
 

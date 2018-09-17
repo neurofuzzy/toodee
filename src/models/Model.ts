@@ -4,13 +4,13 @@ namespace Models {
 
     public bodies:Util.BaseModel<Item>;
     public boundaries:Util.BaseModel<Boundary>;
-    public ray:ProjectedRay;
+    public ray:Geom.Ray;
  
     public init ():any {
       
       this.boundaries = new Util.BaseModel();
       this.bodies = new Util.BaseModel();
-      this.ray = new ProjectedRay();
+      this.ray = new Geom.Ray();
 
       return this;
 

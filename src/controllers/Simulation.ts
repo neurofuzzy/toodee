@@ -198,17 +198,17 @@ namespace Controllers {
 
       let r = this.model.ray;
       r.angle += 1 * Math.PI / 180;
-      r.endPt = r.project(400);
+      let pt = r.project(400);
 
       let hitPts:Array<Geom.IPointHit> = [];
 
-      let qcoords = Geom.gridPointsAlongLineWithThickness(r.origin.x, r.origin.y, r.endPt.x, r.endPt.y, 100, 20);
+      let qcoords = Geom.gridPointsAlongLineWithThickness(r.origin.x, r.origin.y, pt.x, pt.y, 100, 20);
 
       let boundaryQuads = this.boundaryQuadMap.getQuadsFromCoords(qcoords, true);
       
       boundaryQuads.forEach(quad => {
         quad.forEach(seg => {
-          let intPt = Geom.lineLineIntersect(r.origin.x, r.origin.y, r.endPt.x, r.endPt.y, seg.ptA.x, seg.ptA.y, seg.ptB.x, seg.ptB.y);
+          let intPt = Geom.lineLineIntersect(r.origin.x, r.origin.y, pt.x, pt.y, seg.ptA.x, seg.ptA.y, seg.ptB.x, seg.ptB.y);
 
           if (intPt != null) {
             hitPts.push(new Geom.PointHit(r.origin, intPt, seg.parentID))
@@ -221,7 +221,7 @@ namespace Controllers {
       bodyQuads.forEach(quad => {
         quad.forEach(body => {
 
-          let intPts = Geom.boundsLineIntersect(body.bounds, r.origin, r.endPt);
+          let intPts = Geom.boundsLineIntersect(body.bounds, r.origin, pt);
 
           if (intPts && intPts.length) {
             intPts.forEach(intPt => {
@@ -235,7 +235,7 @@ namespace Controllers {
 
       if (hitPts.length > 0) {
         Geom.PointHit.sort(hitPts);
-        r.endPt = hitPts[0].pt;
+        pt = hitPts[0].pt;
       }
 
       // end ray check
