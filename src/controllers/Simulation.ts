@@ -200,18 +200,30 @@ namespace Controllers {
       r.angle += 1 * Math.PI / 180;
       let pt = r.project(400);
 
+      let hitPts = this.raycast(r);
+
+      this.model.rayHit = hitPts[0];
+
+      // end ray check
+
+    }
+
+    public raycast (ray:Geom.Ray):Array<Geom.IPointHit> {
+
+      let pt = ray.project(400);
+
       let hitPts:Array<Geom.IPointHit> = [];
 
-      let qcoords = Geom.gridPointsAlongLineWithThickness(r.origin.x, r.origin.y, pt.x, pt.y, 100, 20);
+      let qcoords = Geom.gridPointsAlongLineWithThickness(ray.origin.x, ray.origin.y, pt.x, pt.y, 100, 20);
 
       let boundaryQuads = this.boundaryQuadMap.getQuadsFromCoords(qcoords, true);
       
       boundaryQuads.forEach(quad => {
         quad.forEach(seg => {
-          let intPt = Geom.lineLineIntersect(r.origin.x, r.origin.y, pt.x, pt.y, seg.ptA.x, seg.ptA.y, seg.ptB.x, seg.ptB.y);
+          let intPt = Geom.lineLineIntersect(ray.origin.x, ray.origin.y, pt.x, pt.y, seg.ptA.x, seg.ptA.y, seg.ptB.x, seg.ptB.y);
 
           if (intPt != null) {
-            hitPts.push(new Geom.PointHit(r.origin, intPt, seg.parentID))
+            hitPts.push(new Geom.PointHit(ray.origin, intPt, seg.parentID))
           }
         });
       });
@@ -221,12 +233,12 @@ namespace Controllers {
       bodyQuads.forEach(quad => {
         quad.forEach(body => {
 
-          let intPts = Geom.boundsLineIntersect(body.bounds, r.origin, pt);
+          let intPts = Geom.boundsLineIntersect(body.bounds, ray.origin, pt);
 
           if (intPts && intPts.length) {
             intPts.forEach(intPt => {
               let item = body as Models.Item;
-              hitPts.push(new Geom.PointHit(r.origin, intPt, item.id));
+              hitPts.push(new Geom.PointHit(ray.origin, intPt, item.id));
             })
           }
 
@@ -235,10 +247,9 @@ namespace Controllers {
 
       if (hitPts.length > 0) {
         Geom.PointHit.sort(hitPts);
-        pt = hitPts[0].pt;
       }
 
-      // end ray check
+      return hitPts;
 
     }
 

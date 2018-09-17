@@ -142,7 +142,6 @@ namespace Controllers {
       let ro = r.origin;
       ro.x = 400;
       ro.y = 400;
-      r.endPt = r.project(200);
 
     }
 

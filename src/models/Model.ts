@@ -5,6 +5,7 @@ namespace Models {
     public bodies:Util.BaseModel<Item>;
     public boundaries:Util.BaseModel<Boundary>;
     public ray:Geom.Ray;
+    public rayHit:Geom.IPointHit;
  
     public init ():any {
       

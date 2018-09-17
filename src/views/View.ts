@@ -98,13 +98,7 @@ namespace Views {
       });
 
       // ray 
-
       this.ray = new PIXI.Graphics().lineStyle(2, 0x00ff66, 0.5);
-
-      let r = this.model.ray;
-
-      this.ray.moveTo(r.origin.x, r.origin.y);
-      this.ray.lineTo(r.endPt.x, r.endPt.y);
 
       // Add to the stage
       this.pixi.stage.addChild(this.ray);
@@ -129,9 +123,12 @@ namespace Views {
       let r = this.model.ray;
 
       this.ray.clear();
-      this.ray.lineStyle(2, 0x00ff66, 0.5);
-      this.ray.moveTo(r.origin.x, r.origin.y);
-      this.ray.lineTo(r.endPt.x, r.endPt.y);
+
+      if (this.model.rayHit != undefined) {
+        this.ray.lineStyle(2, 0x00ff66, 0.5);
+        this.ray.moveTo(r.origin.x, r.origin.y);
+        this.ray.lineTo(this.model.rayHit.pt.x, this.model.rayHit.pt.y);
+      }
       
 
       this.fps.innerText = this.pixi.ticker.FPS.toString();
