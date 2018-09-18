@@ -38,10 +38,10 @@ namespace Controllers {
           b.anchor.x = Math.floor(b.anchor.x / 20) * 20;
           b.anchor.y = Math.floor(b.anchor.y / 20) * 20;
           c.lockX = c.lockY = true;
-
         }
   
         var item:Models.Item = new Models.Item().initWithBoundsAndConstraints(b, c);
+        //item.rotation = 0.5;
 
         // give a random velocity
         if (b.shape == Geom.SHAPE_ROUND) {

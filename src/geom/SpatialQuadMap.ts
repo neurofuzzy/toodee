@@ -1,17 +1,13 @@
 namespace Geom {
 
-  export interface ISpatialQuad extends IQuad<ISpatial> {
-
-  }
-
   export class SpatialQuadMap<T extends Util.Identifiable & ISpatial> implements IQuadMap<T>, Util.IModel<T> {
 
     protected quadSize:number;
     protected itemsQuadIndexes:Array<number>;
-    protected quads:Array<ISpatialQuad>;
+    protected quads:Array<Array<T>>;
 
     protected bufferPt:IPoint;
-    protected bufferArr:Array<ISpatialQuad>;
+    protected bufferArr:Array<Array<T>>;
 
     constructor (quadSize:number = 100) {
 
@@ -64,7 +60,7 @@ namespace Geom {
 
     }
 
-    protected getQuad (x:number, y:number):ISpatialQuad {
+    protected getQuad (x:number, y:number):Array<T> {
 
       return this.quads[this.getQuadIndex(x, y)];
 
@@ -121,7 +117,7 @@ namespace Geom {
 
     }
 
-    public getSurroundingQuads (item:(T)):Array<ISpatialQuad> {
+    public getSurroundingQuads (item:(T)):Array<Array<T>> {
 
       var pt = this.getQuadCoords(item);
       var arr = this.bufferArr;
@@ -145,16 +141,16 @@ namespace Geom {
 
     }
 
-    public getQuadFromPoint (pt:IPoint):ISpatialQuad {
+    public getQuadFromPoint (pt:IPoint):Array<T> {
 
       var idx = this.getQuadIndex(Math.floor(pt.x / this.quadSize), Math.floor(pt.y / this.quadSize));
       return this.quads[idx];
       
     }
 
-    public getQuadsFromCoords (coords:Array<IPoint>, removeDupes:boolean = false):Array<ISpatialQuad> {
+    public getQuadsFromCoords (coords:Array<IPoint>, removeDupes:boolean = false):Array<Array<T>> {
 
-      var matchingQuads:Array<ISpatialQuad> = [];
+      var matchingQuads:Array<Array<T>> = [];
 
       coords.forEach(coord => {
         var idx = this.getQuadIndex(coord.x, coord.y);
@@ -167,6 +163,30 @@ namespace Geom {
       });
 
       return matchingQuads;
+
+    }
+
+    public getQuadsNear (center:IPoint, radius:number):Array<Array<T>> {
+
+      var coords = Geom.gridPointsIntersectingCircle(center, radius, this.quadSize);
+      return this.getQuadsFromCoords(coords, false);
+
+    }
+
+    public getItemsNear (center:IPoint, radius:number):Array<T> {
+
+      let items:Array<T> = [];
+      let quads = this.getQuadsNear(center, radius);
+
+      quads.forEach(quad => {
+        quad.forEach(item => {
+          if (Geom.distanceBetween(center.x, center.y, item.bounds.anchor.x, item.bounds.anchor.y) <= radius) {
+            items.push(item);
+          }
+        })
+      });
+
+      return items;
 
     }
 

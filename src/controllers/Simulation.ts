@@ -184,6 +184,9 @@ namespace Controllers {
         this.bodyQuadMap.updateItem(item);
         this.bodyBoundaryMap.updateItem(item);
 
+        // temp
+        item.rotation = 0.5;
+
         let boundary = this.bodyBoundaryMap.getItemPolygon(item);
 
         if (boundary) {
@@ -192,21 +195,35 @@ namespace Controllers {
         }
 
       });
-      
 
       // ray check
 
       let r = this.model.ray;
       r.angle += 1 * Math.PI / 180;
-      let pt = r.project(400);
-
+  
       let hitPts = this.raycast(r);
 
       this.model.rayHit = hitPts[0];
 
       // end ray check
 
+      // near items check
+
+      let nearItems = this.itemsNear({ x: 400, y:300 }, 300 + 300 * Math.sin(Date.now() / 5000));
+      
+      nearItems.forEach(item => {
+        item.rotation = 0;
+      });
+
+
     }
+
+    public itemsNear (center:Geom.IPoint, radius:number):Array<Models.Item> {
+
+      return this.bodyQuadMap.getItemsNear(center, radius);
+
+    }
+    
 
     public raycast (ray:Geom.Ray):Array<Geom.IPointHit> {
 

@@ -6,6 +6,7 @@ namespace Views {
     protected bodies:Array<PIXI.Graphics>;
     protected boundaries:Array<PIXI.Graphics>;
     protected ray:PIXI.Graphics;
+    protected testGraphic:PIXI.Graphics;
 
     public pixi:PIXI.Application;
     private fps:HTMLElement;
@@ -103,6 +104,9 @@ namespace Views {
       // Add to the stage
       this.pixi.stage.addChild(this.ray);
 
+      this.testGraphic = new PIXI.Graphics();
+      this.pixi.stage.addChild(this.testGraphic);
+
     }
 
     public update () {
@@ -130,6 +134,20 @@ namespace Views {
         this.ray.lineTo(this.model.rayHit.pt.x, this.model.rayHit.pt.y);
       }
       
+      this.testGraphic.clear();
+      this.testGraphic.lineStyle(1, 0x00ffff, 0.5);
+      
+      let cen = { x: 400, y:300 };
+      let rad = 300 + 300 * Math.sin(Date.now() / 5000);
+      let pts = Geom.gridPointsIntersectingCircle(cen, rad, 100);
+
+      for (let i = 0; i < pts.length; i++) {
+        let pt = pts[i];
+        this.testGraphic.drawRect(pt.x * 100, pt.y * 100, 100, 100);
+      }
+
+      this.testGraphic.lineStyle(1, 0xff00ff);
+      this.testGraphic.drawCircle(cen.x, cen.y, rad);
 
       this.fps.innerText = this.pixi.ticker.FPS.toString();
 

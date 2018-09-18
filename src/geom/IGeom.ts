@@ -27,6 +27,11 @@ namespace Geom {
     y2:number;
   }
 
+  export interface ICircle {
+    center:IPoint;
+    radius:number;
+  }
+
   export interface ISegment {
     parentID:number;
     ptA:IPoint;

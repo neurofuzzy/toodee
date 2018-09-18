@@ -579,6 +579,40 @@ namespace Geom {
 
   }
 
+  export function gridPointsIntersectingCircle (center:IPoint, radius:number, gridSize:number):Array<IPoint> {
+    
+    let a:Array<IPoint> = [];
+
+    radius += gridSize * 0.5 * 1.4142;
+    
+    var minx = Math.floor((center.x - radius) / gridSize);
+    var maxx = Math.ceil((center.x + radius) / gridSize);
+    var miny = Math.floor((center.y - radius) / gridSize);
+    var maxy = Math.ceil((center.y + radius) / gridSize);
+
+    let testPt = { x: 0, y: 0 };
+    let hg = gridSize * 0.5;
+
+    for (let y = miny; y <= maxy; y++) {
+
+      for (let x = minx; x <= maxx; x++) {
+
+        testPt.x = x * gridSize + hg;
+        testPt.y = y * gridSize + hg;
+
+        if (distanceBetween(center.x, center.y, testPt.x, testPt.y) < radius) {
+          a.push(new Point(x, y));
+        }
+
+      }
+
+    }
+
+
+    return a;
+
+  }
+
   export function polygonArea(pts:Array<IPoint>):number {
 
     let area = 0;
