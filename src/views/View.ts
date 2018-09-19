@@ -138,7 +138,10 @@ namespace Views {
       this.testGraphic.lineStyle(1, 0x00ffff, 0.5);
       
       let cen = { x: 400, y:300 };
-      let rad = 300 + 300 * Math.sin(Date.now() / 5000);
+      cen.x += 200 * Math.sin(Date.now() / 5000);
+      cen.y += 200 * Math.cos(Date.now() / 5000);
+      let rad = 150;
+      
       let pts = Geom.gridPointsIntersectingCircle(cen, rad, 100);
 
       for (let i = 0; i < pts.length; i++) {

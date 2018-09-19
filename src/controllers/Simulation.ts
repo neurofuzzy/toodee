@@ -196,24 +196,45 @@ namespace Controllers {
 
       });
 
+      // ray 
+      let r = this.model.ray;
+  
+      // near items check
+
+      let cen = { x: 400, y:300 };
+      cen.x += 200 * Math.sin(Date.now() / 5000);
+      cen.y += 200 * Math.cos(Date.now() / 5000);
+      let rad = 150;
+
+      r.origin.x = cen.x;
+      r.origin.y = cen.y;
+      r.angle = Geom.normalizeAngle(Math.PI * 2 - Geom.angleBetween(cen.x, cen.y, 400, 300));
+
+      let nearItems = this.itemsNear(cen, rad);
+
+      
+      nearItems.forEach(item => {
+        let ang = Geom.normalizeAngle(0 - Geom.angleBetween(cen.x, cen.y, item.bounds.anchor.x, item.bounds.anchor.y) + Math.PI * 0.5);
+        let angDelta = Geom.normalizeAngle(r.angle - ang);
+        if (Math.abs(angDelta) < 0.5) {
+          item.rotation = 0;
+        }
+      });
+
       // ray check
 
-      let r = this.model.ray;
-      r.angle += 1 * Math.PI / 180;
-  
       let hitPts = this.raycast(r);
 
       this.model.rayHit = hitPts[0];
 
+      if (this.model.rayHit) {
+        let hitItem = this.model.bodies.getItemByID(this.model.rayHit.parentID);
+        if (hitItem) {
+          hitItem.rotation = -1;
+        }
+      }
+
       // end ray check
-
-      // near items check
-
-      let nearItems = this.itemsNear({ x: 400, y:300 }, 300 + 300 * Math.sin(Date.now() / 5000));
-      
-      nearItems.forEach(item => {
-        item.rotation = 0;
-      });
 
 
     }
