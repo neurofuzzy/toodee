@@ -142,7 +142,7 @@ namespace Views {
       cen.y += 200 * Math.cos(Date.now() / 5000);
       let rad = 150;
       
-      let pts = Geom.gridPointsIntersectingCircle(cen, rad, 100);
+      let pts = Geom.cellCoordsIntersectingCircle(cen, rad, 100);
 
       for (let i = 0; i < pts.length; i++) {
         let pt = pts[i];

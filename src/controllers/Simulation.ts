@@ -3,8 +3,8 @@ namespace Controllers {
   export class Simulation implements Util.IController<Models.Model, null> {
 
     protected model:Models.Model;
-    protected bodyQuadMap:Geom.SpatialQuadMap<Models.Item>;
-    protected boundaryQuadMap:Geom.PolygonQuadMap<Models.Boundary>;
+    protected bodyGrid:Geom.SpatialGrid<Models.Item>;
+    protected boundaryGrid:Geom.PolygonGrid<Models.Boundary>;
     protected bodyBoundaryMap:Geom.SpatialPolygonMap<Models.Boundary, Models.Item>;
 
     protected bodyBodyContacts:Array<Physics.BodyBodyContact>;
@@ -14,8 +14,8 @@ namespace Controllers {
     public initWithModelAndView(model:Models.Model):any {
 
       this.model = model;
-      this.bodyQuadMap = new Geom.SpatialQuadMap(100).init();
-      this.boundaryQuadMap = new Geom.PolygonQuadMap(100, 20).init();
+      this.bodyGrid = new Geom.SpatialGrid(100).init();
+      this.boundaryGrid = new Geom.PolygonGrid(100, 20).init();
       this.bodyBoundaryMap = new Geom.SpatialPolygonMap().init();
 
       return this;
@@ -24,16 +24,16 @@ namespace Controllers {
 
     protected build () {
 
-      // add items to quadmaps
+      // add items to cellmaps
 
       this.model.bodies.items.forEach(body => {
-        this.bodyQuadMap.addItem(body);
+        this.bodyGrid.addItem(body);
       });
 
-      // add bounaries to quadmaps
+      // add bounaries to cellmaps
 
       this.model.boundaries.items.forEach(boundary => {
-        this.boundaryQuadMap.addItem(boundary);
+        this.boundaryGrid.addItem(boundary);
       });
 
       // compare boundaries to find sectors (normal boundaries within normal boundaries)
@@ -124,10 +124,10 @@ namespace Controllers {
         item.bounds.anchor.y += item.velocity.y;
       });
 
-      // update quads
+      // update cells
       
       items.forEach(item => {
-        this.bodyQuadMap.updateItem(item);
+        this.bodyGrid.updateItem(item);
       });
 
       // forward body collision check
@@ -135,13 +135,13 @@ namespace Controllers {
       items.forEach(item => {
 
         let itemA = item as Models.Item;
-        let quads = this.bodyQuadMap.getSurroundingQuads(itemA);
+        let cells = this.bodyGrid.getSurroundingCells(itemA);
 
-        quads.forEach(quad => {
+        cells.forEach(cell => {
   
-          if (quad != null) {
+          if (cell != null) {
   
-            quad.forEach(item => {
+            cell.forEach(item => {
   
               var itemB = item as Models.Item;
               this.getBodyBodyContacts(itemA, itemB);
@@ -159,9 +159,9 @@ namespace Controllers {
       items.forEach(item => {
         if (item.bounds.shape == Geom.SHAPE_ROUND) {
           let itemA = item as Models.Item;
-          let quad = this.boundaryQuadMap.getQuadFromPoint(item.bounds.anchor);
-          if (quad) {
-            quad.forEach(seg => {
+          let cell = this.boundaryGrid.getCellFromPoint(item.bounds.anchor);
+          if (cell) {
+            cell.forEach(seg => {
               this.getBodyBoundaryContacts(itemA, seg);
             })
           }
@@ -176,12 +176,12 @@ namespace Controllers {
         Physics.resolveContact(contact);
       })
       
-      // update quads and sectors
+      // update cells and sectors
       // apply sector properties to body
 
       items.forEach(item => {
 
-        this.bodyQuadMap.updateItem(item);
+        this.bodyGrid.updateItem(item);
         this.bodyBoundaryMap.updateItem(item);
 
         // temp
@@ -241,7 +241,7 @@ namespace Controllers {
 
     public itemsNear (center:Geom.IPoint, radius:number):Array<Models.Item> {
 
-      return this.bodyQuadMap.getItemsNear(center, radius);
+      return this.bodyGrid.getItemsNear(center, radius);
 
     }
     
@@ -252,12 +252,12 @@ namespace Controllers {
 
       let hitPts:Array<Geom.IPointHit> = [];
 
-      let qcoords = Geom.gridPointsAlongLineWithThickness(ray.origin.x, ray.origin.y, pt.x, pt.y, 100, 20);
+      let coords = Geom.cellCoordsAlongLineWithThickness(ray.origin.x, ray.origin.y, pt.x, pt.y, 100, 20);
 
-      let boundaryQuads = this.boundaryQuadMap.getQuadsFromCoords(qcoords, true);
+      let boundaryCells = this.boundaryGrid.getCellsFromCoords(coords, true);
       
-      boundaryQuads.forEach(quad => {
-        quad.forEach(seg => {
+      boundaryCells.forEach(cell => {
+        cell.forEach(seg => {
           let intPt = Geom.lineLineIntersect(ray.origin.x, ray.origin.y, pt.x, pt.y, seg.ptA.x, seg.ptA.y, seg.ptB.x, seg.ptB.y);
 
           if (intPt != null) {
@@ -266,10 +266,10 @@ namespace Controllers {
         });
       });
 
-      let bodyQuads = this.bodyQuadMap.getQuadsFromCoords(qcoords, true);
+      let bodyCells = this.bodyGrid.getCellsFromCoords(coords, true);
 
-      bodyQuads.forEach(quad => {
-        quad.forEach(body => {
+      bodyCells.forEach(cell => {
+        cell.forEach(body => {
 
           let intPts = Geom.boundsLineIntersect(body.bounds, ray.origin, pt);
 

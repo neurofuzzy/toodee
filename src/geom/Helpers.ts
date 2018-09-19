@@ -490,7 +490,7 @@ namespace Geom {
 
   }
 
-  export function gridPointsAlongLine(x0:number, y0:number, x1:number, y1:number, gridSize:number = 20, intoArr?:Array<IPoint>):Array<IPoint> {
+  export function cellCoordsAlongLine(x0:number, y0:number, x1:number, y1:number, gridSize:number = 20, intoArr?:Array<IPoint>):Array<IPoint> {
 
     intoArr = intoArr || [];
 
@@ -528,15 +528,15 @@ namespace Geom {
 
   }
 
-  export function gridPointsAlongLineWithThickness (x0:number, y0:number, x1:number, y1:number, gridSize:number = 20, thickness:number = 0, intoArr?:Array<IPoint>):Array<IPoint> {
+  export function cellCoordsAlongLineWithThickness (x0:number, y0:number, x1:number, y1:number, gridSize:number = 20, thickness:number = 0, intoArr?:Array<IPoint>):Array<IPoint> {
 
     if (thickness == 0) {
 
-      return gridPointsAlongLine(x0, y0, x1, y1, gridSize, intoArr);
+      return cellCoordsAlongLine(x0, y0, x1, y1, gridSize, intoArr);
 
     } else {
 
-      intoArr = gridPointsAlongLine(x0, y0, x1, y1, gridSize, intoArr);
+      intoArr = cellCoordsAlongLine(x0, y0, x1, y1, gridSize, intoArr);
 
       let angle = angleBetween(x0, y0, x1, y1);
 
@@ -548,14 +548,14 @@ namespace Geom {
       x1 += sinang * thickness;
       y1 += cosang * thickness;
 
-      intoArr = gridPointsAlongLine(x0, y0, x1, y1, gridSize, intoArr);
+      intoArr = cellCoordsAlongLine(x0, y0, x1, y1, gridSize, intoArr);
 
       x0 -= sinang * thickness * 2;
       y0 -= cosang * thickness * 2;
       x1 -= sinang * thickness * 2;
       y1 -= cosang * thickness * 2;
 
-      intoArr = gridPointsAlongLine(x0, y0, x1, y1, gridSize, intoArr);
+      intoArr = cellCoordsAlongLine(x0, y0, x1, y1, gridSize, intoArr);
 
       return intoArr;
 
@@ -563,7 +563,7 @@ namespace Geom {
 
   }
 
-  export function gridPointsContainingPolygon (poly:IPolygon, gridSize:number, padding:number = 0):Array<IPoint> {
+  export function cellCoordsContainingPolygon (poly:IPolygon, gridSize:number, padding:number = 0):Array<IPoint> {
     
     let intoArr:Array<IPoint> = [];
     let plen = poly.segments.length;
@@ -571,7 +571,7 @@ namespace Geom {
     for (let i = 0; i < plen; i++) {
 
       let seg = poly.segments[i];
-      gridPointsAlongLineWithThickness(seg.ptA.x, seg.ptA.y, seg.ptB.y, seg.ptB.y, gridSize, padding, intoArr);
+      cellCoordsAlongLineWithThickness(seg.ptA.x, seg.ptA.y, seg.ptB.y, seg.ptB.y, gridSize, padding, intoArr);
 
     }
 
@@ -579,7 +579,7 @@ namespace Geom {
 
   }
 
-  export function gridPointsIntersectingCircle (center:IPoint, radius:number, gridSize:number):Array<IPoint> {
+  export function cellCoordsIntersectingCircle (center:IPoint, radius:number, gridSize:number):Array<IPoint> {
     
     let a:Array<IPoint> = [];
 
