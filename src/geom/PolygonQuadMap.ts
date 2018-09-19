@@ -4,7 +4,7 @@ namespace Geom {
  
   }
 
-  export class PolygonQuadMap<T extends Util.Identifiable & IPolygon> implements IQuadMap<T>, Util.IModel<T> {
+  export class PolygonQuadMap<T extends Util.Identifiable & IPolygon> implements IQuadMap<T>, Util.ICollection<T> {
 
     protected quadSize:number;
     protected segmentThickness:number;

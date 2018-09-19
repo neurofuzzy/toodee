@@ -1,8 +1,8 @@
 namespace Util {
 
-  export interface IModel<T extends Identifiable> {
+  export interface ICollection<T extends Identifiable> {
     items:Array<T>;
-    init():IModel<T>;
+    init():ICollection<T>;
     reset():void;
     addItem(item:T):boolean;
     removeItem(item:T):boolean;

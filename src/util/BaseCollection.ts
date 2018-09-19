@@ -1,6 +1,6 @@
 namespace Util {
 
-  export class BaseModel<T extends Util.Identifiable> implements Util.IModel<T> {
+  export class BaseCollection<T extends Util.Identifiable> implements Util.ICollection<T> {
 
     public items:Array<Identifiable & T>;
 

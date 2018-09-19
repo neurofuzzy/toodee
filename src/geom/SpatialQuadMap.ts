@@ -1,6 +1,6 @@
 namespace Geom {
 
-  export class SpatialQuadMap<T extends Util.Identifiable & ISpatial> implements IQuadMap<T>, Util.IModel<T> {
+  export class SpatialQuadMap<T extends Util.Identifiable & ISpatial> implements IQuadMap<T>, Util.ICollection<T> {
 
     protected quadSize:number;
     protected itemsQuadIndexes:Array<number>;

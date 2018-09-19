@@ -9,7 +9,7 @@ namespace Geom {
 
   }
 
-  export class SpatialPolygonMap<T extends IPolygon & Util.Identifiable, K extends Util.Identifiable & ISpatial> implements IPolygonMap<K>, Util.IModel<K> {
+  export class SpatialPolygonMap<T extends IPolygon & Util.Identifiable, K extends Util.Identifiable & ISpatial> implements IPolygonMap<K>, Util.ICollection<K> {
 
     public items:Array<K>;
     protected itemsPolygonIDs:Array<number>;
