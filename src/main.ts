@@ -7,6 +7,14 @@ class Main {
     this.app = new App().init();
     this.app.start();
 
+    window.onblur = function () {
+      Main.app.pause();
+    }
+
+    window.onfocus = function () {
+      Main.app.resume();
+    }
+
   }
 
 }

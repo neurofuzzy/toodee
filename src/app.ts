@@ -20,7 +20,19 @@ class App {
 
   public start () {
 
-    this.controller.start()
+    this.controller.start();
+
+  }
+
+  public pause () {
+
+    this.controller.pause();
+
+  }
+
+  public resume () {
+
+    this.controller.resume();
 
   }
 

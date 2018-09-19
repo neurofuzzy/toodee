@@ -5,6 +5,8 @@ namespace Controllers {
     protected model:Models.Model;
     protected view:Views.View;
     protected simulation:Simulation;
+    protected paused:boolean;
+    protected started:boolean;
 
     public initWithModelAndView(model:Models.Model, view:Views.View):any {
 
@@ -154,6 +156,7 @@ namespace Controllers {
 
       this.view.ticker.add(this.update);
       //this.view.ticker.add(this.update);
+      this.started = true;
 
     }
 
@@ -169,6 +172,33 @@ namespace Controllers {
       console.log("stopping...");
 
       this.view.ticker.remove(this.update);
+
+    }
+
+    
+    public pause () {
+
+      if (!this.started) {
+        return;
+      }
+
+      if (!this.paused) {
+        this.view.ticker.remove(this.update);
+        this.paused = true;
+      }
+
+    }
+
+    public resume () {
+
+      if (!this.started) {
+        return;
+      }
+
+      if (this.paused) {
+        this.view.ticker.add(this.update);
+        this.paused = false;
+      }
 
     }
 

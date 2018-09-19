@@ -54,9 +54,7 @@ namespace Geom {
 
     protected getQuadIndex (x:number, y:number):number {
 
-      x += 100;
-      y += 100;
-      return y * 1000 + x;
+      return Util.Pairing.cantorPair(x + 1000, y + 1000); // doesn't work for non-negative numbers, so pad for now
 
     }
 
