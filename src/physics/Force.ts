@@ -24,7 +24,7 @@ namespace Physics {
 
   }
 
-  export class Force extends Impulse {
+  export class Force extends Impulse implements IForce {
 
     public age:number;
     public lifespan:number;
@@ -50,6 +50,7 @@ namespace Physics {
       this.range = range;
 
       return this;
+      
 
     }
 
