@@ -6,6 +6,7 @@ namespace Physics {
   }
 
   export interface IForce extends IImpulse {
+    parentID:number;
     age:number;
     lifespan:number;
   }
@@ -26,6 +27,7 @@ namespace Physics {
 
   export class Force extends Impulse implements IForce {
 
+    public parentID:number;
     public age:number;
     public lifespan:number;
 
@@ -42,11 +44,9 @@ namespace Physics {
 
   export class PropulsionForce extends Force {
 
-    public parent:Geom.ISpatial;
+    public initWithParentID(parentID:number):PropulsionForce {
 
-    public initWithParent(parent:Geom.ISpatial):PropulsionForce {
-
-      this.parent = parent;
+      this.parentID = parentID;
       return this;
 
     }
@@ -71,11 +71,9 @@ namespace Physics {
 
   export class AreaForce extends Force {
 
-    public parent:Geom.IPolygon;
+    public initWithParentID (parentID:number):AreaForce {
 
-    public initWithParent (parent:Geom.IPolygon):AreaForce {
-
-      this.parent = parent;
+      this.parentID = parentID;
 
       return this;
 

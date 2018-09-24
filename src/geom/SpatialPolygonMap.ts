@@ -171,13 +171,19 @@ namespace Geom {
 
     }
 
-    public getItemPolygon (item:K):T {
+    public getPolygonByItemID (itemID:number):T {
 
-      let polygonID = this.itemsPolygonIDs[item.id];
+      let polygonID = this.itemsPolygonIDs[itemID];
 
       if (polygonID >= 0) {
         return this.polygonsByID[polygonID];
       }
+
+    }
+
+    public getItemsWithinPolygonID (polygonID:number):Util.IContainer<K> {
+
+      return this.containers[polygonID];
 
     }
 

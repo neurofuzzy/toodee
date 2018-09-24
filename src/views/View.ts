@@ -152,6 +152,10 @@ namespace Views {
       this.testGraphic.lineStyle(1, 0xff00ff);
       this.testGraphic.drawCircle(cen.x, cen.y, rad);
 
+      // proximity force
+      this.testGraphic.lineStyle(1, 0x00ff00);
+      this.testGraphic.drawCircle(200, 200, 200);
+
       this.fps.innerText = this.pixi.ticker.FPS.toString();
 
     }

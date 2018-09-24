@@ -1,6 +1,6 @@
 namespace Controllers {
 
-  export class Controller implements Util.IController<Models.Model, Views.View> {
+  export class Controller implements Util.IModelViewController<Models.Model, Views.View> {
 
     protected model:Models.Model;
     protected view:Views.View;
@@ -12,7 +12,7 @@ namespace Controllers {
 
       this.model = model;
       this.view = view;
-      this.simulation = new Simulation().initWithModelAndView(model);
+      this.simulation = new Simulation().initWithModel(model);
 
       return this;
 
@@ -48,8 +48,8 @@ namespace Controllers {
         // give a random velocity
         if (b.shape == Geom.SHAPE_ROUND) {
 
-          item.velocity.x = (Math.random() - 0.5) * 5;
-          item.velocity.y = (Math.random() - 0.5) * 5;
+          //item.velocity.x = (Math.random() - 0.5) * 5;
+         // item.velocity.y = (Math.random() - 0.5) * 5;
 
         }
 
@@ -116,6 +116,7 @@ namespace Controllers {
       }
 
       bnd = new Models.Boundary(vertices, 0);
+      let smallBoundaryID = bnd.id;
 
       this.model.boundaries.addItem(bnd);
 
@@ -144,6 +145,16 @@ namespace Controllers {
       let ro = r.origin;
       ro.x = 400;
       ro.y = 400;
+
+      // forces
+      // let pforce = new Physics.ProximityForce(5).initWithOriginAndRange({ x: 200, y: 200 }, 200);
+      // this.simulation.api.addForce(pforce);
+
+      //let aforce = new Physics.AreaForce(5, Math.PI * 0.5).initWithParentID(smallBoundaryID);
+      //this.simulation.api.addForce(aforce);
+
+      let ppforce = new Physics.PropulsionForce(5).initWithParentID(1);
+      this.simulation.api.addForce(ppforce);
 
     }
 

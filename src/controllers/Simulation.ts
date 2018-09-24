@@ -1,6 +1,6 @@
 namespace Controllers {
 
-  export class Simulation implements Util.IController<Models.Model, null> {
+  export class Simulation implements Util.IModelController<Models.Model> {
 
     protected model:Models.Model;
     protected bodyGrid:Geom.SpatialGrid<Models.Item>;
@@ -10,19 +10,26 @@ namespace Controllers {
     protected bodyBodyContacts:Array<Physics.BodyBodyContact>;
     protected bodyBodyContactIndices:Array<boolean>;
     protected bodyBoundaryContacts:Array<Physics.BodyBoundaryContact>;
+    protected forces:Array<Physics.IForce>;
 
     public api:SimulationAPI<Models.Boundary, Models.Item>;
 
-    public initWithModelAndView(model:Models.Model):any {
+    public initWithModel(model:Models.Model):any {
 
       this.model = model;
+      this.reset();
+      return this;
+
+    }
+
+    public reset ():void {
+
       this.bodyGrid = new Geom.SpatialGrid(100).init();
       this.boundaryGrid = new Geom.PolygonGrid(100, 20).init();
       this.bodyBoundaryMap = new Geom.SpatialPolygonMap().init();
+      this.forces = [];
 
-      this.api = new SimulationAPI(this.bodyGrid, this.boundaryGrid, this.bodyBoundaryMap);
-
-      return this;
+      this.api = new SimulationAPI(this.bodyGrid, this.boundaryGrid, this.bodyBoundaryMap, this.forces);
 
     }
 
@@ -113,6 +120,99 @@ namespace Controllers {
 
     }
 
+    private applyPointAsForce (pt:Geom.IPoint, body:Physics.IBody) {
+
+      body.velocity.x += pt.x;
+      body.velocity.y += pt.y;
+
+    }
+
+    private applyForces () {
+
+      let forcePt = new Geom.Point();
+
+      this.forces.forEach(force => {
+
+        if (force instanceof Physics.ProximityForce) {
+
+          let bodies = this.api.bodiesNear(force.origin, force.range);
+
+          let ptA = force.origin;
+
+          bodies.forEach(body => {
+
+            let ptB = body.bounds.anchor;
+            let angle = 0 - Geom.angleBetween(ptA.x, ptA.y, ptB.x, ptB.y);
+
+            forcePt.y = 0;
+            forcePt.x = force.power * 0.0166; // 60 frames per second
+
+            Geom.rotatePoint(forcePt, force.angle);
+            Geom.rotatePoint(forcePt, angle);
+            this.applyPointAsForce(forcePt, body);
+
+          })
+
+        } else if (force instanceof Physics.AreaForce) {
+
+          let bodies = this.bodyBoundaryMap.getItemsWithinPolygonID(force.parentID);
+
+          if (bodies) {
+
+            forcePt.y = 0;
+            forcePt.x = force.power * 0.0166; // 60 frames per second
+            Geom.rotatePoint(forcePt, force.angle);
+
+            bodies.forEach(body => {
+              this.applyPointAsForce(forcePt, body);
+            });
+
+          }
+
+        } else if (force instanceof Physics.PropulsionForce) {
+
+          let body = this.model.bodies.getItemByID(force.parentID);
+
+          if (body) {
+
+            forcePt.y = 0;
+            forcePt.x = force.power * 0.0166; // 60 frames per second
+            Geom.rotatePoint(forcePt, force.angle);
+            Geom.rotatePoint(forcePt, body.rotation);
+            this.applyPointAsForce(forcePt, body);
+
+          }
+
+        }
+
+        if (force.lifespan > 0) {
+          force.age++;
+        }
+
+      });
+
+      // remove spent forces
+
+      let i = this.forces.length;
+
+      while (i--) {
+        let force = this.forces[i];
+        if (force.lifespan > 0 && force.age > force.lifespan) {
+          this.forces.splice(i, 1);
+        }
+      }
+
+    }
+
+    private applyVelocities () {
+
+      this.model.bodies.items.forEach(item => {
+        item.bounds.anchor.x += item.velocity.x;
+        item.bounds.anchor.y += item.velocity.y;
+      });
+
+    }
+
     public update = () => {
 
       this.bodyBodyContacts = [];
@@ -123,12 +223,11 @@ namespace Controllers {
 
       // apply forces to velocities
 
+      this.applyForces();
+
       // apply velocities to positions
 
-      items.forEach(item => {
-        item.bounds.anchor.x += item.velocity.x;
-        item.bounds.anchor.y += item.velocity.y;
-      });
+      this.applyVelocities();
 
       // update cells
       
@@ -195,7 +294,7 @@ namespace Controllers {
         // temp
         item.rotation = 0.5;
 
-        let boundary = this.bodyBoundaryMap.getItemPolygon(item);
+        let boundary = this.bodyBoundaryMap.getPolygonByItemID(item.id);
 
         if (boundary) {
           item.velocity.x *= 1 - boundary.drag;
@@ -218,15 +317,9 @@ namespace Controllers {
       r.origin.y = cen.y;
       r.angle = Geom.normalizeAngle(Math.PI * 2 - Geom.angleBetween(cen.x, cen.y, 400, 300));
 
-      let nearItems = this.bodyGrid.getItemsNear(cen, rad);
-
-      
+      let nearItems = this.api.bodiesNearAndInFront(r.origin, 150, r.angle, 0.5);
       nearItems.forEach(item => {
-        let ang = Geom.normalizeAngle(0 - Geom.angleBetween(cen.x, cen.y, item.bounds.anchor.x, item.bounds.anchor.y) + Math.PI * 0.5);
-        let angDelta = Geom.normalizeAngle(r.angle - ang);
-        if (Math.abs(angDelta) < 0.5) {
-          item.rotation = 0;
-        }
+        item.rotation = 0;
       });
 
       // ray check

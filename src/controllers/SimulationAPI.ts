@@ -5,44 +5,65 @@ namespace Controllers {
     protected readonly bodyGrid:Geom.SpatialGrid<K>;
     protected readonly boundaryGrid:Geom.PolygonGrid<T>;
     protected readonly bodyBoundaryMap:Geom.SpatialPolygonMap<T, K>;
+    protected forces:Array<Physics.IForce>;
 
-    constructor (bodyGrid:Geom.SpatialGrid<K>, boundaryGrid:Geom.PolygonGrid<T>, bodyBoundaryMap:Geom.SpatialPolygonMap<T, K>) {
+    constructor (bodyGrid:Geom.SpatialGrid<K>, boundaryGrid:Geom.PolygonGrid<T>, bodyBoundaryMap:Geom.SpatialPolygonMap<T, K>, forces:Array<Physics.IForce>) {
 
       this.bodyGrid = bodyGrid;
       this.boundaryGrid = boundaryGrid;
       this.bodyBoundaryMap = bodyBoundaryMap;
+      this.forces = forces;
 
       return this;
 
     }
 
+    public addForce (force:Physics.IForce) {
+
+      this.forces.push(force);
+
+    }
+
+    public removeForcesByParentID (id:number) {
+
+      let i = this.forces.length;
+
+      while (i--) {
+        let force = this.forces[i];
+        if (force.parentID == id) {
+          this.forces.splice(i, 1);
+        }
+      }
+
+    }
+
     /**
      * Finds bodies near a point
-     * @param pt point to check nearness
+     * @param focusPt point to check nearness
      * @param range how far is near
      */
-    public bodiesNear (pt:Geom.IPoint, range:number):Array<K> {
+    public bodiesNear (focalPt:Geom.IPoint, range:number):Array<K> {
 
-      return this.bodyGrid.getItemsNear(pt, range);
+      return this.bodyGrid.getItemsNear(focalPt, range);
 
     }
 
     /**
      * Finds bodies near another body, filtering out bodies not in front. Useful for sight-based AI
-     * @param body subject body
+     * @param focusPt focal point
      * @param range near range
+     * @param facingAngle 
      * @param withinAngle angle delta from front
      */
-    public bodiesNearAndInFront (body:Geom.ISpatial, range:number, withinAngle:number = 0.5):Array<K> {
+    public bodiesNearAndInFront (focalPt:Geom.IPoint, range:number, facingAngle:number, withinAngle:number = 0.5):Array<K> {
       
       let frontBodies:Array<K> = [];
-      let ptA = body.bounds.anchor;
-      let nearItems = this.bodiesNear(ptA, range);
+      let nearItems = this.bodiesNear(focalPt, range);
       
       nearItems.forEach(bodyB => {
         let ptB = bodyB.bounds.anchor;
-        let ang = Geom.normalizeAngle(0 - Geom.angleBetween(ptA.x, ptA.y, ptB.x, ptB.y) + Math.PI * 0.5);
-        let angDelta = Geom.normalizeAngle(body.rotation - ang);
+        let ang = Geom.normalizeAngle(0 - Geom.angleBetween(focalPt.x, focalPt.y, ptB.x, ptB.y) + Math.PI * 0.5);
+        let angDelta = Geom.normalizeAngle(facingAngle - ang);
         if (Math.abs(angDelta) < withinAngle) {
           frontBodies.push(bodyB)
         }
