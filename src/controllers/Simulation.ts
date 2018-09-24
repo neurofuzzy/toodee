@@ -11,6 +11,8 @@ namespace Controllers {
     protected bodyBodyContactIndices:Array<boolean>;
     protected bodyBoundaryContacts:Array<Physics.BodyBoundaryContact>;
 
+    public api:SimulationAPI<Models.Boundary, Models.Item>;
+
     public initWithModelAndView(model:Models.Model):any {
 
       this.model = model;
@@ -18,19 +20,21 @@ namespace Controllers {
       this.boundaryGrid = new Geom.PolygonGrid(100, 20).init();
       this.bodyBoundaryMap = new Geom.SpatialPolygonMap().init();
 
+      this.api = new SimulationAPI(this.bodyGrid, this.boundaryGrid, this.bodyBoundaryMap);
+
       return this;
 
     }
 
     protected build () {
 
-      // add items to cellmaps
+      // add items to grid
 
       this.model.bodies.items.forEach(body => {
         this.bodyGrid.addItem(body);
       });
 
-      // add bounaries to cellmaps
+      // add boundaries to grid
 
       this.model.boundaries.items.forEach(boundary => {
         this.boundaryGrid.addItem(boundary);
@@ -84,7 +88,7 @@ namespace Controllers {
 
         let penetration = Geom.resolvePenetrationBetweenBounds(itemA.bounds, itemB.bounds, itemA.constraints, itemB.constraints, true);
 
-        if (penetration && !isNaN(penetration.x) && !isNaN(penetration.y)) {
+        if (penetration) {
           this.bodyBodyContactIndices[contactPairIdx] = true;
           this.bodyBodyContacts.push(new Physics.BodyBodyContact(penetration, itemA, itemB));
         }
@@ -104,9 +108,7 @@ namespace Controllers {
       let penetration = Geom.resolvePenetrationSegmentRound(seg.ptA, seg.ptB, item.bounds);
 
       if (penetration) {
-   
         this.bodyBoundaryContacts.push(new Physics.BodyBoundaryContact(penetration, item, seg));
-
       }
 
     }
@@ -119,6 +121,10 @@ namespace Controllers {
 
       var items = this.model.bodies.items;
 
+      // apply forces to velocities
+
+      // apply velocities to positions
+
       items.forEach(item => {
         item.bounds.anchor.x += item.velocity.x;
         item.bounds.anchor.y += item.velocity.y;
@@ -130,7 +136,7 @@ namespace Controllers {
         this.bodyGrid.updateItem(item);
       });
 
-      // forward body collision check
+      // body-body collision check
 
       items.forEach(item => {
 
@@ -154,7 +160,7 @@ namespace Controllers {
 
       });
 
-      // forward boundary collision check
+      // body-boundary collision check
 
       items.forEach(item => {
         if (item.bounds.shape == Geom.SHAPE_ROUND) {
@@ -167,6 +173,8 @@ namespace Controllers {
           }
         }
       });
+
+      // resove accumulated contacts
 
       this.bodyBodyContacts.forEach(contact => {
         Physics.resolveContact(contact);
@@ -210,7 +218,7 @@ namespace Controllers {
       r.origin.y = cen.y;
       r.angle = Geom.normalizeAngle(Math.PI * 2 - Geom.angleBetween(cen.x, cen.y, 400, 300));
 
-      let nearItems = this.itemsNear(cen, rad);
+      let nearItems = this.bodyGrid.getItemsNear(cen, rad);
 
       
       nearItems.forEach(item => {
@@ -223,7 +231,7 @@ namespace Controllers {
 
       // ray check
 
-      let hitPts = this.raycast(r);
+      let hitPts = this.api.raycast(r, 400);
 
       this.model.rayHit = hitPts[0];
 
@@ -238,59 +246,7 @@ namespace Controllers {
 
 
     }
-
-    public itemsNear (center:Geom.IPoint, radius:number):Array<Models.Item> {
-
-      return this.bodyGrid.getItemsNear(center, radius);
-
-    }
     
-
-    public raycast (ray:Geom.Ray):Array<Geom.IPointHit> {
-
-      let pt = ray.project(400);
-
-      let hitPts:Array<Geom.IPointHit> = [];
-
-      let coords = Geom.cellCoordsAlongLineWithThickness(ray.origin.x, ray.origin.y, pt.x, pt.y, 100, 20);
-
-      let boundaryCells = this.boundaryGrid.getCellsFromCoords(coords, true);
-      
-      boundaryCells.forEach(cell => {
-        cell.forEach(seg => {
-          let intPt = Geom.lineLineIntersect(ray.origin.x, ray.origin.y, pt.x, pt.y, seg.ptA.x, seg.ptA.y, seg.ptB.x, seg.ptB.y);
-
-          if (intPt != null) {
-            hitPts.push(new Geom.PointHit(ray.origin, intPt, seg.parentID))
-          }
-        });
-      });
-
-      let bodyCells = this.bodyGrid.getCellsFromCoords(coords, true);
-
-      bodyCells.forEach(cell => {
-        cell.forEach(body => {
-
-          let intPts = Geom.boundsLineIntersect(body.bounds, ray.origin, pt);
-
-          if (intPts && intPts.length) {
-            intPts.forEach(intPt => {
-              let item = body as Models.Item;
-              hitPts.push(new Geom.PointHit(ray.origin, intPt, item.id));
-            })
-          }
-
-        })
-      })
-
-      if (hitPts.length > 0) {
-        Geom.PointHit.sort(hitPts);
-      }
-
-      return hitPts;
-
-    }
-
     public stop () {
 
       console.log("stopping...");

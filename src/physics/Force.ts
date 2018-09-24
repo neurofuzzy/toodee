@@ -1,7 +1,7 @@
 namespace Physics {
 
   export interface IImpulse {
-    origin:Geom.IPoint;
+    power:number;
     angle:number;
   }
 
@@ -12,12 +12,12 @@ namespace Physics {
 
   export class Impulse implements IImpulse {
 
-    public origin:Geom.IPoint;
+    public power:number;
     public angle:number;
 
-    constructor (origin:Geom.IPoint, angle:number = 0) {
+    constructor (power:number, angle:number = 0) {
 
-      this.origin = origin;
+      this.power = power;
       this.angle = angle;
 
     }
@@ -29,11 +29,24 @@ namespace Physics {
     public age:number;
     public lifespan:number;
 
-    public initWithLifespan (lifespan:number):Force {
+    constructor (power:number, angle:number = 0, lifespan:number = 0) {
+
+      super(power, angle);
 
       this.age = 0;
       this.lifespan = lifespan;
 
+    }
+
+  }
+
+  export class PropulsionForce extends Force {
+
+    public parent:Geom.ISpatial;
+
+    public initWithParent(parent:Geom.ISpatial):PropulsionForce {
+
+      this.parent = parent;
       return this;
 
     }
@@ -42,15 +55,15 @@ namespace Physics {
 
   export class ProximityForce extends Force {
 
+    public origin:Geom.IPoint;
     public range:number;
 
-    public initWithRangeAndLifespan (range:number = 0, lifespan:number = 0):ProximityForce {
+    public initWithOriginAndRange (origin:Geom.IPoint, range:number = 0):ProximityForce {
 
-      super.initWithLifespan(lifespan);
+      this.origin = origin;
       this.range = range;
 
       return this;
-      
 
     }
 
@@ -60,9 +73,8 @@ namespace Physics {
 
     public parent:Geom.IPolygon;
 
-    public initWithParentAndLifespan (parent:Geom.IPolygon, lifespan:number = 0):AreaForce {
+    public initWithParent (parent:Geom.IPolygon):AreaForce {
 
-      super.initWithLifespan(lifespan);
       this.parent = parent;
 
       return this;
