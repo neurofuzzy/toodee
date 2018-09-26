@@ -150,11 +150,11 @@ namespace Controllers {
       // let pforce = new Physics.ProximityForce(5).initWithOriginAndRange({ x: 200, y: 200 }, 200);
       // this.simulation.api.addForce(pforce);
 
-      //let aforce = new Physics.AreaForce(5, Math.PI * 0.5).initWithParentID(smallBoundaryID);
-      //this.simulation.api.addForce(aforce);
+      let aforce = new Physics.AreaForce(5, Math.PI * 0.5).initWithParentID(smallBoundaryID);
+      this.simulation.api.addForce(aforce);
 
-      let ppforce = new Physics.PropulsionForce(5).initWithParentID(1);
-      this.simulation.api.addForce(ppforce);
+      //let ppforce = new Physics.PropulsionForce(5).initWithParentID(1);
+      //this.simulation.api.addForce(ppforce);
 
     }
 
@@ -174,6 +174,42 @@ namespace Controllers {
     public update = () => {
 
       this.simulation.update();
+
+      // ray 
+      let r = this.model.ray;
+  
+      // near items check
+
+      let cen = { x: 400, y:300 };
+      cen.x += 200 * Math.sin(Date.now() / 5000);
+      cen.y += 200 * Math.cos(Date.now() / 5000);
+      let rad = 150;
+
+      r.origin.x = cen.x;
+      r.origin.y = cen.y;
+      r.angle = Geom.normalizeAngle(Math.PI * 2 - Geom.angleBetween(cen.x, cen.y, 400, 300));
+
+      let nearItems = this.simulation.api.bodiesNearAndInFront(r.origin, 150, r.angle, 0.5);
+      nearItems.forEach(item => {
+        item.rotation = 0;
+      });
+
+      // ray check
+
+      let hitPts = this.simulation.api.raycast(r, 400);
+
+      this.model.rayHit = hitPts[0];
+
+      if (this.model.rayHit) {
+        let hitItem = this.model.bodies.getItemByID(this.model.rayHit.parentID);
+        if (hitItem) {
+          hitItem.rotation = -1;
+        }
+      }
+
+      // end ray check
+
+
       this.view.update();
 
     }

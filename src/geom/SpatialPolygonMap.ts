@@ -1,5 +1,6 @@
-namespace Geom {
+/// <reference path="../util/Events.ts" />
 
+namespace Geom {
 
   export interface IPolygonMap<T> {
 
@@ -9,14 +10,14 @@ namespace Geom {
 
   }
 
-  export class SpatialPolygonMap<T extends IPolygon & Util.Identifiable, K extends Util.Identifiable & ISpatial> implements IPolygonMap<K>, Util.ICollection<K> {
+  export class SpatialPolygonMap<T extends IPolygon & Util.Identifiable, K extends Util.Identifiable & ISpatial> extends Util.EventDispatcher implements IPolygonMap<K>, Util.ICollection<K> {
 
     public items:Array<K>;
     protected itemsPolygonIDs:Array<number>;
     protected containers:Array<Util.IContainer<K>>;
     protected polygonsByID:Array<T>;
     protected polygonsSortedByArea:Array<T>;
-    
+
     public init ():any {
 
       this.reset();
@@ -25,6 +26,8 @@ namespace Geom {
     }
 
     public reset ():void {
+
+      super.reset();
 
       this.items = [];
       this.itemsPolygonIDs = [];
@@ -160,10 +163,13 @@ namespace Geom {
     public updateItem (item:K):boolean {
 
       let polygonID = this.getPolygonId(item.bounds.anchor);
+      let prevPolygonID = this.itemsPolygonIDs[item.id];
       
-      if (polygonID != this.itemsPolygonIDs[item.id]) {
+      if (polygonID != prevPolygonID) {
         this.removeItem(item);
         this.addItem(item);
+        this.dispatch(Constants.Event.Remove, this.polygonsByID[prevPolygonID], item);
+        this.dispatch(Constants.Event.Change, this.polygonsByID[polygonID], item);
         return true;
       }
 

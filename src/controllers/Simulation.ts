@@ -1,6 +1,6 @@
 namespace Controllers {
 
-  export class Simulation implements Util.IModelController<Models.Model> {
+  export class Simulation implements Util.IModelController<Models.Model>, Util.IEventListener {
 
     protected model:Models.Model;
     protected bodyGrid:Geom.SpatialGrid<Models.Item>;
@@ -30,6 +30,8 @@ namespace Controllers {
       this.forces = [];
 
       this.api = new SimulationAPI(this.bodyGrid, this.boundaryGrid, this.bodyBoundaryMap, this.forces);
+
+      this.bodyBoundaryMap.addListener(this);
 
     }
 
@@ -303,46 +305,17 @@ namespace Controllers {
 
       });
 
-      // ray 
-      let r = this.model.ray;
-  
-      // near items check
-
-      let cen = { x: 400, y:300 };
-      cen.x += 200 * Math.sin(Date.now() / 5000);
-      cen.y += 200 * Math.cos(Date.now() / 5000);
-      let rad = 150;
-
-      r.origin.x = cen.x;
-      r.origin.y = cen.y;
-      r.angle = Geom.normalizeAngle(Math.PI * 2 - Geom.angleBetween(cen.x, cen.y, 400, 300));
-
-      let nearItems = this.api.bodiesNearAndInFront(r.origin, 150, r.angle, 0.5);
-      nearItems.forEach(item => {
-        item.rotation = 0;
-      });
-
-      // ray check
-
-      let hitPts = this.api.raycast(r, 400);
-
-      this.model.rayHit = hitPts[0];
-
-      if (this.model.rayHit) {
-        let hitItem = this.model.bodies.getItemByID(this.model.rayHit.parentID);
-        if (hitItem) {
-          hitItem.rotation = -1;
-        }
-      }
-
-      // end ray check
-
-
     }
     
     public stop () {
 
       console.log("stopping...");
+
+    }
+
+    onEvent(event: Util.IEvent<any>, context: number) {
+      
+      console.log(event, context);
 
     }
 
