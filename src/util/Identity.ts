@@ -2,7 +2,11 @@ namespace Util {
 
   export interface Identifiable {
     id:number;
-  } 
+  }
+
+  export interface IChild {
+    parentID:number;
+  }
 
   export class IdentityService {
     

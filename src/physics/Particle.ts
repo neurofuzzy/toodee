@@ -1,22 +1,24 @@
 namespace Physics {
 
-  export interface IParticle extends Geom.IPoint {
+  export interface IParticle extends Geom.IPoint, ITemporal {
     velocity:Geom.IPoint;
     size:number;
-    initWithSize(size:number):any;
   }
 
   export class BaseParticle extends Geom.Point implements IParticle {
 
     public velocity:Geom.IPoint;
     public size:number;
+    public age:number;
+    public lifespan:number;
 
-    public initWithSize(size:number):any {
+    constructor (x:number = 0, y:number = 0, size:number = 0, lifespan:number = 0) {
 
-      this.velocity = new Geom.Point();
+      super(x, y);
+
       this.size = size;
-
-      return this;
+      this.age = 0;
+      this.lifespan = lifespan;
 
     }
 

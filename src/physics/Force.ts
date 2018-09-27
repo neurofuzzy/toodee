@@ -5,10 +5,8 @@ namespace Physics {
     angle:number;
   }
 
-  export interface IForce extends IImpulse {
-    parentID:number;
-    age:number;
-    lifespan:number;
+  export interface IForce extends IImpulse, ITemporal, Util.IChild {
+    // mixed interface
   }
 
   export class Impulse implements IImpulse {
