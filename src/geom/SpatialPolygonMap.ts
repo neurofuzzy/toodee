@@ -168,8 +168,8 @@ namespace Geom {
       if (polygonID != prevPolygonID) {
         this.removeItem(item);
         this.addItem(item);
-        this.dispatch(Constants.Event.Remove, this.polygonsByID[prevPolygonID], item);
-        this.dispatch(Constants.Event.Change, this.polygonsByID[polygonID], item);
+        this.dispatch(Util.EventType.Remove, this.polygonsByID[prevPolygonID], item);
+        this.dispatch(Util.EventType.Add, this.polygonsByID[polygonID], item);
         return true;
       }
 

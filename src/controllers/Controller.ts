@@ -7,6 +7,7 @@ namespace Controllers {
     protected simulation:Simulation;
     protected paused:boolean;
     protected started:boolean;
+    protected step:number = 0;
 
     public initWithModelAndView(model:Models.Model, view:Views.View):any {
 
@@ -209,8 +210,14 @@ namespace Controllers {
 
       // end ray check
 
+      if (this.step % 60 == 0) {
+        let bullet = new Models.Projectile(Math.random() * 800, Math.random() * 600, 60, 5);
+        this.model.projectiles.addItem(bullet);
+      }
 
       this.view.update();
+
+      this.step++;
 
     }
 

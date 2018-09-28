@@ -1,23 +1,25 @@
 namespace Util {
 
-  export class BaseCollection<T extends Util.Identifiable> implements Util.ICollection<T> {
+  export class BaseCollection<T extends Util.Identifiable> extends EventDispatcher implements Util.ICollection<T> {
 
     public items:Array<Identifiable & T>;
 
     constructor () {
 
-      this.reset();
+      super();
 
     }
 
     public init ():any {
 
+      this.reset();
       return this;
 
     }
 
     public reset ():void {
 
+      super.reset();
       this.items = [];
  
     }
@@ -35,6 +37,7 @@ namespace Util {
       }
 
       this.items[item.id] = item;
+      this.dispatch(EventType.Add, item);
       
       return true;
 
@@ -43,8 +46,12 @@ namespace Util {
     public removeItem (item:T):boolean {
 
       if (item.id >= 0 && this.items[item.id] != undefined) {
+
         this.items[item.id] = null;
+        this.dispatch(EventType.Remove, item);
+        
         return true;
+
       }
 
       return false;

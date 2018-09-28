@@ -1,3 +1,5 @@
+/// <reference path="../physics/Particle.ts" />
+
 namespace Models {
 
   export class Projectile extends Physics.BaseParticle implements Util.Identifiable {

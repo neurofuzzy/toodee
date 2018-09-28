@@ -1,5 +1,11 @@
 namespace Util {
 
+  export enum EventType {
+    Change = 1,
+    Add,
+    Remove,
+  }
+
   export interface IEvent<T> {
     type:number;
     sourceID:number;
@@ -12,6 +18,7 @@ namespace Util {
   }
 
   export interface IEventDispatcher {
+    init();
     reset();
     addListener(listener:IEventListener, context:number);
     removeListenter(listener:IEventListener);
@@ -53,7 +60,7 @@ namespace Util {
     protected listeners:Array<IEventListener>;
     protected listenerContexts:Array<number>;
 
-    constructor () {
+    public init () {
       this.reset();
     }
 

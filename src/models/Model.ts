@@ -10,8 +10,9 @@ namespace Models {
  
     public init ():any {
       
-      this.boundaries = new Util.BaseCollection();
-      this.bodies = new Util.BaseCollection();
+      this.boundaries = new Util.BaseCollection().init();
+      this.projectiles = new Util.BaseCollection().init();
+      this.bodies = new Util.BaseCollection().init();
       this.ray = new Geom.Ray();
 
       return this;
