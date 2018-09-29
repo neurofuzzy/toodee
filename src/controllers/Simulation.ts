@@ -246,6 +246,9 @@ namespace Controllers {
 
       items.forEach(item => {
 
+        // temp
+        item.rotation = 0.5;
+
         let itemA = item as Models.Item;
         let cells = this.bodyGrid.getSurroundingCells(itemA);
 
@@ -300,6 +303,13 @@ namespace Controllers {
           this.model.projectiles.removeItem(projectile);
           return;
         }
+        let hitItems = this.bodyGrid.getItemsUnderPoint(projectile.position);
+        if (hitItems.length > 0) {
+          //console.log("hits", hitItems.length)
+          hitItems.forEach(item => {
+            item.rotation = 0;
+          })
+        }
       });
       
       // update cells and sectors
@@ -311,7 +321,7 @@ namespace Controllers {
         this.bodyBoundaryMap.updateItem(item);
 
         // temp
-        item.rotation = 0.5;
+       // item.rotation = 0.5;
 
         let boundary = this.bodyBoundaryMap.getPolygonByItemID(item.id);
 

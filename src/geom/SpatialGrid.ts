@@ -171,6 +171,29 @@ namespace Geom {
 
     }
 
+    public getItemsUnderPoint (pt:IPoint):Array<T> {
+
+      let items:Array<T> = [];
+      let cells = this.getCellsNear(pt, this.cellSize * 0.25)
+
+      cells.forEach(cell => {
+        cell.forEach(item => {
+          if (item.bounds.shape == SHAPE_ORTHO) {
+            if (Geom.pointWithinBounds(pt.x, pt.y, item.bounds)) {
+              items.push(item);
+            }
+          } else {
+            if (Geom.distanceBetween(pt.x, pt.y, item.bounds.anchor.x, item.bounds.anchor.y) < item.bounds.hw) {
+              items.push(item);
+            }
+          }
+        });
+      });
+
+      return items;
+
+    }
+
     public getItemsNear (center:IPoint, radius:number):Array<T> {
 
       let items:Array<T> = [];
