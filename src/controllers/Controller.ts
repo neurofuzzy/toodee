@@ -21,14 +21,23 @@ namespace Controllers {
 
     protected build () {
 
+      let masks = [
+        0b00000001,
+        0b00000010,
+        0b00000100,
+        0b00001000, 
+      ];
+
+      let bndMask = 0b00001111;
+
       for (let i = 0; i < 600; i++) {
   
-        var x = 20 + Math.random() * 1480;
-        var y = 20 + Math.random() * 560;
-        var wh = Math.random() * 10 + 5
+        let x = 20 + Math.random() * 1480;
+        let y = 20 + Math.random() * 560;
+        let wh = Math.random() * 10 + 5
  
-        var b = new Geom.Bounds(x, y, wh, wh, Math.floor(Math.random() * 2 + 1));
-        var c = new Geom.Constraints();
+        let b = new Geom.Bounds(x, y, wh, wh, Math.floor(Math.random() * 2 + 1));
+        let c = new Geom.Constraints();
 
         b.shape = Geom.SHAPE_ROUND;
         c.lockX = c.lockY = false;
@@ -44,13 +53,13 @@ namespace Controllers {
         }
   
         var item:Models.Item = new Models.Item().initWithBoundsAndConstraints(b, c);
-        //item.rotation = 0.5;
+        item.contactMask = item.resolveMask = masks[item.id % 4];
 
         // give a random velocity
         if (b.shape == Geom.SHAPE_ROUND) {
 
-          //item.velocity.x = (Math.random() - 0.5) * 5;
-         // item.velocity.y = (Math.random() - 0.5) * 5;
+          item.velocity.x = (Math.random() - 0.5) * 5;
+          item.velocity.y = (Math.random() - 0.5) * 5;
 
         }
 
@@ -77,6 +86,7 @@ namespace Controllers {
       }
 
       let bnd = new Models.Boundary(vertices);
+      bnd.contactMask = bnd.resolveMask = bndMask;
 
       this.model.boundaries.addItem(bnd);
 
@@ -97,6 +107,7 @@ namespace Controllers {
       }
 
       bnd = new Models.Boundary(vertices);
+      bnd.contactMask = bnd.resolveMask = bndMask;
       bnd.drag = 0.1;
 
       this.model.boundaries.addItem(bnd);
@@ -118,6 +129,7 @@ namespace Controllers {
       }
 
       bnd = new Models.Boundary(vertices);
+      bnd.contactMask = bnd.resolveMask = bndMask;
       let smallBoundaryID = bnd.id;
 
       this.model.boundaries.addItem(bnd);
@@ -139,6 +151,7 @@ namespace Controllers {
       }
 
       bnd = new Models.Boundary(vertices);
+      bnd.contactMask = bnd.resolveMask = bndMask;
 
       this.model.boundaries.addItem(bnd);
 
@@ -215,12 +228,20 @@ namespace Controllers {
 
       // projectile madness
 
+      let masks = [
+        0b00000001,
+        0b00000010,
+        0b00000100,
+        0b00001000, 
+      ];
+
       if (this.step % 3 == 0) {
         for (var i = 0; i < 10; i++) {
-          let vel = new Geom.Point(4, 0);
+          let vel = new Geom.Point(2, 0);
           Geom.rotatePoint(vel, Math.random() * Math.PI * 2);
           let pos = new Geom.Point(Math.random() * 800, Math.random() * 600);
           let bullet = new Models.Projectile().initWithPositionSizeAndLifespan(pos, 5, 360);
+          bullet.contactMask = bullet.resolveMask = masks[bullet.id % 4];
           bullet.velocity.x = vel.x;
           bullet.velocity.y = vel.y;
           this.model.projectiles.addItem(bullet);

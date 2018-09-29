@@ -12,6 +12,13 @@ namespace Views {
     public pixi:PIXI.Application;
     private fps:HTMLElement;
 
+    private colors = [
+      0xff0000,
+      0x00ff00,
+      0x00ffff,
+      0xffff00,
+    ]
+
     get ticker ():any {
       return this.pixi.ticker;
     }
@@ -42,19 +49,17 @@ namespace Views {
       this.pixi.stage.interactive = true;
       this.pixi.stage.hitArea = new PIXI.Rectangle(0, 0, 800, 600);
 
-      var colors = [0xff9900, 0x0099ff, 0x9900ff, 0x33ff33]
-
       // bodies 
 
-      this.model.bodies.items.forEach((item, idx) => {
+      this.model.bodies.items.forEach(item => {
   
         let b = item.bounds;
-        let lineColor = colors[idx % 4];
+        let lineColor = this.colors[item.id % 4];
         if (item.constraints.lockX) {
           lineColor = 0xffffff;
         }
         let gfx = new PIXI.Graphics()
-          .beginFill(colors[idx % 4], 0.5)
+          .beginFill(this.colors[item.id % 4], 0.5)
           .lineStyle(2, lineColor);
 
         if (item.bounds.shape == Geom.SHAPE_ORTHO) {
@@ -184,7 +189,7 @@ namespace Views {
 
               let p = this.model.projectiles.getItemByID(event.sourceID);
               gfx = new PIXI.Graphics();
-              gfx.beginFill(Math.random() * 0xffffff, 1);
+              gfx.beginFill(this.colors[p.id % 4], 1);
               gfx.drawRect(0 - p.size * 0.5, 0 - p.size * 0.5, p.size, p.size);
               gfx.x = p.position.x;
               gfx.y = p.position.y;

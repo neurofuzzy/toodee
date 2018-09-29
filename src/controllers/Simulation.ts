@@ -351,19 +351,35 @@ namespace Controllers {
 
         // out of bounds by inverted polygon
         if (polygon.inverted) { 
-          this.model.projectiles.removeItem(projectile);
+
+          if (projectile.resolveMask & polygon.resolveMask) {
+            this.model.projectiles.removeItem(projectile);
+          }
           return;
+
         }
 
         let hitItems = this.bodyGrid.getItemsUnderPoint(projectile.position);
 
         // if hit an object
         if (hitItems.length > 0) { 
-          //console.log("hits", hitItems.length)
+          
+          let didHit = false;
+
           hitItems.forEach(item => {
+            if (!(projectile.contactMask & item.contactMask)) {
+              return;
+            }
             item.rotation = 0;
-          })
-          this.model.projectiles.removeItem(projectile);
+            if (projectile.resolveMask & item.resolveMask) {
+              didHit = true;
+            }
+          });
+
+          if (didHit) {
+            this.model.projectiles.removeItem(projectile);
+          }
+
           return;
         }
 
