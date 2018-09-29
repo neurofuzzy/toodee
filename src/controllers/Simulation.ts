@@ -213,6 +213,11 @@ namespace Controllers {
         item.bounds.anchor.y += item.velocity.y;
       });
 
+      this.model.projectiles.items.forEach(item => {
+        item.position.x += item.velocity.x;
+        item.position.y += item.velocity.y;
+      });
+
     }
 
     public update = () => {
@@ -283,7 +288,19 @@ namespace Controllers {
 
       this.bodyBoundaryContacts.forEach(contact => {
         Physics.resolveContact(contact);
-      })
+      });
+
+      // projectiles
+
+      var projectiles = this.model.projectiles;
+
+      projectiles.items.forEach(projectile => {
+        projectile.age++;
+        if (projectile.age > projectile.lifespan) {
+          this.model.projectiles.removeItem(projectile);
+          return;
+        }
+      });
       
       // update cells and sectors
       // apply sector properties to body
@@ -315,7 +332,7 @@ namespace Controllers {
 
     onEvent(event: Util.IEvent<any>, context: number) {
       
-      console.log(event, context);
+      // console.log(event, context);
 
     }
 

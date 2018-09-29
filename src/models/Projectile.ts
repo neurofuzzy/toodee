@@ -6,9 +6,9 @@ namespace Models {
 
     public id:number;
 
-    constructor (x:number = 0, y:number = 0, lifespan:number = 0, size:number = 0) {
+    constructor () {
 
-      super(x, y, lifespan, size);
+      super();
 
       this.id = Util.IdentityService.newIdentity();
 

@@ -210,9 +210,18 @@ namespace Controllers {
 
       // end ray check
 
-      if (this.step % 60 == 0) {
-        let bullet = new Models.Projectile(Math.random() * 800, Math.random() * 600, 60, 5);
-        this.model.projectiles.addItem(bullet);
+      // projectile madness
+
+      if (this.step % 3 == 0) {
+        for (var i = 0; i < 10; i++) {
+          let vel = new Geom.Point(2, 0);
+          Geom.rotatePoint(vel, Math.random() * Math.PI * 2);
+          let pos = new Geom.Point(Math.random() * 800, Math.random() * 600);
+          let bullet = new Models.Projectile().initWithPositionSizeAndLifespan(pos, 5, 360);
+          bullet.velocity.x = vel.x;
+          bullet.velocity.y = vel.y;
+          this.model.projectiles.addItem(bullet);
+        }
       }
 
       this.view.update();

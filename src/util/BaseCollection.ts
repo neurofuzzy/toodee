@@ -3,6 +3,7 @@ namespace Util {
   export class BaseCollection<T extends Util.Identifiable> extends EventDispatcher implements Util.ICollection<T> {
 
     public items:Array<Identifiable & T>;
+    protected itemsByID:Array<Identifiable & T>;
 
     constructor () {
 
@@ -21,22 +22,24 @@ namespace Util {
 
       super.reset();
       this.items = [];
+      this.itemsByID = [];
  
     }
 
     public getItemByID (id:number):T {
 
-      return this.items[id];
+      return this.itemsByID[id];
 
     }
 
     public addItem (item:T):boolean {
 
-      if (item.id < 0 || this.items[item.id] != undefined) {
+      if (item.id < 0 || this.itemsByID[item.id] != undefined) {
         return false;
       }
 
-      this.items[item.id] = item;
+      this.items.push(item);
+      this.itemsByID[item.id] = item;
       this.dispatch(EventType.Add, item);
       
       return true;
@@ -45,9 +48,13 @@ namespace Util {
 
     public removeItem (item:T):boolean {
 
-      if (item.id >= 0 && this.items[item.id] != undefined) {
+      if (item.id >= 0 && this.itemsByID[item.id] != undefined) {
 
-        this.items[item.id] = null;
+        this.itemsByID[item.id] = null;
+        let i = this.items.indexOf(item);
+        if (i >= 0) {
+          this.items.splice(i, 1);
+        }
         this.dispatch(EventType.Remove, item);
         
         return true;

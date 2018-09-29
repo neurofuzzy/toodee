@@ -1,10 +1,11 @@
 namespace Views {
 
-  export class View implements Util.IView<Models.Model> {
+  export class View implements Util.IView<Models.Model>, Util.IEventListener {
 
     protected model:Models.Model;
     protected bodies:Array<PIXI.Graphics>;
     protected boundaries:Array<PIXI.Graphics>;
+    protected projectiles:Array<PIXI.Graphics>;
     protected ray:PIXI.Graphics;
     protected testGraphic:PIXI.Graphics;
 
@@ -27,7 +28,10 @@ namespace Views {
       this.model = model;
       this.bodies = [];
       this.boundaries = [];
+      this.projectiles = [];
       this.fps = document.getElementById("fps");
+
+      this.model.projectiles.addListener(this, 3);
 
       return this;
 
@@ -117,11 +121,17 @@ namespace Views {
       }
       
       // view update
-      this.model.bodies.items.forEach((item, idx) => {
+      this.model.bodies.items.forEach(item => {
         let gfx = this.bodies[item.id];
         gfx.x = item.bounds.anchor.x;
         gfx.y = item.bounds.anchor.y;
         gfx.alpha = 1 - item.rotation;
+      });
+
+      this.model.projectiles.items.forEach(item => {
+        let gfx = this.projectiles[item.id];
+        gfx.x = item.position.x;
+        gfx.y = item.position.y;
       });
 
       let r = this.model.ray;
@@ -157,6 +167,44 @@ namespace Views {
       this.testGraphic.drawCircle(200, 200, 200);
 
       this.fps.innerText = this.pixi.ticker.FPS.toString();
+
+    }
+
+    onEvent(event: Util.IEvent<any>, context: number) {
+
+      let gfx:PIXI.Graphics;
+      
+      switch (context) {
+
+        case 3:
+
+          switch (event.type) {
+
+            case Util.EventType.Add:
+
+              let p = this.model.projectiles.getItemByID(event.sourceID);
+              gfx = new PIXI.Graphics();
+              gfx.beginFill(0xff0000, 1);
+              gfx.drawRect(0 - p.size * 0.5, 0 - p.size * 0.5, p.size, p.size);
+              gfx.x = p.position.x;
+              gfx.y = p.position.y;
+              this.pixi.stage.addChild(gfx);
+              this.projectiles[event.sourceID] = gfx;
+
+              break;
+
+            case Util.EventType.Remove:
+
+              gfx = this.projectiles[event.sourceID];
+              if (gfx) {
+                this.pixi.stage.removeChild(gfx);
+              }
+
+              break;
+
+          }
+
+      }
 
     }
 
