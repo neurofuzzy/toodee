@@ -213,7 +213,7 @@ namespace Controllers {
       // projectile madness
 
       if (this.step % 3 == 0) {
-        for (var i = 0; i < 10; i++) {
+        for (var i = 0; i < 100; i++) {
           let vel = new Geom.Point(2, 0);
           Geom.rotatePoint(vel, Math.random() * Math.PI * 2);
           let pos = new Geom.Point(Math.random() * 800, Math.random() * 600);

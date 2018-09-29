@@ -184,7 +184,7 @@ namespace Views {
 
               let p = this.model.projectiles.getItemByID(event.sourceID);
               gfx = new PIXI.Graphics();
-              gfx.beginFill(0xff0000, 1);
+              gfx.beginFill(Math.random() * 0xffffff, 1);
               gfx.drawRect(0 - p.size * 0.5, 0 - p.size * 0.5, p.size, p.size);
               gfx.x = p.position.x;
               gfx.y = p.position.y;

@@ -37,13 +37,13 @@ namespace Geom {
 
     }
 
-    public getPolygonFromPoint (pt:IPoint):T {
+    public getPolygonFromPoint (pt:IPoint, includeInverted:boolean = false):T {
 
       for (let i = 0; i < this.polygonsSortedByArea.length; i++) {
 
         let poly = this.polygonsSortedByArea[i];
 
-        if (poly.inverted) {
+        if (poly.inverted && !includeInverted) {
           // don't allow items in inverted polys
           continue;
         }

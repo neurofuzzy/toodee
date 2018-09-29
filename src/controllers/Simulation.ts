@@ -298,18 +298,35 @@ namespace Controllers {
       var projectiles = this.model.projectiles;
 
       projectiles.items.forEach(projectile => {
+
         projectile.age++;
+
+        // if end of lifespan
         if (projectile.age > projectile.lifespan) {
           this.model.projectiles.removeItem(projectile);
           return;
         }
+
+        let polygon = this.bodyBoundaryMap.getPolygonFromPoint(projectile.position, true);
+
+        // if out of bounds
+        if (!polygon || polygon.inverted) { 
+          this.model.projectiles.removeItem(projectile);
+          return;
+        }
+
         let hitItems = this.bodyGrid.getItemsUnderPoint(projectile.position);
-        if (hitItems.length > 0) {
+
+        // if hit an object
+        if (hitItems.length > 0) { 
           //console.log("hits", hitItems.length)
           hitItems.forEach(item => {
             item.rotation = 0;
           })
+          this.model.projectiles.removeItem(projectile);
+          return;
         }
+
       });
       
       // update cells and sectors
