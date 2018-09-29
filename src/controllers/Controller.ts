@@ -76,7 +76,7 @@ namespace Controllers {
 
       }
 
-      let bnd = new Models.Boundary(vertices, 0);
+      let bnd = new Models.Boundary(vertices);
 
       this.model.boundaries.addItem(bnd);
 
@@ -96,7 +96,8 @@ namespace Controllers {
 
       }
 
-      bnd = new Models.Boundary(vertices, 0.1);
+      bnd = new Models.Boundary(vertices);
+      bnd.drag = 0.1;
 
       this.model.boundaries.addItem(bnd);
 
@@ -116,7 +117,7 @@ namespace Controllers {
 
       }
 
-      bnd = new Models.Boundary(vertices, 0);
+      bnd = new Models.Boundary(vertices);
       let smallBoundaryID = bnd.id;
 
       this.model.boundaries.addItem(bnd);
@@ -175,6 +176,7 @@ namespace Controllers {
     public update = () => {
 
       this.simulation.update();
+      // this.simulation.update();
 
       // ray 
       let r = this.model.ray;
@@ -185,6 +187,7 @@ namespace Controllers {
       cen.x += 200 * Math.sin(Date.now() / 5000);
       cen.y += 200 * Math.cos(Date.now() / 5000);
       let rad = 150;
+      let b = 0b00101;
 
       r.origin.x = cen.x;
       r.origin.y = cen.y;
@@ -213,8 +216,8 @@ namespace Controllers {
       // projectile madness
 
       if (this.step % 3 == 0) {
-        for (var i = 0; i < 100; i++) {
-          let vel = new Geom.Point(2, 0);
+        for (var i = 0; i < 10; i++) {
+          let vel = new Geom.Point(4, 0);
           Geom.rotatePoint(vel, Math.random() * Math.PI * 2);
           let pos = new Geom.Point(Math.random() * 800, Math.random() * 600);
           let bullet = new Models.Projectile().initWithPositionSizeAndLifespan(pos, 5, 360);

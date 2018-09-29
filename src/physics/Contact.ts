@@ -1,5 +1,9 @@
 namespace Physics {
 
+  export interface IContactable {
+    contactMask:number;
+    resolveMask:number;
+  }
 
   export class IContact<B> {
     penetration:Geom.IPoint;

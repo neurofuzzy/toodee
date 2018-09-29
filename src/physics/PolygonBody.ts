@@ -10,11 +10,10 @@ namespace Physics {
     public isSector:boolean;
     public drag:number;
 
-    constructor (vertices:Array<Geom.IPoint>, drag:number = 0) {
+    constructor (vertices:Array<Geom.IPoint>) {
 
       super(vertices);
-
-      this.drag = drag;
+      this.drag = 0;
 
     }
 

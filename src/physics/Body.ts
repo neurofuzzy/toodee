@@ -7,7 +7,7 @@ namespace Physics {
   }
 
   export class BaseBody extends Geom.BaseSpatial implements IBody {
-
+  
     public constraints:Geom.IConstraints;
     public velocity:Geom.IPoint;
 

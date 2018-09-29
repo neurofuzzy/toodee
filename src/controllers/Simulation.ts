@@ -83,6 +83,10 @@ namespace Controllers {
         return;
       }
 
+      if (!(itemA.contactMask & itemB.contactMask)) {
+        return;
+      }
+
       let contactPairIdx = Util.Pairing.cantorPair(itemA.id, itemB.id);
 
       if (itemA.bounds.shape == Geom.SHAPE_ORTHO) {
@@ -95,11 +99,20 @@ namespace Controllers {
 
       if (Geom.boundsIntersect(itemA.bounds, itemB.bounds, true)) {
 
-        let penetration = Geom.resolvePenetrationBetweenBounds(itemA.bounds, itemB.bounds, itemA.constraints, itemB.constraints, true);
+        if (itemA.resolveMask & itemB.resolveMask) {
 
-        if (penetration) {
-          this.bodyBodyContactIndices[contactPairIdx] = true;
-          this.bodyBodyContacts.push(new Physics.BodyBodyContact(penetration, itemA, itemB));
+          let penetration = Geom.resolvePenetrationBetweenBounds(itemA.bounds, itemB.bounds, itemA.constraints, itemB.constraints, true);
+
+          if (penetration) {
+            this.bodyBodyContactIndices[contactPairIdx] = true;
+            this.bodyBodyContacts.push(new Physics.BodyBodyContact(penetration, itemA, itemB));
+          }
+
+        } else {
+
+          // TODO: dispatch contact event
+
+
         }
 
       }
@@ -114,10 +127,26 @@ namespace Controllers {
         return;
       }
 
-      let penetration = Geom.resolvePenetrationSegmentRound(seg.ptA, seg.ptB, item.bounds);
+      if (!(item.contactMask & parentPoly.contactMask)) {
+        return;
+      }
 
-      if (penetration) {
-        this.bodyBoundaryContacts.push(new Physics.BodyBoundaryContact(penetration, item, seg));
+      if (item.resolveMask & parentPoly.resolveMask) {
+
+        let penetration = Geom.resolvePenetrationSegmentRound(seg.ptA, seg.ptB, item.bounds);
+
+        if (penetration) {
+          this.bodyBoundaryContacts.push(new Physics.BodyBoundaryContact(penetration, item, seg));
+        }
+
+      } else {
+
+        if (Geom.getPenetrationSegmentRound(seg.ptA, seg.ptB, item.bounds) > 0) {
+
+          // TODO: dispatch contact event
+
+        }
+
       }
 
     }
@@ -310,7 +339,18 @@ namespace Controllers {
         let polygon = this.bodyBoundaryMap.getPolygonFromPoint(projectile.position, true);
 
         // if out of bounds
-        if (!polygon || polygon.inverted) { 
+        if (!polygon) { 
+          this.model.projectiles.removeItem(projectile);
+          return;
+        }
+
+        // masked out
+        if (!(projectile.contactMask & polygon.contactMask)) {
+          return;
+        }
+
+        // out of bounds by inverted polygon
+        if (polygon.inverted) { 
           this.model.projectiles.removeItem(projectile);
           return;
         }

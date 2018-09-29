@@ -221,6 +221,22 @@ namespace Geom {
 
   }
 
+  export function getPenetrationSegmentRound (segPtA:IPoint, segPtB:IPoint, b:IBounds):number {
+
+    var a = b.anchor;
+    let closestPt:IPoint = closestPtPointLine(a, segPtA, segPtB);
+
+    let delta = distanceBetween(a.x, a.y, closestPt.x, closestPt.y);
+    delta -= b.hw;
+    
+    if (delta < 0) {
+      return 0 - delta;
+    }
+
+    return 0;
+
+  }
+
   export function resolvePenetrationSegmentRound (segPtA:IPoint, segPtB:IPoint, b:IBounds):IPoint {
 
     var a = b.anchor;
