@@ -1,7 +1,7 @@
 namespace Controllers {
 
-  export class Controller implements Util.IModelViewController<Models.Model, Views.View> {
-
+  export class Controller implements Util.IModelViewController<Models.Model, Views.View>, Util.IEventListener {
+    
     protected model:Models.Model;
     protected view:Views.View;
     protected simulation:Simulation;
@@ -14,6 +14,8 @@ namespace Controllers {
       this.model = model;
       this.view = view;
       this.simulation = new Simulation().initWithModel(model);
+
+      this.simulation.addListener(this, 0);
 
       return this;
 
@@ -285,6 +287,18 @@ namespace Controllers {
       if (this.paused) {
         this.view.ticker.add(this.update);
         this.paused = false;
+      }
+
+    }
+
+    public onEvent(event: Util.IEvent<any>, context: number) {
+
+      switch (context) {
+
+        case 0:
+          
+          break;
+
       }
 
     }

@@ -1,6 +1,12 @@
+/// <reference path="../util/Events.ts" />
+
 namespace Controllers {
 
-  export class Simulation implements Util.IModelController<Models.Model>, Util.IEventListener {
+  export enum EventType {
+    Contact = 4,
+  }
+
+  export class Simulation extends Util.EventDispatcher implements Util.IModelController<Models.Model> {
 
     protected model:Models.Model;
     protected bodyGrid:Geom.SpatialGrid<Models.Item>;
@@ -24,14 +30,14 @@ namespace Controllers {
 
     public reset ():void {
 
+      super.reset();
+
       this.bodyGrid = new Geom.SpatialGrid(100).init();
       this.boundaryGrid = new Geom.PolygonGrid(100, 20).init();
       this.bodyBoundaryMap = new Geom.SpatialPolygonMap().init();
       this.forces = [];
 
       this.api = new SimulationAPI(this.bodyGrid, this.boundaryGrid, this.bodyBoundaryMap, this.forces);
-
-      this.bodyBoundaryMap.addListener(this);
 
     }
 
@@ -108,12 +114,9 @@ namespace Controllers {
             this.bodyBodyContacts.push(new Physics.BodyBodyContact(penetration, itemA, itemB));
           }
 
-        } else {
-
-          // TODO: dispatch contact event
-
-
-        }
+        } 
+        
+        this.dispatch(EventType.Contact, itemA, itemB);
 
       }
 
@@ -131,22 +134,13 @@ namespace Controllers {
         return;
       }
 
-      if (item.resolveMask & parentPoly.resolveMask) {
+      let resolve = (item.resolveMask & parentPoly.resolveMask) > 0;
 
-        let penetration = Geom.resolvePenetrationSegmentRound(seg.ptA, seg.ptB, item.bounds);
+      let penetration = Geom.getPenetrationSegmentRound(seg.ptA, seg.ptB, item.bounds, resolve);
 
-        if (penetration) {
-          this.bodyBoundaryContacts.push(new Physics.BodyBoundaryContact(penetration, item, seg));
-        }
-
-      } else {
-
-        if (Geom.getPenetrationSegmentRound(seg.ptA, seg.ptB, item.bounds) > 0) {
-
-          // TODO: dispatch contact event
-
-        }
-
+      if (penetration) {
+        this.bodyBoundaryContacts.push(new Physics.BodyBoundaryContact(penetration, item, seg));
+        this.dispatch(EventType.Contact, item, parentPoly, penetration);
       }
 
     }
@@ -410,12 +404,6 @@ namespace Controllers {
     public stop () {
 
       console.log("stopping...");
-
-    }
-
-    onEvent(event: Util.IEvent<any>, context: number) {
-      
-      // console.log(event, context);
 
     }
 
