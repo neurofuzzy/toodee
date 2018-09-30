@@ -66,6 +66,7 @@ namespace Views {
           gfx.drawRect(0 - b.hw, 0 - b.hh, b.hw * 2, b.hh * 2);
         } else {
           gfx.drawCircle(0, 0, Math.min(b.hw, b.hh));
+          gfx.cacheAsBitmap = true;
         }
   
         gfx.x = item.bounds.anchor.x;

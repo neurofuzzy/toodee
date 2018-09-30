@@ -147,8 +147,13 @@ namespace Controllers {
 
     private applyPointAsForce (pt:Geom.IPoint, body:Physics.IBody) {
 
-      body.velocity.x += pt.x;
-      body.velocity.y += pt.y;
+      if (!body.constraints.lockX) {
+        body.velocity.x += pt.x;
+      }
+
+      if (!body.constraints.lockY) {
+        body.velocity.y += pt.y;
+      }
 
     }
 
