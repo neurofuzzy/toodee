@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "es5",
     "sourceMap": true,
+    "noImplicitAny": true,
     "outFile": "dist/bundle.js",
     "sourceRoot": "src"
   },

@@ -498,7 +498,7 @@ namespace Geom {
     var maxx = Math.floor(Math.max(x0, x1) / gridSize);
     var miny = Math.floor(Math.min(y0, y1) / gridSize);
     var maxy = Math.floor(Math.max(y0, y1) / gridSize);
-    var sides = [];
+    var sides:Array<Array<number>> = [];
 
     for (var j = miny; j <= maxy + 1; j++) {
 

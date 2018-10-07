@@ -14,16 +14,16 @@ namespace Util {
   }
 
   export interface IEventListener {
-    onEvent(event:IEvent<any>, context:number);
+    onEvent(event:IEvent<any>, context:number):void;
   }
 
   export interface IEventDispatcher {
-    init();
-    reset();
-    addListener(listener:IEventListener, context:number);
-    removeListenter(listener:IEventListener);
-    dispatchEvent(event:IEvent<any>);
-    dispatch(type:number, source:Identifiable, target:Identifiable, payload:any);
+    init():any;
+    reset():void;
+    addListener(listener:IEventListener, context:number):void;
+    removeListenter(listener:IEventListener):void;
+    dispatchEvent(event:IEvent<any>):void;
+    dispatch(type:number, source:Identifiable, target:Identifiable, payload:any):void;
   }
 
   export class Event<T> implements IEvent<T> {

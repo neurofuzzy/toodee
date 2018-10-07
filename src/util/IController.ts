@@ -2,9 +2,9 @@ namespace Util {
 
   export interface IController {
 
-    start();
-    update();
-    stop();
+    start():void;
+    update():void;
+    stop():void;
 
   }
 

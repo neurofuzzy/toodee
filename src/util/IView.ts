@@ -4,7 +4,7 @@ namespace Util {
 
     initWithModel(model:T):any;
     ticker:any;
-    update();
+    update():void;
 
   }
 

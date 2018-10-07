@@ -14,9 +14,8 @@ class Main {
 // folderol
 
 window.onload = function () {
-  //Main.main();
-  window['Main'] = Main;
   Main.main();
+  window.document.head.setAttribute("has-main",  "yes");
 }
 
 window.onblur = function () {
@@ -27,6 +26,7 @@ window.onfocus = function () {
   Main.app.resume();
 }
 
-if (window['Main']) {
+// get parcel to refresh on TypeScript bundle export
+if (document.head.getAttribute("has-main") == "yes") {
   window.location.reload();
 }

@@ -5,7 +5,7 @@ namespace Views {
     dobj.interactive = true;
     dobj.buttonMode = true;
 
-    var onDragStart = function (event) {
+    var onDragStart = function (event:PIXI.interaction.InteractionEvent) {
       // store a reference to the data
       // the reason for this is because of multitouch
       // we want to track the movement of this particular touch
@@ -14,14 +14,14 @@ namespace Views {
       this.dragging = true;
     }
   
-    var onDragEnd = function (event) {
+    var onDragEnd = function (event:PIXI.interaction.InteractionEvent) {
       this.alpha = 1;
       this.dragging = false;
       // set the interaction data to null
       this.data = null;
     }
   
-    var onDragMove = function (event) {
+    var onDragMove = function (event:PIXI.interaction.InteractionEvent) {
       if (this.dragging) {
         var newPosition = this.data.getLocalPosition(this.parent);
         this.x = newPosition.x;
@@ -46,7 +46,7 @@ namespace Views {
 
     var dragOrigin = false;
 
-    var onDragStart = function (event) {
+    var onDragStart = function (event:PIXI.interaction.InteractionEvent) {
       // store a reference to the data
       // the reason for this is because of multitouch
       // we want to track the movement of this particular touch
@@ -62,7 +62,7 @@ namespace Views {
       }
     }
   
-    var onDragEnd = function (event) {
+    var onDragEnd = function (event:PIXI.interaction.InteractionEvent) {
       this.alpha = 1;
       this.dragging = false;
       // set the interaction data to null
@@ -70,7 +70,7 @@ namespace Views {
       dragOrigin = !dragOrigin;
     }
   
-    var onDragMove = function (event) {
+    var onDragMove = function (event:PIXI.interaction.InteractionEvent) {
       if (this.dragging) {
         if (dragOrigin) {
           ray.ptA.x = event.data.global.x;
