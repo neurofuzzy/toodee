@@ -14,9 +14,9 @@ namespace Controllers {
   export class Simulation implements Util.IModelController<Models.Model> {
 
     protected model:Models.Model;
-    protected bodyGrid:Geom.SpatialGrid<Models.Item>;
+    protected bodyGrid:Geom.SpatialGrid<Models.Entity>;
     protected boundaryGrid:Geom.PolygonGrid<Models.Boundary>;
-    protected bodyBoundaryMap:Geom.SpatialPolygonMap<Models.Boundary, Models.Item>;
+    protected bodyBoundaryMap:Geom.SpatialPolygonMap<Models.Boundary, Models.Entity>;
 
     protected bodyBodyContacts:Array<Physics.BodyBodyContact>;
     protected bodyBodyContactIndices:Array<boolean>;
@@ -24,7 +24,7 @@ namespace Controllers {
     protected forces:Array<Physics.IForce>;
     protected dispatcher:Util.IEventDispatcher;
 
-    protected _api:SimulationAPI<Models.Boundary, Models.Item>;
+    protected _api:SimulationAPI<Models.Boundary, Models.Entity>;
 
     get api () {
       return this._api;
@@ -92,7 +92,7 @@ namespace Controllers {
 
     }
 
-    private getBodyBodyContacts (itemA:Models.Item, itemB:Models.Item):Physics.BodyBodyContact {
+    private getBodyBodyContacts (itemA:Models.Entity, itemB:Models.Entity):Physics.BodyBodyContact {
 
       if (itemA == itemB) {
         return;
@@ -133,7 +133,7 @@ namespace Controllers {
 
     }
 
-    private getBodyBoundaryContacts (item:Models.Item, seg:Geom.ISegment):void {
+    private getBodyBoundaryContacts (item:Models.Entity, seg:Geom.ISegment):void {
 
       let parentPoly = this.model.boundaries.getItemByID(seg.parentID);
 
@@ -291,7 +291,7 @@ namespace Controllers {
         // temp
         item.rotation = 0.5;
 
-        let itemA = item as Models.Item;
+        let itemA = item as Models.Entity;
         let cells = this.bodyGrid.getSurroundingCells(itemA);
 
         cells.forEach(cell => {
@@ -300,7 +300,7 @@ namespace Controllers {
   
             cell.forEach(item => {
   
-              var itemB = item as Models.Item;
+              var itemB = item as Models.Entity;
               this.getBodyBodyContacts(itemA, itemB);
 
             });
@@ -315,7 +315,7 @@ namespace Controllers {
 
       items.forEach(item => {
         if (item.bounds.shape == Geom.SHAPE_ROUND) {
-          let itemA = item as Models.Item;
+          let itemA = item as Models.Entity;
           let cell = this.boundaryGrid.getCellFromPoint(item.bounds.anchor);
           if (cell) {
             cell.forEach(seg => {

@@ -2,7 +2,7 @@ namespace Models {
 
   export class Model {
 
-    public bodies:Util.BaseCollection<Item>;
+    public bodies:Util.BaseCollection<Entity>;
     public projectiles:Util.BaseCollection<Projectile>;
     public boundaries:Util.BaseCollection<Boundary>;
     public ray:Geom.Ray;

@@ -55,7 +55,7 @@ namespace Controllers {
           c.lockX = c.lockY = true;
         }
   
-        var item:Models.Item = new Models.Item().initWithBoundsAndConstraints(b, c);
+        var item:Models.Entity = new Models.Entity().initWithBoundsAndConstraints(b, c);
         item.contactMask = item.resolveMask = masks[item.id % 4];
 
         // give a random velocity
