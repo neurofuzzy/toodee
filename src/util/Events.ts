@@ -13,17 +13,17 @@ namespace Util {
     payload:T;
   }
 
-  export interface IEventListener {
-    onEvent(event:IEvent<any>, context:number):void;
+  export interface IEventListenerFunc {
+    (event:IEvent<any>):void;
   }
 
   export interface IEventDispatcher {
     init():any;
     reset():void;
-    addListener(listener:IEventListener, context:number):void;
-    removeListenter(listener:IEventListener):void;
+    addListener(listener:IEventListenerFunc, scope:any):void;
+    removeListener(listener:IEventListenerFunc):void;
     dispatchEvent(event:IEvent<any>):void;
-    dispatch(type:number, source:Identifiable, target:Identifiable, payload:any):void;
+    dispatch(type:number, source:Identifiable, target?:Identifiable, payload?:any):void;
   }
 
   export class Event<T> implements IEvent<T> {
@@ -56,33 +56,34 @@ namespace Util {
   }
 
   export class EventDispatcher implements IEventDispatcher {
-
-    protected listeners:Array<IEventListener>;
-    protected listenerContexts:Array<number>;
+    
+    protected listeners:Array<IEventListenerFunc>;
+    protected listenerScopes:Array<any>;
 
     public init () {
       this.reset();
+      return this;
     }
 
     public reset () {
       this.listeners = [];
-      this.listenerContexts = [];
+      this.listenerScopes = [];
     }
 
-    public addListener(listener:IEventListener, eventContext:number = 0) {
+    public addListener(listener:IEventListenerFunc, scope:any):void {
 
       this.listeners.push(listener);
-      this.listenerContexts.push(eventContext);
+      this.listenerScopes.push(scope);
 
     }
 
-    public removeListenter(listener:IEventListener) {
+    public removeListener(listener:IEventListenerFunc):void {
 
       let idx = this.listeners.indexOf(listener);
 
       if (idx >= 0) {
         this.listeners.splice(idx, 1);
-        this.listenerContexts.splice(idx, 1);
+        this.listenerScopes.splice(idx, 1);
       }
 
     }
@@ -91,8 +92,8 @@ namespace Util {
 
       this.listeners.forEach((listener, idx) => {
         
-        let context = this.listenerContexts[idx];
-        listener.onEvent(event, context);
+        let scope = this.listenerScopes[idx];
+        listener.call(scope, event);
 
       });
 

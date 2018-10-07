@@ -6,24 +6,34 @@ namespace Controllers {
     protected readonly boundaryGrid:Geom.PolygonGrid<T>;
     protected readonly bodyBoundaryMap:Geom.SpatialPolygonMap<T, K>;
     protected forces:Array<Physics.IForce>;
+    protected dispatcher:Util.IEventDispatcher;
 
-    constructor (bodyGrid:Geom.SpatialGrid<K>, boundaryGrid:Geom.PolygonGrid<T>, bodyBoundaryMap:Geom.SpatialPolygonMap<T, K>, forces:Array<Physics.IForce>) {
+    constructor (bodyGrid:Geom.SpatialGrid<K>, boundaryGrid:Geom.PolygonGrid<T>, bodyBoundaryMap:Geom.SpatialPolygonMap<T, K>, forces:Array<Physics.IForce>, dispatcher:Util.IEventDispatcher) {
 
       this.bodyGrid = bodyGrid;
       this.boundaryGrid = boundaryGrid;
       this.bodyBoundaryMap = bodyBoundaryMap;
       this.forces = forces;
+      this.dispatcher = dispatcher;
 
       return this;
 
     }
 
+    /**
+     * Adds a force to the simulation
+     * @param force
+     */
     public addForce (force:Physics.IForce) {
 
       this.forces.push(force);
 
     }
 
+    /**
+     * Removes forces that act on a particular id
+     * @param id
+     */
     public removeForcesByParentID (id:number) {
 
       let i = this.forces.length;
@@ -34,6 +44,28 @@ namespace Controllers {
           this.forces.splice(i, 1);
         }
       }
+
+    }
+
+    /**
+     * Adds a listener function to receive events when objects make contact with eachother or boundaries
+     * @param listener Util.IEventListenerFunc
+     * @param scope scope object to use as _this_
+     */
+    public addContactListener (listener:Util.IEventListenerFunc, scope:any):void {
+
+      this.dispatcher.addListener(listener, scope);
+
+    }
+
+    /**
+     * Adds a listener function to receive events when object enter or leave boundary areas
+     * @param listener Util.IEventListenerFunc
+     * @param scope scope object to use as _this_
+     */
+    public addBoundaryListener (listener:Util.IEventListenerFunc, scope:any):void {
+
+      this.bodyBoundaryMap.addListener(listener, scope);
 
     }
 

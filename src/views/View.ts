@@ -1,6 +1,6 @@
 namespace Views {
 
-  export class View implements Util.IView<Models.Model>, Util.IEventListener {
+  export class View implements Util.IView<Models.Model> {
 
     protected model:Models.Model;
     protected bodies:Array<PIXI.Graphics>;
@@ -38,7 +38,7 @@ namespace Views {
       this.projectiles = [];
       this.fps = document.getElementById("fps");
 
-      this.model.projectiles.addListener(this, 3);
+      this.model.projectiles.addListener(this.onProjectileEvent, this);
 
       return this;
 
@@ -176,39 +176,33 @@ namespace Views {
 
     }
 
-    onEvent(event: Util.IEvent<any>, context: number) {
+    onProjectileEvent(event: Util.IEvent<any>) {
 
       let gfx:PIXI.Graphics;
       
-      switch (context) {
+      switch (event.type) {
 
-        case 3:
+        case Util.EventType.Add:
 
-          switch (event.type) {
+          let p = this.model.projectiles.getItemByID(event.sourceID);
+          gfx = new PIXI.Graphics();
+          gfx.beginFill(this.colors[p.id % 4], 1);
+          gfx.drawRect(0 - p.size * 0.5, 0 - p.size * 0.5, p.size, p.size);
+          gfx.x = p.position.x;
+          gfx.y = p.position.y;
+          this.pixi.stage.addChild(gfx);
+          this.projectiles[event.sourceID] = gfx;
 
-            case Util.EventType.Add:
+          break;
 
-              let p = this.model.projectiles.getItemByID(event.sourceID);
-              gfx = new PIXI.Graphics();
-              gfx.beginFill(this.colors[p.id % 4], 1);
-              gfx.drawRect(0 - p.size * 0.5, 0 - p.size * 0.5, p.size, p.size);
-              gfx.x = p.position.x;
-              gfx.y = p.position.y;
-              this.pixi.stage.addChild(gfx);
-              this.projectiles[event.sourceID] = gfx;
+        case Util.EventType.Remove:
 
-              break;
-
-            case Util.EventType.Remove:
-
-              gfx = this.projectiles[event.sourceID];
-              if (gfx) {
-                this.pixi.stage.removeChild(gfx);
-              }
-
-              break;
-
+          gfx = this.projectiles[event.sourceID];
+          if (gfx) {
+            this.pixi.stage.removeChild(gfx);
           }
+
+          break;
 
       }
 

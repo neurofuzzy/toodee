@@ -6,7 +6,12 @@ namespace Controllers {
     Contact = 4,
   }
 
-  export class Simulation extends Util.EventDispatcher implements Util.IModelController<Models.Model> {
+  export enum EventContext {
+    Simulation = 1,
+    Boundary = 2,
+  }
+
+  export class Simulation implements Util.IModelController<Models.Model> {
 
     protected model:Models.Model;
     protected bodyGrid:Geom.SpatialGrid<Models.Item>;
@@ -17,8 +22,13 @@ namespace Controllers {
     protected bodyBodyContactIndices:Array<boolean>;
     protected bodyBoundaryContacts:Array<Physics.BodyBoundaryContact>;
     protected forces:Array<Physics.IForce>;
+    protected dispatcher:Util.IEventDispatcher;
 
-    public api:SimulationAPI<Models.Boundary, Models.Item>;
+    protected _api:SimulationAPI<Models.Boundary, Models.Item>;
+
+    get api () {
+      return this._api;
+    }
 
     public initWithModel(model:Models.Model):any {
 
@@ -30,14 +40,13 @@ namespace Controllers {
 
     public reset ():void {
 
-      super.reset();
-
+      this.dispatcher = new Util.EventDispatcher().init();
       this.bodyGrid = new Geom.SpatialGrid(100).init();
       this.boundaryGrid = new Geom.PolygonGrid(100, 20).init();
       this.bodyBoundaryMap = new Geom.SpatialPolygonMap().init();
       this.forces = [];
-
-      this.api = new SimulationAPI(this.bodyGrid, this.boundaryGrid, this.bodyBoundaryMap, this.forces);
+      
+      this._api = new SimulationAPI(this.bodyGrid, this.boundaryGrid, this.bodyBoundaryMap, this.forces, this.dispatcher);
 
     }
 
@@ -83,7 +92,7 @@ namespace Controllers {
 
     }
 
-    private getBodyBodyContacts (itemA:Models.Item, itemB:Models.Item):void {
+    private getBodyBodyContacts (itemA:Models.Item, itemB:Models.Item):Physics.BodyBodyContact {
 
       if (itemA == itemB) {
         return;
@@ -116,7 +125,9 @@ namespace Controllers {
 
         } 
         
-        this.dispatch(EventType.Contact, itemA, itemB);
+        if (this.dispatcher) {
+          this.dispatcher.dispatch(EventType.Contact, itemA, itemB);
+        }
 
       }
 
@@ -140,7 +151,10 @@ namespace Controllers {
 
       if (penetration) {
         this.bodyBoundaryContacts.push(new Physics.BodyBoundaryContact(penetration, item, seg));
-        this.dispatch(EventType.Contact, item, parentPoly, penetration);
+        
+        if (this.dispatcher) {
+          this.dispatcher.dispatch(EventType.Contact, item, parentPoly, penetration);
+        }
       }
 
     }

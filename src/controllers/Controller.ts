@@ -1,6 +1,6 @@
 namespace Controllers {
 
-  export class Controller implements Util.IModelViewController<Models.Model, Views.View>, Util.IEventListener {
+  export class Controller implements Util.IModelViewController<Models.Model, Views.View> {
     
     protected model:Models.Model;
     protected view:Views.View;
@@ -15,7 +15,8 @@ namespace Controllers {
       this.view = view;
       this.simulation = new Simulation().initWithModel(model);
 
-      this.simulation.addListener(this, 0);
+      this.simulation.api.addContactListener(this.onContactEvent, this);
+      this.simulation.api.addBoundaryListener(this.onBoundaryEvent, this);
 
       return this;
 
@@ -291,15 +292,15 @@ namespace Controllers {
 
     }
 
-    public onEvent(event: Util.IEvent<any>, context: number) {
+    public onContactEvent(event:Util.IEvent<any>) {
 
-      switch (context) {
+      console.log("contact", event.sourceID, event.targetID)
 
-        case 0:
-          
-          break;
+    }
 
-      }
+    public onBoundaryEvent(event:Util.IEvent<any>) {
+      
+      console.log("boundary", event.type, event.sourceID, event.targetID)
 
     }
 
