@@ -53,10 +53,10 @@ namespace Physics {
 
   export class ProximityForce extends Force {
 
-    public origin:Geom.IPoint;
+    public origin:Util.Geom.IPoint;
     public range:number;
 
-    public initWithOriginAndRange (origin:Geom.IPoint, range:number = 0):ProximityForce {
+    public initWithOriginAndRange (origin:Util.Geom.IPoint, range:number = 0):ProximityForce {
 
       this.origin = origin;
       this.range = range;

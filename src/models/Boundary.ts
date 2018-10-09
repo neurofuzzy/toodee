@@ -9,7 +9,7 @@ namespace Models {
     public contactMask:number;
     public resolveMask:number;
 
-    constructor (vertices?:Array<Geom.IPoint>) {
+    constructor (vertices?:Array<Util.Geom.IPoint>) {
 
       super(vertices);
 

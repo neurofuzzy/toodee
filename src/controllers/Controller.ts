@@ -39,17 +39,17 @@ namespace Controllers {
         let y = 20 + Math.random() * 560;
         let wh = Math.random() * 10 + 5
  
-        let b = new Geom.Bounds(x, y, wh, wh, Math.floor(Math.random() * 2 + 1));
-        let c = new Geom.Constraints();
+        let b = new Util.Geom.Bounds(x, y, wh, wh, Math.floor(Math.random() * 2 + 1));
+        let c = new Util.Geom.Constraints();
 
-        b.shape = Geom.SHAPE_ROUND;
+        b.shape = Util.Geom.SHAPE_ROUND;
         c.lockX = c.lockY = false;
 
         if (Math.random() > 0.75) {
-          b.shape = Geom.SHAPE_ORTHO;
+          b.shape = Util.Geom.SHAPE_ORTHO;
         }
         
-        if (b.shape == Geom.SHAPE_ORTHO) {
+        if (b.shape == Util.Geom.SHAPE_ORTHO) {
           b.anchor.x = Math.floor(b.anchor.x / 20) * 20;
           b.anchor.y = Math.floor(b.anchor.y / 20) * 20;
           c.lockX = c.lockY = true;
@@ -59,7 +59,7 @@ namespace Controllers {
         item.contactMask = item.resolveMask = masks[item.id % 4];
 
         // give a random velocity
-        if (b.shape == Geom.SHAPE_ROUND) {
+        if (b.shape == Util.Geom.SHAPE_ROUND) {
 
           item.velocity.x = (Math.random() - 0.5) * 5;
           item.velocity.y = (Math.random() - 0.5) * 5;
@@ -72,7 +72,7 @@ namespace Controllers {
 
       // make a boundary
 
-      let vertices:Array<Geom.IPoint> = [];
+      let vertices:Array<Util.Geom.IPoint> = [];
       let len = 12;
       let radius = 350;
       let cenX = 400;
@@ -84,7 +84,7 @@ namespace Controllers {
         let rr = radius + Math.random() * 300 - 100;
         let x = rr * Math.sin(ang);
         let y = rr * Math.cos(ang);
-        vertices.push(new Geom.Point(x + cenX, y + cenY));
+        vertices.push(new Util.Geom.Point(x + cenX, y + cenY));
 
       }
 
@@ -105,7 +105,7 @@ namespace Controllers {
         let rr = radius * 1.5 + Math.random() * 100 - 50;
         let x = rr * Math.sin(ang);
         let y = rr * Math.cos(ang);
-        vertices.push(new Geom.Point(x + cenX - 100, y + cenY));
+        vertices.push(new Util.Geom.Point(x + cenX - 100, y + cenY));
 
       }
 
@@ -127,7 +127,7 @@ namespace Controllers {
         let rr = radius + Math.random() * 60 - 50;
         let x = rr * Math.sin(ang);
         let y = rr * Math.cos(ang);
-        vertices.push(new Geom.Point(x + cenX - 100, y + cenY));
+        vertices.push(new Util.Geom.Point(x + cenX - 100, y + cenY));
 
       }
 
@@ -149,7 +149,7 @@ namespace Controllers {
         let rr = radius + Math.random() * 25 - 25;
         let x = rr * Math.sin(ang);
         let y = rr * Math.cos(ang);
-        vertices.push(new Geom.Point(x + cenX + 100, y + cenY));
+        vertices.push(new Util.Geom.Point(x + cenX + 100, y + cenY));
 
       }
 
@@ -207,7 +207,7 @@ namespace Controllers {
 
       r.origin.x = cen.x;
       r.origin.y = cen.y;
-      r.angle = Geom.normalizeAngle(Math.PI * 2 - Geom.angleBetween(cen.x, cen.y, 400, 300));
+      r.angle = Util.Geom.normalizeAngle(Math.PI * 2 - Util.Geom.angleBetween(cen.x, cen.y, 400, 300));
 
       let nearItems = this.simulation.api.bodiesNearAndInFront(r.origin, 150, r.angle, 0.5);
       nearItems.forEach(item => {
@@ -240,9 +240,9 @@ namespace Controllers {
 
       if (this.step % 3 == 0) {
         for (var i = 0; i < 10; i++) {
-          let vel = new Geom.Point(2, 0);
-          Geom.rotatePoint(vel, Math.random() * Math.PI * 2);
-          let pos = new Geom.Point(Math.random() * 800, Math.random() * 600);
+          let vel = new Util.Geom.Point(2, 0);
+          Util.Geom.rotatePoint(vel, Math.random() * Math.PI * 2);
+          let pos = new Util.Geom.Point(Math.random() * 800, Math.random() * 600);
           let bullet = new Models.Projectile().initWithPositionSizeAndLifespan(pos, 5, 360);
           bullet.contactMask = bullet.resolveMask = masks[bullet.id % 4];
           bullet.velocity.x = vel.x;

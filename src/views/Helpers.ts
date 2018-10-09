@@ -1,6 +1,6 @@
 namespace Views {
 
-  export function makeItemDraggable (item:Geom.ISpatial, dobj:PIXI.DisplayObject):void {
+  export function makeItemDraggable (item:Util.Geom.ISpatial, dobj:PIXI.DisplayObject):void {
 
     dobj.interactive = true;
     dobj.buttonMode = true;
@@ -39,7 +39,7 @@ namespace Views {
 
   }
 
-  export function makeSegmentDraggable (ray:Geom.ISegment, dobj:PIXI.DisplayObject, stage:PIXI.Container):void {
+  export function makeSegmentDraggable (ray:Util.Geom.ISegment, dobj:PIXI.DisplayObject, stage:PIXI.Container):void {
 
     dobj.interactive = true;
     dobj.buttonMode = true;

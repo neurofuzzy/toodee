@@ -1,4 +1,4 @@
-namespace Geom {
+namespace Util.Geom {
 
   var pt:Point = new Point();
 

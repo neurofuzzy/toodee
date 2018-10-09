@@ -1,4 +1,4 @@
-namespace Geom {
+namespace Util.Geom {
 
   export interface IConstraints {
     lockX:boolean;

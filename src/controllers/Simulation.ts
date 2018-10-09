@@ -14,9 +14,9 @@ namespace Controllers {
   export class Simulation implements Util.IModelController<Models.Model> {
 
     protected model:Models.Model;
-    protected bodyGrid:Geom.SpatialGrid<Models.Entity>;
-    protected boundaryGrid:Geom.PolygonGrid<Models.Boundary>;
-    protected bodyBoundaryMap:Geom.SpatialPolygonMap<Models.Boundary, Models.Entity>;
+    protected bodyGrid:Util.Geom.SpatialGrid<Models.Entity>;
+    protected boundaryGrid:Util.Geom.PolygonGrid<Models.Boundary>;
+    protected bodyBoundaryMap:Util.Geom.SpatialPolygonMap<Models.Boundary, Models.Entity>;
 
     protected bodyBodyContacts:Array<Physics.BodyBodyContact>;
     protected bodyBodyContactIndices:Array<boolean>;
@@ -41,9 +41,9 @@ namespace Controllers {
     public reset ():void {
 
       this.dispatcher = new Util.EventDispatcher().init();
-      this.bodyGrid = new Geom.SpatialGrid(100).init();
-      this.boundaryGrid = new Geom.PolygonGrid(100, 20).init();
-      this.bodyBoundaryMap = new Geom.SpatialPolygonMap().init();
+      this.bodyGrid = new Util.Geom.SpatialGrid(100).init();
+      this.boundaryGrid = new Util.Geom.PolygonGrid(100, 20).init();
+      this.bodyBoundaryMap = new Util.Geom.SpatialPolygonMap().init();
       this.forces = [];
       
       this._api = new SimulationAPI(this.bodyGrid, this.boundaryGrid, this.bodyBoundaryMap, this.forces, this.dispatcher);
@@ -69,7 +69,7 @@ namespace Controllers {
       this.model.boundaries.items.forEach(boundary => {
         this.model.boundaries.items.forEach(otherBoundary => {
           if (boundary != otherBoundary) {
-            if (!boundary.inverted && Geom.polygonInPolygon(boundary, otherBoundary)) {
+            if (!boundary.inverted && Util.Geom.polygonInPolygon(boundary, otherBoundary)) {
               boundary.isSector = true;
               return;
             }
@@ -104,7 +104,7 @@ namespace Controllers {
 
       let contactPairIdx = Util.Pairing.cantorPair(itemA.id, itemB.id);
 
-      if (itemA.bounds.shape == Geom.SHAPE_ORTHO) {
+      if (itemA.bounds.shape == Util.Geom.SHAPE_ORTHO) {
         return;
       }
 
@@ -112,11 +112,11 @@ namespace Controllers {
         return;
       }
 
-      if (Geom.boundsIntersect(itemA.bounds, itemB.bounds, true)) {
+      if (Util.Geom.boundsIntersect(itemA.bounds, itemB.bounds, true)) {
 
         if (itemA.resolveMask & itemB.resolveMask) {
 
-          let penetration = Geom.resolvePenetrationBetweenBounds(itemA.bounds, itemB.bounds, itemA.constraints, itemB.constraints, true);
+          let penetration = Util.Geom.resolvePenetrationBetweenBounds(itemA.bounds, itemB.bounds, itemA.constraints, itemB.constraints, true);
 
           if (penetration) {
             this.bodyBodyContactIndices[contactPairIdx] = true;
@@ -133,7 +133,7 @@ namespace Controllers {
 
     }
 
-    private getBodyBoundaryContacts (item:Models.Entity, seg:Geom.ISegment):void {
+    private getBodyBoundaryContacts (item:Models.Entity, seg:Util.Geom.ISegment):void {
 
       let parentPoly = this.model.boundaries.getItemByID(seg.parentID);
 
@@ -147,7 +147,7 @@ namespace Controllers {
 
       let resolve = (item.resolveMask & parentPoly.resolveMask) > 0;
 
-      let penetration = Geom.getPenetrationSegmentRound(seg.ptA, seg.ptB, item.bounds, resolve);
+      let penetration = Util.Geom.getPenetrationSegmentRound(seg.ptA, seg.ptB, item.bounds, resolve);
 
       if (penetration) {
         this.bodyBoundaryContacts.push(new Physics.BodyBoundaryContact(penetration, item, seg));
@@ -159,7 +159,7 @@ namespace Controllers {
 
     }
 
-    private applyPointAsForce (pt:Geom.IPoint, body:Physics.IBody) {
+    private applyPointAsForce (pt:Util.Geom.IPoint, body:Physics.IBody) {
 
       if (!body.constraints.lockX) {
         body.velocity.x += pt.x;
@@ -173,7 +173,7 @@ namespace Controllers {
 
     private applyForces () {
 
-      let forcePt = new Geom.Point();
+      let forcePt = new Util.Geom.Point();
 
       this.forces.forEach(force => {
 
@@ -186,13 +186,13 @@ namespace Controllers {
           bodies.forEach(body => {
 
             let ptB = body.bounds.anchor;
-            let angle = 0 - Geom.angleBetween(ptA.x, ptA.y, ptB.x, ptB.y);
+            let angle = 0 - Util.Geom.angleBetween(ptA.x, ptA.y, ptB.x, ptB.y);
 
             forcePt.y = 0;
             forcePt.x = force.power * 0.0166; // 60 frames per second
 
-            Geom.rotatePoint(forcePt, force.angle);
-            Geom.rotatePoint(forcePt, angle);
+            Util.Geom.rotatePoint(forcePt, force.angle);
+            Util.Geom.rotatePoint(forcePt, angle);
             this.applyPointAsForce(forcePt, body);
 
           })
@@ -205,7 +205,7 @@ namespace Controllers {
 
             forcePt.y = 0;
             forcePt.x = force.power * 0.0166; // 60 frames per second
-            Geom.rotatePoint(forcePt, force.angle);
+            Util.Geom.rotatePoint(forcePt, force.angle);
 
             bodies.forEach(body => {
               this.applyPointAsForce(forcePt, body);
@@ -221,8 +221,8 @@ namespace Controllers {
 
             forcePt.y = 0;
             forcePt.x = force.power * 0.0166; // 60 frames per second
-            Geom.rotatePoint(forcePt, force.angle);
-            Geom.rotatePoint(forcePt, body.rotation);
+            Util.Geom.rotatePoint(forcePt, force.angle);
+            Util.Geom.rotatePoint(forcePt, body.rotation);
             this.applyPointAsForce(forcePt, body);
 
           }
@@ -314,7 +314,7 @@ namespace Controllers {
       // body-boundary collision check
 
       items.forEach(item => {
-        if (item.bounds.shape == Geom.SHAPE_ROUND) {
+        if (item.bounds.shape == Util.Geom.SHAPE_ROUND) {
           let itemA = item as Models.Entity;
           let cell = this.boundaryGrid.getCellFromPoint(item.bounds.anchor);
           if (cell) {

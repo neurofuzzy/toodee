@@ -1,4 +1,4 @@
-namespace Geom {
+namespace Util.Geom {
 
   export interface ICell<T> extends Array<T> {
 

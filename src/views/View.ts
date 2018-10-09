@@ -62,7 +62,7 @@ namespace Views {
           .beginFill(this.colors[item.id % 4], 0.5)
           .lineStyle(2, lineColor);
 
-        if (item.bounds.shape == Geom.SHAPE_ORTHO) {
+        if (item.bounds.shape == Util.Geom.SHAPE_ORTHO) {
           gfx.drawRect(0 - b.hw, 0 - b.hh, b.hw * 2, b.hh * 2);
         } else {
           gfx.drawCircle(0, 0, Math.min(b.hw, b.hh));
@@ -158,7 +158,7 @@ namespace Views {
       cen.y += 200 * Math.cos(Date.now() / 5000);
       let rad = 150;
       
-      let pts = Geom.cellCoordsIntersectingCircle(cen, rad, 100);
+      let pts = Util.Geom.cellCoordsIntersectingCircle(cen, rad, 100);
 
       for (let i = 0; i < pts.length; i++) {
         let pt = pts[i];

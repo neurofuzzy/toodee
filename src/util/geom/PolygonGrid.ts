@@ -1,4 +1,4 @@
-namespace Geom {
+namespace Util.Geom {
 
   export interface ISegmentCell extends ICell<ISegment> {
  
