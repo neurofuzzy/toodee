@@ -1,3 +1,5 @@
+/// <reference path="../geom/BaseSpatial.ts" />
+
 namespace Physics {
 
   export interface IBody extends Geom.ISpatial {

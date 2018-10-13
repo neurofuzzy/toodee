@@ -1,4 +1,4 @@
-namespace Util {
+namespace Models {
 
   export interface ICollection<T extends Identifiable> {
     items:Array<T>;

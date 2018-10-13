@@ -1,3 +1,5 @@
+/// <reference path="../geom/BaseGeom.ts" />
+
 namespace Physics {
 
   export interface IPolygonBody extends Geom.IPolygon {

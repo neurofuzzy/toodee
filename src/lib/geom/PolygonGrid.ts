@@ -4,7 +4,7 @@ namespace Geom {
  
   }
 
-  export class PolygonGrid<T extends Util.Identifiable & IPolygon> implements IGrid<T>, Util.ICollection<T> {
+  export class PolygonGrid<T extends Models.Identifiable & IPolygon> implements IGrid<T>, Models.ICollection<T> {
 
     protected cellSize:number;
     protected segmentThickness:number;

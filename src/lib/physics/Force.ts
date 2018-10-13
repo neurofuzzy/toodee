@@ -5,7 +5,7 @@ namespace Physics {
     angle:number;
   }
 
-  export interface IForce extends IImpulse, ITemporal, Util.IChild {
+  export interface IForce extends IImpulse, ITemporal, Models.IChild {
     // mixed interface
   }
 

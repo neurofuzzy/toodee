@@ -1,8 +1,8 @@
 class App {
 
-  public model:Models.Model;
+  public model:Simulation.Model;
   public view:Views.View;
-  public controller:Controllers.Controller;
+  public controller:AppController;
 
   constructor () {
 
@@ -10,9 +10,9 @@ class App {
 
   public init ():App {
 
-    this.model = new Models.Model().init();
+    this.model = new Simulation.Model().init();
     this.view = new Views.View().initWithModel(this.model);
-    this.controller = new Controllers.Controller().initWithModelAndView(this.model, this.view);
+    this.controller = new AppController().initWithModelAndView(this.model, this.view);
 
     return this;
 

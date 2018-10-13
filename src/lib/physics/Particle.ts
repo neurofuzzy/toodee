@@ -1,6 +1,6 @@
 namespace Physics {
 
-  export interface IParticle extends ITemporal, Util.IChild {
+  export interface IParticle extends ITemporal, Models.IChild {
     position:Geom.IPoint;
     velocity:Geom.IPoint;
     size:number;

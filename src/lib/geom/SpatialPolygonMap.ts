@@ -1,16 +1,16 @@
-/// <reference path="../util/Events.ts" />
+/// <reference path="../models/Events.ts" />
 
 namespace Geom {
 
   export interface IPolygonMap<T> {
 
-    addPolygon(poly:(IPolygon & Util.Identifiable)):void;
-    getPolygonFromPoint (pt:IPoint):(IPolygon & Util.Identifiable);
+    addPolygon(poly:(IPolygon & Models.Identifiable)):void;
+    getPolygonFromPoint (pt:IPoint):(IPolygon & Models.Identifiable);
     getContainerFromPoint (pt:IPoint):Util.IContainer<T>;
 
   }
 
-  export class SpatialPolygonMap<T extends IPolygon & Util.Identifiable, K extends Util.Identifiable & ISpatial> extends Util.EventDispatcher implements IPolygonMap<K>, Util.ICollection<K> {
+  export class SpatialPolygonMap<T extends IPolygon & Models.Identifiable, K extends Models.Identifiable & ISpatial> extends Models.EventDispatcher implements IPolygonMap<K>, Models.ICollection<K> {
 
     public items:Array<K>;
     protected itemsPolygonIDs:Array<number>;
@@ -169,10 +169,10 @@ namespace Geom {
         this.removeItem(item);
         this.addItem(item);
         if (prevPolygonID >= 0) {
-          this.dispatch(Util.EventType.Remove, this.polygonsByID[prevPolygonID], item);
+          this.dispatch(Models.EventType.Remove, this.polygonsByID[prevPolygonID], item);
         }
         if (polygonID >= 0) {
-          this.dispatch(Util.EventType.Add, this.polygonsByID[polygonID], item);
+          this.dispatch(Models.EventType.Add, this.polygonsByID[polygonID], item);
         }
         return true;
       }

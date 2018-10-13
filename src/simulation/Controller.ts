@@ -1,6 +1,4 @@
-/// <reference path="../util/Events.ts" />
-
-namespace Controllers {
+namespace Simulation {
 
   export enum EventType {
     Contact = 4,
@@ -11,26 +9,26 @@ namespace Controllers {
     Boundary = 2,
   }
 
-  export class Simulation implements Util.IModelController<Models.Model> {
+  export class Controller implements Models.IModelController<Simulation.Model> {
 
-    protected model:Models.Model;
-    protected bodyGrid:Geom.SpatialGrid<Models.Entity>;
-    protected boundaryGrid:Geom.PolygonGrid<Models.Boundary>;
-    protected bodyBoundaryMap:Geom.SpatialPolygonMap<Models.Boundary, Models.Entity>;
+    protected model:Simulation.Model;
+    protected bodyGrid:Geom.SpatialGrid<Simulation.Entity>;
+    protected boundaryGrid:Geom.PolygonGrid<Simulation.Boundary>;
+    protected bodyBoundaryMap:Geom.SpatialPolygonMap<Simulation.Boundary, Simulation.Entity>;
 
     protected bodyBodyContacts:Array<Physics.BodyBodyContact>;
     protected bodyBodyContactIndices:Array<boolean>;
     protected bodyBoundaryContacts:Array<Physics.BodyBoundaryContact>;
     protected forces:Array<Physics.IForce>;
-    protected dispatcher:Util.IEventDispatcher;
+    protected dispatcher:Models.IEventDispatcher;
 
-    protected _api:SimulationAPI<Models.Boundary, Models.Entity>;
+    protected _api:API<Simulation.Boundary, Simulation.Entity>;
 
     get api () {
       return this._api;
     }
 
-    public initWithModel(model:Models.Model):any {
+    public initWithModel(model:Simulation.Model):any {
 
       this.model = model;
       this.reset();
@@ -40,13 +38,13 @@ namespace Controllers {
 
     public reset ():void {
 
-      this.dispatcher = new Util.EventDispatcher().init();
+      this.dispatcher = new Models.EventDispatcher().init();
       this.bodyGrid = new Geom.SpatialGrid(100).init();
       this.boundaryGrid = new Geom.PolygonGrid(100, 20).init();
       this.bodyBoundaryMap = new Geom.SpatialPolygonMap().init();
       this.forces = [];
       
-      this._api = new SimulationAPI(this.bodyGrid, this.boundaryGrid, this.bodyBoundaryMap, this.forces, this.dispatcher);
+      this._api = new API(this.bodyGrid, this.boundaryGrid, this.bodyBoundaryMap, this.forces, this.dispatcher);
 
     }
 
@@ -92,7 +90,7 @@ namespace Controllers {
 
     }
 
-    private getBodyBodyContacts (itemA:Models.Entity, itemB:Models.Entity):Physics.BodyBodyContact {
+    private getBodyBodyContacts (itemA:Simulation.Entity, itemB:Simulation.Entity):Physics.BodyBodyContact {
 
       if (itemA == itemB) {
         return;
@@ -133,7 +131,7 @@ namespace Controllers {
 
     }
 
-    private getBodyBoundaryContacts (item:Models.Entity, seg:Geom.ISegment):void {
+    private getBodyBoundaryContacts (item:Simulation.Entity, seg:Geom.ISegment):void {
 
       let parentPoly = this.model.boundaries.getItemByID(seg.parentID);
 
@@ -291,7 +289,7 @@ namespace Controllers {
         // temp
         item.rotation = 0.5;
 
-        let itemA = item as Models.Entity;
+        let itemA = item as Simulation.Entity;
         let cells = this.bodyGrid.getSurroundingCells(itemA);
 
         cells.forEach(cell => {
@@ -300,7 +298,7 @@ namespace Controllers {
   
             cell.forEach(item => {
   
-              var itemB = item as Models.Entity;
+              var itemB = item as Simulation.Entity;
               this.getBodyBodyContacts(itemA, itemB);
 
             });
@@ -315,7 +313,7 @@ namespace Controllers {
 
       items.forEach(item => {
         if (item.bounds.shape == Geom.SHAPE_ROUND) {
-          let itemA = item as Models.Entity;
+          let itemA = item as Simulation.Entity;
           let cell = this.boundaryGrid.getCellFromPoint(item.bounds.anchor);
           if (cell) {
             cell.forEach(seg => {

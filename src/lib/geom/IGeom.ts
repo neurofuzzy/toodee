@@ -32,7 +32,7 @@ namespace Geom {
     radius:number;
   }
 
-  export interface ISegment extends Util.IChild {
+  export interface ISegment extends Models.IChild {
     ptA:IPoint;
     ptB:IPoint;
   }
@@ -51,7 +51,7 @@ namespace Geom {
     project(len:number):IPoint;
   }
 
-  export interface IPointHit extends Util.IChild {
+  export interface IPointHit extends Models.IChild {
     pt:IPoint;
     angle:number;
     dist:number;
