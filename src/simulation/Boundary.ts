@@ -1,3 +1,5 @@
+/// <reference path="../lib/physics/PolygonBody.ts" />
+
 namespace Simulation {
 
   export class Boundary extends Physics.PolygonBody implements Util.Identifiable, Physics.IContactable {
@@ -7,7 +9,7 @@ namespace Simulation {
     public contactMask:number;
     public resolveMask:number;
 
-    constructor (vertices?:Array<Util.Geom.IPoint>) {
+    constructor (vertices?:Array<Geom.IPoint>) {
 
       super(vertices);
 

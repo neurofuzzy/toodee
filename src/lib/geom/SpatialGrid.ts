@@ -1,4 +1,4 @@
-namespace Util.Geom {
+namespace Geom {
 
   export class SpatialGrid<T extends Util.Identifiable & ISpatial> implements IGrid<T>, Util.ICollection<T> {
 
@@ -166,7 +166,7 @@ namespace Util.Geom {
 
     public getCellsNear (center:IPoint, radius:number):Array<Array<T>> {
 
-      var coords = Util.Geom.cellCoordsIntersectingCircle(center, radius, this.cellSize);
+      var coords = Geom.cellCoordsIntersectingCircle(center, radius, this.cellSize);
       return this.getCellsFromCoords(coords, false);
 
     }

@@ -1,4 +1,4 @@
-namespace Util.Geom {
+namespace Geom {
 
   export const SHAPE_ORTHO:number = 1;
   export const SHAPE_ROUND:number = 2;

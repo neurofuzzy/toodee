@@ -1,4 +1,4 @@
-namespace Util.Geom {
+namespace Geom {
 
   export function pointWithinBounds(x:number, y:number, b:IBounds):boolean {
 

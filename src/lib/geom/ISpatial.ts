@@ -1,4 +1,4 @@
-namespace Util.Geom {
+namespace Geom {
 
   export interface ISpatial {
     bounds:IBounds;

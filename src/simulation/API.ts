@@ -1,14 +1,14 @@
 namespace Simulation {
 
-  export class SimulationAPI<T extends Util.Geom.IPolygon & Util.Identifiable, K extends Util.Identifiable & Util.Geom.ISpatial> {
+  export class API<T extends Geom.IPolygon & Util.Identifiable, K extends Util.Identifiable & Geom.ISpatial> {
 
-    protected readonly bodyGrid:Util.Geom.SpatialGrid<K>;
-    protected readonly boundaryGrid:Util.Geom.PolygonGrid<T>;
-    protected readonly bodyBoundaryMap:Util.Geom.SpatialPolygonMap<T, K>;
+    protected readonly bodyGrid:Geom.SpatialGrid<K>;
+    protected readonly boundaryGrid:Geom.PolygonGrid<T>;
+    protected readonly bodyBoundaryMap:Geom.SpatialPolygonMap<T, K>;
     protected forces:Array<Physics.IForce>;
     protected dispatcher:Util.IEventDispatcher;
 
-    constructor (bodyGrid:Util.Geom.SpatialGrid<K>, boundaryGrid:Util.Geom.PolygonGrid<T>, bodyBoundaryMap:Util.Geom.SpatialPolygonMap<T, K>, forces:Array<Physics.IForce>, dispatcher:Util.IEventDispatcher) {
+    constructor (bodyGrid:Geom.SpatialGrid<K>, boundaryGrid:Geom.PolygonGrid<T>, bodyBoundaryMap:Geom.SpatialPolygonMap<T, K>, forces:Array<Physics.IForce>, dispatcher:Util.IEventDispatcher) {
 
       this.bodyGrid = bodyGrid;
       this.boundaryGrid = boundaryGrid;
@@ -74,7 +74,7 @@ namespace Simulation {
      * @param focusPt point to check nearness
      * @param range how far is near
      */
-    public bodiesNear (focalPt:Util.Geom.IPoint, range:number):Array<K> {
+    public bodiesNear (focalPt:Geom.IPoint, range:number):Array<K> {
 
       return this.bodyGrid.getItemsNear(focalPt, range);
 
@@ -87,15 +87,15 @@ namespace Simulation {
      * @param facingAngle 
      * @param withinAngle angle delta from front
      */
-    public bodiesNearAndInFront (focalPt:Util.Geom.IPoint, range:number, facingAngle:number, withinAngle:number = 0.5):Array<K> {
+    public bodiesNearAndInFront (focalPt:Geom.IPoint, range:number, facingAngle:number, withinAngle:number = 0.5):Array<K> {
       
       let frontBodies:Array<K> = [];
       let nearItems = this.bodiesNear(focalPt, range);
       
       nearItems.forEach(bodyB => {
         let ptB = bodyB.bounds.anchor;
-        let ang = Util.Geom.normalizeAngle(0 - Util.Geom.angleBetween(focalPt.x, focalPt.y, ptB.x, ptB.y) + Math.PI * 0.5);
-        let angDelta = Util.Geom.normalizeAngle(facingAngle - ang);
+        let ang = Geom.normalizeAngle(0 - Geom.angleBetween(focalPt.x, focalPt.y, ptB.x, ptB.y) + Math.PI * 0.5);
+        let angDelta = Geom.normalizeAngle(facingAngle - ang);
         if (Math.abs(angDelta) < withinAngle) {
           frontBodies.push(bodyB)
         }
@@ -110,22 +110,22 @@ namespace Simulation {
      * @param ray a ray to project
      * @param range how far to project the ray
      */
-    public raycast (ray:Util.Geom.Ray, range:number):Array<Util.Geom.IPointHit> {
+    public raycast (ray:Geom.Ray, range:number):Array<Geom.IPointHit> {
       
       let pt = ray.project(range);
 
-      let hitPts:Array<Util.Geom.IPointHit> = [];
+      let hitPts:Array<Geom.IPointHit> = [];
 
-      let coords = Util.Geom.cellCoordsAlongLineWithThickness(ray.origin.x, ray.origin.y, pt.x, pt.y, 100, 20);
+      let coords = Geom.cellCoordsAlongLineWithThickness(ray.origin.x, ray.origin.y, pt.x, pt.y, 100, 20);
 
       let boundaryCells = this.boundaryGrid.getCellsFromCoords(coords, true);
       
       boundaryCells.forEach(cell => {
         cell.forEach(seg => {
-          let intPt = Util.Geom.lineLineIntersect(ray.origin.x, ray.origin.y, pt.x, pt.y, seg.ptA.x, seg.ptA.y, seg.ptB.x, seg.ptB.y);
+          let intPt = Geom.lineLineIntersect(ray.origin.x, ray.origin.y, pt.x, pt.y, seg.ptA.x, seg.ptA.y, seg.ptB.x, seg.ptB.y);
 
           if (intPt != null) {
-            hitPts.push(new Util.Geom.PointHit(ray.origin, intPt, seg.parentID))
+            hitPts.push(new Geom.PointHit(ray.origin, intPt, seg.parentID))
           }
         });
       });
@@ -136,12 +136,12 @@ namespace Simulation {
 
         cell.forEach(body => {
 
-          let intPts = Util.Geom.boundsLineIntersect(body.bounds, ray.origin, pt);
+          let intPts = Geom.boundsLineIntersect(body.bounds, ray.origin, pt);
 
           if (intPts && intPts.length) {
             intPts.forEach(intPt => {
               let item = body;
-              hitPts.push(new Util.Geom.PointHit(ray.origin, intPt, item.id));
+              hitPts.push(new Geom.PointHit(ray.origin, intPt, item.id));
             })
           }
 
@@ -150,7 +150,7 @@ namespace Simulation {
       })
 
       if (hitPts.length > 0) {
-        Util.Geom.PointHit.sort(hitPts);
+        Geom.PointHit.sort(hitPts);
       }
 
       return hitPts;

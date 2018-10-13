@@ -1,4 +1,4 @@
-namespace Util.Geom {
+namespace Geom {
 
   export class BaseSpatial implements ISpatial {
 

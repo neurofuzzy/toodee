@@ -1,4 +1,6 @@
-namespace Util.Geom {
+/// <reference path="../../util/Events.ts" />
+
+namespace Geom {
 
   export interface IPolygonMap<T> {
 
