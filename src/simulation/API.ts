@@ -1,14 +1,14 @@
 namespace Simulation {
 
-  export class API<T extends Geom.IPolygon & Util.Identifiable, K extends Util.Identifiable & Geom.ISpatial> {
+  export class API<T extends Geom.IPolygon & Models.Identifiable, K extends Models.Identifiable & Geom.ISpatial> {
 
     protected readonly bodyGrid:Geom.SpatialGrid<K>;
     protected readonly boundaryGrid:Geom.PolygonGrid<T>;
     protected readonly bodyBoundaryMap:Geom.SpatialPolygonMap<T, K>;
     protected forces:Array<Physics.IForce>;
-    protected dispatcher:Util.IEventDispatcher;
+    protected dispatcher:Models.IEventDispatcher;
 
-    constructor (bodyGrid:Geom.SpatialGrid<K>, boundaryGrid:Geom.PolygonGrid<T>, bodyBoundaryMap:Geom.SpatialPolygonMap<T, K>, forces:Array<Physics.IForce>, dispatcher:Util.IEventDispatcher) {
+    constructor (bodyGrid:Geom.SpatialGrid<K>, boundaryGrid:Geom.PolygonGrid<T>, bodyBoundaryMap:Geom.SpatialPolygonMap<T, K>, forces:Array<Physics.IForce>, dispatcher:Models.IEventDispatcher) {
 
       this.bodyGrid = bodyGrid;
       this.boundaryGrid = boundaryGrid;
@@ -49,10 +49,10 @@ namespace Simulation {
 
     /**
      * Adds a listener function to receive events when objects make contact with eachother or boundaries
-     * @param listener Util.IEventListenerFunc
+     * @param listener Models.IEventListenerFunc
      * @param scope scope object to use as _this_
      */
-    public addContactListener (listener:Util.IEventListenerFunc, scope:any):void {
+    public addContactListener (listener:Models.IEventListenerFunc, scope:any):void {
 
       this.dispatcher.addListener(listener, scope);
 
@@ -60,10 +60,10 @@ namespace Simulation {
 
     /**
      * Adds a listener function to receive events when object enter or leave boundary areas
-     * @param listener Util.IEventListenerFunc
+     * @param listener Models.IEventListenerFunc
      * @param scope scope object to use as _this_
      */
-    public addBoundaryListener (listener:Util.IEventListenerFunc, scope:any):void {
+    public addBoundaryListener (listener:Models.IEventListenerFunc, scope:any):void {
 
       this.bodyBoundaryMap.addListener(listener, scope);
 

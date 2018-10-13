@@ -1,4 +1,4 @@
-class AppController implements Util.IModelViewController<Simulation.Model, Views.View> {
+class AppController implements Models.IModelViewController<Simulation.Model, Views.View> {
   
   protected model:Simulation.Model;
   protected view:Views.View;
@@ -290,13 +290,13 @@ class AppController implements Util.IModelViewController<Simulation.Model, Views
 
   }
 
-  public onContactEvent(event:Util.IEvent<any>) {
+  public onContactEvent(event:Models.IEvent<any>) {
 
     console.log("contact", event.sourceID, event.targetID)
 
   }
 
-  public onBoundaryEvent(event:Util.IEvent<any>) {
+  public onBoundaryEvent(event:Models.IEvent<any>) {
     
     console.log("boundary", event.type, event.sourceID, event.targetID)
 

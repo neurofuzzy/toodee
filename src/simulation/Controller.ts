@@ -9,7 +9,7 @@ namespace Simulation {
     Boundary = 2,
   }
 
-  export class Controller implements Util.IModelController<Simulation.Model> {
+  export class Controller implements Models.IModelController<Simulation.Model> {
 
     protected model:Simulation.Model;
     protected bodyGrid:Geom.SpatialGrid<Simulation.Entity>;
@@ -20,7 +20,7 @@ namespace Simulation {
     protected bodyBodyContactIndices:Array<boolean>;
     protected bodyBoundaryContacts:Array<Physics.BodyBoundaryContact>;
     protected forces:Array<Physics.IForce>;
-    protected dispatcher:Util.IEventDispatcher;
+    protected dispatcher:Models.IEventDispatcher;
 
     protected _api:API<Simulation.Boundary, Simulation.Entity>;
 
@@ -38,7 +38,7 @@ namespace Simulation {
 
     public reset ():void {
 
-      this.dispatcher = new Util.EventDispatcher().init();
+      this.dispatcher = new Models.EventDispatcher().init();
       this.bodyGrid = new Geom.SpatialGrid(100).init();
       this.boundaryGrid = new Geom.PolygonGrid(100, 20).init();
       this.bodyBoundaryMap = new Geom.SpatialPolygonMap().init();

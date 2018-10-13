@@ -1,4 +1,4 @@
-namespace Util {
+namespace Models {
 
   export enum EventType {
     Change = 1,
@@ -23,7 +23,7 @@ namespace Util {
     addListener(listener:IEventListenerFunc, scope:any):void;
     removeListener(listener:IEventListenerFunc):void;
     dispatchEvent(event:IEvent<any>):void;
-    dispatch(type:number, source:Identifiable, target?:Identifiable, payload?:any):void;
+    dispatch(type:number, source:Models.Identifiable, target?:Identifiable, payload?:any):void;
   }
 
   export class Event<T> implements IEvent<T> {

@@ -2,7 +2,7 @@
 
 namespace Simulation {
 
-  export class Boundary extends Physics.PolygonBody implements Util.Identifiable, Physics.IContactable {
+  export class Boundary extends Physics.PolygonBody implements Models.Identifiable, Physics.IContactable {
     
     public id:number;
 
@@ -13,7 +13,7 @@ namespace Simulation {
 
       super(vertices);
 
-      this.id = Util.IdentityService.newIdentity();
+      this.id = Models.IdentityService.newIdentity();
       this.resolveMask = 0b11111111;
       this.contactMask = 0b11111111;
 

@@ -1,6 +1,6 @@
 namespace Views {
 
-  export class View implements Util.IView<Simulation.Model> {
+  export class View implements Models.IView<Simulation.Model> {
 
     protected model:Simulation.Model;
     protected bodies:Array<PIXI.Graphics>;
@@ -176,13 +176,13 @@ namespace Views {
 
     }
 
-    onProjectileEvent(event: Util.IEvent<any>) {
+    onProjectileEvent(event: Models.IEvent<any>) {
 
       let gfx:PIXI.Graphics;
       
       switch (event.type) {
 
-        case Util.EventType.Add:
+        case Models.EventType.Add:
 
           let p = this.model.projectiles.getItemByID(event.sourceID);
           gfx = new PIXI.Graphics();
@@ -195,7 +195,7 @@ namespace Views {
 
           break;
 
-        case Util.EventType.Remove:
+        case Models.EventType.Remove:
 
           gfx = this.projectiles[event.sourceID];
           if (gfx) {

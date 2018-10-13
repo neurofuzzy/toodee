@@ -1,6 +1,6 @@
 namespace Geom {
 
-  export class SpatialGrid<T extends Util.Identifiable & ISpatial> implements IGrid<T>, Util.ICollection<T> {
+  export class SpatialGrid<T extends Models.Identifiable & ISpatial> implements IGrid<T>, Models.ICollection<T> {
 
     protected cellSize:number;
     protected itemsCellIndexes:Array<number>;

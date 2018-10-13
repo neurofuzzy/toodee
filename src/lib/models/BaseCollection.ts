@@ -1,8 +1,8 @@
-/// <reference path="Events.ts" />
+/// <reference path="./Events.ts" />
 
-namespace Util {
+namespace Models {
 
-  export class BaseCollection<T extends Util.Identifiable> extends EventDispatcher implements Util.ICollection<T> {
+  export class BaseCollection<T extends Identifiable> extends EventDispatcher implements ICollection<T> {
 
     public items:Array<Identifiable & T>;
     protected itemsByID:Array<Identifiable & T>;

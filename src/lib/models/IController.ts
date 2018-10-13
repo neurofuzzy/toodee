@@ -1,4 +1,4 @@
-namespace Util {
+namespace Models {
 
   export interface IController {
 
