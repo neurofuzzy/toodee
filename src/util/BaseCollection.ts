@@ -1,3 +1,5 @@
+/// <reference path="Events.ts" />
+
 namespace Util {
 
   export class BaseCollection<T extends Util.Identifiable> extends EventDispatcher implements Util.ICollection<T> {

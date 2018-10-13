@@ -1,6 +1,4 @@
-/// <reference path="../physics/Body.ts" />
-
-namespace Models {
+namespace Simulation {
 
   export class Entity
    extends Physics.BaseBody implements Util.Identifiable, Physics.IContactable {

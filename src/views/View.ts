@@ -1,8 +1,8 @@
 namespace Views {
 
-  export class View implements Util.IView<Models.Model> {
+  export class View implements Util.IView<Simulation.Model> {
 
-    protected model:Models.Model;
+    protected model:Simulation.Model;
     protected bodies:Array<PIXI.Graphics>;
     protected boundaries:Array<PIXI.Graphics>;
     protected projectiles:Array<PIXI.Graphics>;
@@ -30,7 +30,7 @@ namespace Views {
 
     }
 
-    public initWithModel (model:Models.Model):any {
+    public initWithModel (model:Simulation.Model):any {
  
       this.model = model;
       this.bodies = [];

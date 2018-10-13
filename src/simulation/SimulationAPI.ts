@@ -1,4 +1,4 @@
-namespace Controllers {
+namespace Simulation {
 
   export class SimulationAPI<T extends Util.Geom.IPolygon & Util.Identifiable, K extends Util.Identifiable & Util.Geom.ISpatial> {
 

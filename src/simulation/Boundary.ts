@@ -1,6 +1,4 @@
-/// <reference path="../physics/PolygonBody.ts" />
-
-namespace Models {
+namespace Simulation {
 
   export class Boundary extends Physics.PolygonBody implements Util.Identifiable, Physics.IContactable {
     
