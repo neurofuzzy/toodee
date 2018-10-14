@@ -64,4 +64,4 @@ typings/
 .cache
 
 # compiled bundles
-dist/*
+dist

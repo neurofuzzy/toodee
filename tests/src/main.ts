@@ -1,11 +1,13 @@
 class Main {
 
   public static app:App;
+  public static controller:AppController;
 
   public static main():void {
 
     this.app = new App().init();
-    this.app.start();
+    this.controller = new AppController().init(this.app);
+    this.controller.start();
 
   }
 
@@ -19,11 +21,11 @@ window.onload = function () {
 }
 
 window.onblur = function () {
-  Main.app.pause();
+  Main.app.start();
 }
 
 window.onfocus = function () {
-  Main.app.resume();
+  Main.app.stop();
 }
 
 // get parcel to refresh on TypeScript bundle export

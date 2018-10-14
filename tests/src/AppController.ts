@@ -1,26 +1,24 @@
-class AppController implements Models.IModelViewController<Simulation.Model, Views.View> {
+class AppController {
   
-  protected model:Simulation.Model;
-  protected view:Views.View;
-  protected simulation:Simulation.Controller;
+  protected app:App;
   protected paused:boolean;
   protected started:boolean;
   protected step:number = 0;
 
-  public initWithModelAndView(model:Simulation.Model, view:Views.View):any {
+  public init(app:App):any {
 
-    this.model = model;
-    this.view = view;
-    this.simulation = new Simulation.Controller().initWithModel(model);
-
-    this.simulation.api.addContactListener(this.onContactEvent, this);
-    this.simulation.api.addBoundaryListener(this.onBoundaryEvent, this);
+    this.app = app;
+    this.app.simulation.api.addContactListener(this.onContactEvent, this);
+    this.app.simulation.api.addBoundaryListener(this.onBoundaryEvent, this);
 
     return this;
 
   }
 
   protected build () {
+
+    var model = this.app.model;
+    var sim = this.app.simulation;
 
     let masks = [
       0b00000001,
@@ -64,7 +62,7 @@ class AppController implements Models.IModelViewController<Simulation.Model, Vie
 
       }
 
-      this.model.bodies.addItem(item);
+      model.bodies.addItem(item);
 
     }
 
@@ -89,7 +87,7 @@ class AppController implements Models.IModelViewController<Simulation.Model, Vie
     let bnd = new Simulation.Boundary(vertices);
     bnd.contactMask = bnd.resolveMask = bndMask;
 
-    this.model.boundaries.addItem(bnd);
+    model.boundaries.addItem(bnd);
 
     // smaller sector poly
 
@@ -111,7 +109,7 @@ class AppController implements Models.IModelViewController<Simulation.Model, Vie
     bnd.contactMask = bnd.resolveMask = bndMask;
     bnd.drag = 0.1;
 
-    this.model.boundaries.addItem(bnd);
+    model.boundaries.addItem(bnd);
 
     // even smaller sector poly
 
@@ -133,7 +131,7 @@ class AppController implements Models.IModelViewController<Simulation.Model, Vie
     bnd.contactMask = bnd.resolveMask = bndMask;
     let smallBoundaryID = bnd.id;
 
-    this.model.boundaries.addItem(bnd);
+    model.boundaries.addItem(bnd);
 
     // smaller inverted poly
 
@@ -154,23 +152,23 @@ class AppController implements Models.IModelViewController<Simulation.Model, Vie
     bnd = new Simulation.Boundary(vertices);
     bnd.contactMask = bnd.resolveMask = bndMask;
 
-    this.model.boundaries.addItem(bnd);
+    model.boundaries.addItem(bnd);
 
     // test ray
-    let r = this.model.ray;
+    let r = model.ray;
     let ro = r.origin;
     ro.x = 400;
     ro.y = 400;
 
     // forces
     // let pforce = new Physics.ProximityForce(5).initWithOriginAndRange({ x: 200, y: 200 }, 200);
-    // this.simulation.api.addForce(pforce);
+    // sim.api.addForce(pforce);
 
     let aforce = new Physics.AreaForce(5, Math.PI * 0.5).initWithParentID(smallBoundaryID);
-    this.simulation.api.addForce(aforce);
+    sim.api.addForce(aforce);
 
     //let ppforce = new Physics.PropulsionForce(5).initWithParentID(1);
-    //this.simulation.api.addForce(ppforce);
+    //sim.api.addForce(ppforce);
 
   }
 
@@ -179,21 +177,23 @@ class AppController implements Models.IModelViewController<Simulation.Model, Vie
     console.log("starting...");
     this.build();
 
-    this.simulation.start();
+    this.app.simulation.start();
 
-    this.view.ticker.add(this.update);
+    this.app.view.ticker.add(this.update);
     //this.view.ticker.add(this.update);
-    this.started = true;
 
   }
 
   public update = () => {
 
-    this.simulation.update();
-    // this.simulation.update();
+    var model = this.app.model;
+    var sim = this.app.simulation;
+
+    sim.update();
+    // sim.update();
 
     // ray 
-    let r = this.model.ray;
+    let r = model.ray;
 
     // near items check
 
@@ -207,19 +207,19 @@ class AppController implements Models.IModelViewController<Simulation.Model, Vie
     r.origin.y = cen.y;
     r.angle = Geom.normalizeAngle(Math.PI * 2 - Geom.angleBetween(cen.x, cen.y, 400, 300));
 
-    let nearItems = this.simulation.api.bodiesNearAndInFront(r.origin, 150, r.angle, 0.5);
+    let nearItems = sim.api.bodiesNearAndInFront(r.origin, 150, r.angle, 0.5);
     nearItems.forEach(item => {
       item.rotation = 0;
     });
 
     // ray check
 
-    let hitPts = this.simulation.api.raycast(r, 400);
+    let hitPts = sim.api.raycast(r, 400);
 
-    this.model.rayHit = hitPts[0];
+    model.rayHit = hitPts[0];
 
-    if (this.model.rayHit) {
-      let hitItem = this.model.bodies.getItemByID(this.model.rayHit.parentID);
+    if (model.rayHit) {
+      let hitItem = model.bodies.getItemByID(model.rayHit.parentID);
       if (hitItem) {
         hitItem.rotation = -1;
       }
@@ -245,11 +245,11 @@ class AppController implements Models.IModelViewController<Simulation.Model, Vie
         bullet.contactMask = bullet.resolveMask = masks[bullet.id % 4];
         bullet.velocity.x = vel.x;
         bullet.velocity.y = vel.y;
-        this.model.projectiles.addItem(bullet);
+        model.projectiles.addItem(bullet);
       }
     }
 
-    this.view.update();
+    this.app.view.update();
 
     this.step++;
 
@@ -259,7 +259,7 @@ class AppController implements Models.IModelViewController<Simulation.Model, Vie
 
     console.log("stopping...");
 
-    this.view.ticker.remove(this.update);
+    this.app.view.ticker.remove(this.update);
 
   }
 
@@ -271,7 +271,7 @@ class AppController implements Models.IModelViewController<Simulation.Model, Vie
     }
 
     if (!this.paused) {
-      this.view.ticker.remove(this.update);
+      this.app.view.ticker.remove(this.update);
       this.paused = true;
     }
 
@@ -284,7 +284,7 @@ class AppController implements Models.IModelViewController<Simulation.Model, Vie
     }
 
     if (this.paused) {
-      this.view.ticker.add(this.update);
+      this.app.view.ticker.add(this.update);
       this.paused = false;
     }
 
@@ -292,13 +292,13 @@ class AppController implements Models.IModelViewController<Simulation.Model, Vie
 
   public onContactEvent(event:Models.IEvent<any>) {
 
-    console.log("contact", event.sourceID, event.targetID)
+   // console.log("contact", event.sourceID, event.targetID)
 
   }
 
   public onBoundaryEvent(event:Models.IEvent<any>) {
     
-    console.log("boundary", event.type, event.sourceID, event.targetID)
+  //  console.log("boundary", event.type, event.sourceID, event.targetID)
 
   }
 
