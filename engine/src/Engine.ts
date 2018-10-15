@@ -1,10 +1,10 @@
-class App {
+class Engine {
 
   public model:Simulation.Model;
   public simulation:Simulation.Controller;
   public view:Views.View;
 
-  public init ():App {
+  public init ():Engine {
 
     this.model = new Simulation.Model().init();
     this.simulation = new Simulation.Controller().initWithModel(this.model);

@@ -1,15 +1,15 @@
-class AppController {
+class Delegate {
   
-  protected app:App;
+  protected engine:Engine;
   protected paused:boolean;
   protected started:boolean;
   protected step:number = 0;
 
-  public init(app:App):any {
+  public init(engine:Engine):any {
 
-    this.app = app;
-    this.app.simulation.api.addContactListener(this.onContactEvent, this);
-    this.app.simulation.api.addBoundaryListener(this.onBoundaryEvent, this);
+    this.engine = engine;
+    this.engine.simulation.api.addContactListener(this.onContactEvent, this);
+    this.engine.simulation.api.addBoundaryListener(this.onBoundaryEvent, this);
 
     return this;
 
@@ -17,8 +17,8 @@ class AppController {
 
   protected build () {
 
-    var model = this.app.model;
-    var sim = this.app.simulation;
+    var model = this.engine.model;
+    var sim = this.engine.simulation;
 
     let masks = [
       0b00000001,
@@ -177,17 +177,17 @@ class AppController {
     console.log("starting...");
     this.build();
 
-    this.app.simulation.start();
+    this.engine.simulation.start();
 
-    this.app.view.ticker.add(this.update);
+    this.engine.view.ticker.add(this.update);
     //this.view.ticker.add(this.update);
 
   }
 
   public update = () => {
 
-    var model = this.app.model;
-    var sim = this.app.simulation;
+    var model = this.engine.model;
+    var sim = this.engine.simulation;
 
     sim.update();
     // sim.update();
@@ -249,7 +249,7 @@ class AppController {
       }
     }
 
-    this.app.view.update();
+    this.engine.view.update();
 
     this.step++;
 
@@ -259,7 +259,7 @@ class AppController {
 
     console.log("stopping...");
 
-    this.app.view.ticker.remove(this.update);
+    this.engine.view.ticker.remove(this.update);
 
   }
 
@@ -271,7 +271,7 @@ class AppController {
     }
 
     if (!this.paused) {
-      this.app.view.ticker.remove(this.update);
+      this.engine.view.ticker.remove(this.update);
       this.paused = true;
     }
 
@@ -284,7 +284,7 @@ class AppController {
     }
 
     if (this.paused) {
-      this.app.view.ticker.add(this.update);
+      this.engine.view.ticker.add(this.update);
       this.paused = false;
     }
 

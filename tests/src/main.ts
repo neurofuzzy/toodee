@@ -1,13 +1,13 @@
 class Main {
 
-  public static app:App;
-  public static controller:AppController;
+  public static engine:Engine;
+  public static delegate:Delegate;
 
-  public static main():void {
+  public static main():void { 
 
-    this.app = new App().init();
-    this.controller = new AppController().init(this.app);
-    this.controller.start();
+    this.engine = new Engine().init();
+    this.delegate = new Delegate().init(this.engine);
+    this.delegate.start();
 
   }
 
@@ -21,11 +21,11 @@ window.onload = function () {
 }
 
 window.onblur = function () {
-  Main.app.start();
+  Main.delegate.start();
 }
 
 window.onfocus = function () {
-  Main.app.stop();
+  Main.delegate.stop();
 }
 
 // get parcel to refresh on TypeScript bundle export
