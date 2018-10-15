@@ -7,10 +7,11 @@ class StartTest {
   public static main():void { 
 
     this.engine = new Engine().init();
-    console.log("HI!");
-    this.engine.model.bodies.addItem(new Simulation.Entity().initWithBounds(new Geom.Bounds(20, 20, 20, 20)));
+    console.log("HELLO!");
+    let b = new Geom.Bounds(20, 20, 20, 20, Geom.SHAPE_ROUND);
+    let c = new Geom.Constraints();
+    this.engine.model.bodies.addItem(new Simulation.Entity().initWithBoundsAndConstraints(b, c));
     this.engine.start();
-    this.engine.simulation.update();
 
   }
 

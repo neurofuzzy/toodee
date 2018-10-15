@@ -4,11 +4,14 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "type": "typescript",
-      "tsconfig": "tests/tsconfig.json",
-      "problemMatcher": [
-        "$tsc"
-      ]
+      "label": "test1",
+      "type": "shell",
+      "command": "tsc --target es5 --sourceMap --outFile dist/bundle.js ./src/test.ts ../engine/src/**/*.ts",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
     }
   ]
 }
