@@ -8,11 +8,13 @@ class StartTest {
 
     this.engine = new Engine().init();
     console.log("HELLO!");
-    let b = new Geom.Bounds(20, 20, 20, 20, Geom.SHAPE_ROUND);
+    let b = new Geom.Bounds(200, 200, 20, 20, Geom.SHAPE_ROUND);
     let c = new Geom.Constraints();
-    this.engine.model.bodies.addItem(new Simulation.Entity().initWithBoundsAndConstraints(b, c));
+    let body = new Simulation.Entity().initWithBoundsAndConstraints(b, c);
+    this.engine.model.bodies.addItem(body);
     this.engine.start();
-
+    this.engine.simulation.update();
+    this.engine.view.update();
   }
 
 }
