@@ -1,4 +1,4 @@
-/// <reference path="../lib/physics/Particle.ts" />
+/// <reference path="../physics/Particle.ts" />
 
 namespace Simulation {
 

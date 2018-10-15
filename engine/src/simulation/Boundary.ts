@@ -1,4 +1,4 @@
-/// <reference path="../lib/physics/PolygonBody.ts" />
+/// <reference path="../physics/PolygonBody.ts" />
 
 namespace Simulation {
 
