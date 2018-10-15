@@ -21,11 +21,11 @@ window.onload = function () {
 }
 
 window.onblur = function () {
-  Main.delegate.start();
+  Main.delegate.stop();
 }
 
 window.onfocus = function () {
-  Main.delegate.stop();
+  Main.delegate.start();
 }
 
 // get parcel to refresh on TypeScript bundle export

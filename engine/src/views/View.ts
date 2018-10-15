@@ -129,15 +129,19 @@ namespace Views {
       // view update
       this.model.bodies.items.forEach(item => {
         let gfx = this.bodies[item.id];
-        gfx.x = item.bounds.anchor.x;
-        gfx.y = item.bounds.anchor.y;
-        gfx.alpha = 1 - item.rotation;
+        if (gfx) {
+          gfx.x = item.bounds.anchor.x;
+          gfx.y = item.bounds.anchor.y;
+          gfx.alpha = 1 - item.rotation;
+        }
       });
 
       this.model.projectiles.items.forEach(item => {
         let gfx = this.projectiles[item.id];
-        gfx.x = item.position.x;
-        gfx.y = item.position.y;
+        if (gfx) {
+          gfx.x = item.position.x;
+          gfx.y = item.position.y;
+        }
       });
 
       let r = this.model.ray;
