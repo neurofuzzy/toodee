@@ -5,9 +5,9 @@ class Main {
 
   public static main():void { 
 
-    this.engine = new Engine().init();
-    this.delegate = new Delegate().init(this.engine);
-    this.delegate.start();
+    Main.engine = new Engine().init();
+    Main.delegate = new Delegate().init(this.engine);
+    Main.delegate.start();
 
   }
 
@@ -15,18 +15,20 @@ class Main {
 
 // folderol
 
+
 window.onload = function () {
   Main.main();
   window.document.head.setAttribute("has-main",  "yes");
 }
 
 window.onblur = function () {
-  Main.delegate.stop();
-}
+  Main.delegate.pause();
+} 
 
 window.onfocus = function () {
-  Main.delegate.start();
+  Main.delegate.resume();
 }
+
 
 // get parcel to refresh on TypeScript bundle export
 if (document.head.getAttribute("has-main") == "yes") {

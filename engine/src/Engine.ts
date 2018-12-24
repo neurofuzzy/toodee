@@ -26,4 +26,8 @@ class Engine {
 
   }
 
+  get api () {
+    return this.simulation.api;
+  }
+
 }

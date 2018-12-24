@@ -2,14 +2,16 @@ namespace Simulation {
 
   export class API<T extends Geom.IPolygon & Models.Identifiable, K extends Models.Identifiable & Geom.ISpatial> {
 
+    protected readonly model:Model;
     protected readonly bodyGrid:Geom.SpatialGrid<K>;
     protected readonly boundaryGrid:Geom.PolygonGrid<T>;
     protected readonly bodyBoundaryMap:Geom.SpatialPolygonMap<T, K>;
     protected forces:Array<Physics.IForce>;
-    protected dispatcher:Models.IEventDispatcher;
+    protected dispatcher:Models.IEventDispatcher<K>;
 
-    constructor (bodyGrid:Geom.SpatialGrid<K>, boundaryGrid:Geom.PolygonGrid<T>, bodyBoundaryMap:Geom.SpatialPolygonMap<T, K>, forces:Array<Physics.IForce>, dispatcher:Models.IEventDispatcher) {
+    constructor (model:Model, bodyGrid:Geom.SpatialGrid<K>, boundaryGrid:Geom.PolygonGrid<T>, bodyBoundaryMap:Geom.SpatialPolygonMap<T, K>, forces:Array<Physics.IForce>, dispatcher:Models.IEventDispatcher<K>) {
 
+      this.model = model;
       this.bodyGrid = bodyGrid;
       this.boundaryGrid = boundaryGrid;
       this.bodyBoundaryMap = bodyBoundaryMap;
@@ -17,6 +19,41 @@ namespace Simulation {
       this.dispatcher = dispatcher;
 
       return this;
+
+    }
+
+    /**
+     * Adds a listener function to receive events when objects are added or removed from a model
+     * @param listener Models.IEventListenerFunc<Entity | Projectile | Boundary>
+     * @param scope scope object to use as _this_
+     */
+    public addModelListener (listener:Models.IEventListenerFunc<Entity | Projectile | Boundary>, scope:any):void {
+
+      this.model.bodies.addListener(listener, scope)
+      this.model.projectiles.addListener(listener, scope)
+      this.model.boundaries.addListener(listener, scope)
+  
+    }
+
+    /**
+     * Adds a listener function to receive events when objects make contact with eachother or boundaries
+     * @param listener Models.IEventListenerFunc<K>
+     * @param scope scope object to use as _this_
+     */
+    public addContactListener (listener:Models.IEventListenerFunc<K>, scope:any):void {
+
+      this.dispatcher.addListener(listener, scope);
+
+    }
+
+    /**
+     * Adds a listener function to receive events when object enter or leave boundary areas
+     * @param listener Models.IEventListenerFunc<T>
+     * @param scope scope object to use as _this_
+     */
+    public addBoundaryListener (listener:Models.IEventListenerFunc<T>, scope:any):void {
+
+      this.bodyBoundaryMap.addListener(listener, scope);
 
     }
 
@@ -44,28 +81,6 @@ namespace Simulation {
           this.forces.splice(i, 1);
         }
       }
-
-    }
-
-    /**
-     * Adds a listener function to receive events when objects make contact with eachother or boundaries
-     * @param listener Models.IEventListenerFunc
-     * @param scope scope object to use as _this_
-     */
-    public addContactListener (listener:Models.IEventListenerFunc, scope:any):void {
-
-      this.dispatcher.addListener(listener, scope);
-
-    }
-
-    /**
-     * Adds a listener function to receive events when object enter or leave boundary areas
-     * @param listener Models.IEventListenerFunc
-     * @param scope scope object to use as _this_
-     */
-    public addBoundaryListener (listener:Models.IEventListenerFunc, scope:any):void {
-
-      this.bodyBoundaryMap.addListener(listener, scope);
 
     }
 

@@ -19,10 +19,6 @@ namespace Views {
       0xffff00,
     ]
 
-    get ticker ():any {
-      return this.pixi.ticker;
-    }
-
     constructor () {
 
       this.pixi = new PIXI.Application();
@@ -144,6 +140,7 @@ namespace Views {
         }
       });
 
+      /*
       let r = this.model.ray;
 
       this.ray.clear();
@@ -155,7 +152,7 @@ namespace Views {
       }
       
       this.testGraphic.clear();
-      this.testGraphic.lineStyle(1, 0x00ffff, 0.5);
+      this.testGraphic.lineStyle(1, 0x00ff00, 0.5);
       
       let cen = { x: 400, y:300 };
       cen.x += 200 * Math.sin(Date.now() / 5000);
@@ -175,12 +172,13 @@ namespace Views {
       // proximity force
       this.testGraphic.lineStyle(1, 0x00ff00);
       this.testGraphic.drawCircle(200, 200, 200);
+      */
 
       this.fps.innerText = this.pixi.ticker.FPS.toString();
 
     }
 
-    onProjectileEvent(event: Models.IEvent<any>) {
+    onProjectileEvent(event: Models.IEvent<Simulation.Projectile>) {
 
       let gfx:PIXI.Graphics;
       
@@ -188,20 +186,20 @@ namespace Views {
 
         case Models.EventType.Add:
 
-          let p = this.model.projectiles.getItemByID(event.sourceID);
+          let p = event.source;
           gfx = new PIXI.Graphics();
           gfx.beginFill(this.colors[p.id % 4], 1);
           gfx.drawRect(0 - p.size * 0.5, 0 - p.size * 0.5, p.size, p.size);
           gfx.x = p.position.x;
           gfx.y = p.position.y;
           this.pixi.stage.addChild(gfx);
-          this.projectiles[event.sourceID] = gfx;
+          this.projectiles[event.source.id] = gfx;
 
           break;
 
         case Models.EventType.Remove:
 
-          gfx = this.projectiles[event.sourceID];
+          gfx = this.projectiles[event.source.id];
           if (gfx) {
             this.pixi.stage.removeChild(gfx);
           }

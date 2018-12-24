@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "sourceMap": true,
+    "declaration": true,
+    "outFile": "dist/bundle.js",
+    "sourceRoot": "src"
+  },
+  "include": [
+    "../engine/src/**/*.ts",
+    "src/**/*.ts",
+    "test1/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules/"
+  ]
+}
+

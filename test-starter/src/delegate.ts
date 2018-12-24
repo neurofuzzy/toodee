@@ -1,0 +1,108 @@
+class Delegate {
+  
+  protected engine:Engine;
+  protected paused:boolean;
+  protected started:boolean;
+  protected step:number = 0;
+
+  public init(engine:Engine):any {
+
+    this.engine = engine;
+    this.engine.simulation.api.addContactListener(this.onContactEvent, this);
+    this.engine.simulation.api.addBoundaryListener(this.onBoundaryEvent, this);
+
+    return this;
+
+  }
+
+  protected build () {
+
+    var model = this.engine.model;
+    var sim = this.engine.simulation;
+
+    let b = new Geom.Bounds(400, 300, 10, 10, Math.floor(Math.random() * 2 + 1));
+    let c = new Geom.Constraints();
+
+    b.shape = Geom.SHAPE_ROUND;
+    c.lockX = c.lockY = false;
+
+    var item:Simulation.Entity = new Simulation.Entity().initWithBoundsAndConstraints(b, c);
+
+    item.velocity.x = 0;
+    item.velocity.y = -1;
+
+    model.bodies.addItem(item);
+
+  }
+
+  public start () {
+
+    console.log("starting...");
+    this.build();
+
+    this.engine.simulation.start();
+
+    this.started = true;
+
+    window.requestAnimationFrame(() => { this.update() })
+
+  }
+
+  public update = () => {
+
+    if (this.started) {
+      window.requestAnimationFrame(() => { this.update() })
+    }
+
+    var model = this.engine.model;
+    var sim = this.engine.simulation;
+
+    sim.update();
+    
+    this.engine.view.update();
+
+    this.step++;
+
+  }
+
+  public stop () {
+
+    console.log("stopping...");
+    this.started = false;
+
+  }
+
+  
+  public pause () {
+
+    if (!this.started) {
+      return;
+    }
+
+    this.paused = true;
+
+  }
+
+  public resume () {
+
+    if (!this.started) {
+      return;
+    }
+
+    this.paused = false;
+
+  }
+
+  public onContactEvent(event:Models.IEvent<any>) {
+
+   // console.log("contact", event.sourceID, event.targetID)
+
+  }
+
+  public onBoundaryEvent(event:Models.IEvent<any>) {
+    
+  //  console.log("boundary", event.type, event.sourceID, event.targetID)
+
+  }
+
+}

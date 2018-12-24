@@ -2,7 +2,7 @@
 
 namespace Models {
 
-  export class BaseCollection<T extends Identifiable> extends EventDispatcher implements ICollection<T> {
+  export class BaseCollection<T extends Identifiable> extends EventDispatcher<T> implements ICollection<T> {
 
     public items:Array<Identifiable & T>;
     protected itemsByID:Array<Identifiable & T>;
@@ -42,7 +42,7 @@ namespace Models {
 
       this.items.push(item);
       this.itemsByID[item.id] = item;
-      this.dispatch(EventType.Add, item);
+      this.dispatch(EventType.Add, item, null, item);
       
       return true;
 
@@ -57,7 +57,7 @@ namespace Models {
         if (i >= 0) {
           this.items.splice(i, 1);
         }
-        this.dispatch(EventType.Remove, item);
+        this.dispatch(EventType.Remove, item, null, item);
         
         return true;
 

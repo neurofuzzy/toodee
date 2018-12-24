@@ -4,12 +4,15 @@ class Delegate {
   protected paused:boolean;
   protected started:boolean;
   protected step:number = 0;
+  protected api:Simulation.API<Simulation.Boundary, Simulation.Entity>;
 
   public init(engine:Engine):any {
 
     this.engine = engine;
-    this.engine.simulation.api.addContactListener(this.onContactEvent, this);
-    this.engine.simulation.api.addBoundaryListener(this.onBoundaryEvent, this);
+    this.api = this.engine.api;
+    this.api.addModelListener(this.onModelEvent, this);
+    this.api.addContactListener(this.onContactEvent, this);
+    this.api.addBoundaryListener(this.onBoundaryEvent, this);
 
     return this;
 
@@ -114,7 +117,7 @@ class Delegate {
     // even smaller sector poly
 
     vertices = [];
-    len = 8;
+    len = 8; 
     radius = 100;
 
     for (let i = 0; i < len; i++) {
@@ -179,12 +182,21 @@ class Delegate {
 
     this.engine.simulation.start();
 
-    this.engine.view.ticker.add(this.update);
-    //this.view.ticker.add(this.update);
+    this.started = true;
+
+    window.requestAnimationFrame(() => { this.update() })
 
   }
 
   public update = () => {
+
+    if (this.started) {
+      window.requestAnimationFrame(() => { this.update() })
+    }
+
+    if (this.paused) {
+      return
+    }
 
     var model = this.engine.model;
     var sim = this.engine.simulation;
@@ -258,8 +270,8 @@ class Delegate {
   public stop () {
 
     console.log("stopping...");
-
-    this.engine.view.ticker.remove(this.update);
+    this.started = false;
+    // TODO: cleanup
 
   }
 
@@ -270,10 +282,7 @@ class Delegate {
       return;
     }
 
-    if (!this.paused) {
-      this.engine.view.ticker.remove(this.update);
-      this.paused = true;
-    }
+    this.paused = true;
 
   }
 
@@ -283,22 +292,25 @@ class Delegate {
       return;
     }
 
-    if (this.paused) {
-      this.engine.view.ticker.add(this.update);
-      this.paused = false;
-    }
+    this.paused = false;
 
   }
 
+  public onModelEvent(event:Models.IEvent<any>) {
+
+    // console.log("model event", event.type, event.source.id)
+ 
+  } 
+
   public onContactEvent(event:Models.IEvent<any>) {
 
-   // console.log("contact", event.sourceID, event.targetID)
+   // console.log("contact", event.source.id, event.target.id)
 
   }
 
   public onBoundaryEvent(event:Models.IEvent<any>) {
     
-  //  console.log("boundary", event.type, event.sourceID, event.targetID)
+  //  console.log("boundary", event.type, event.source.id, event.target.id)
 
   }
 

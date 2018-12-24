@@ -6,58 +6,54 @@ namespace Models {
     Remove,
   }
 
-  export interface IEvent<T> {
+  export interface IEvent<T extends Identifiable> {
     type:number;
-    sourceID:number;
-    targetID:number;
-    payload:T;
+    source:T;
+    target:Identifiable;
+    payload:any;
+    cancelled:boolean;
+    cancel():void;
   }
 
-  export interface IEventListenerFunc {
-    (event:IEvent<any>):void;
+  export interface IEventListenerFunc<T extends Identifiable> {
+    (event:IEvent<T>):void;
   }
 
-  export interface IEventDispatcher {
+  export interface IEventDispatcher<T extends Identifiable> {
     init():any;
     reset():void;
-    addListener(listener:IEventListenerFunc, scope:any):void;
-    removeListener(listener:IEventListenerFunc):void;
-    dispatchEvent(event:IEvent<any>):void;
-    dispatch(type:number, source:Models.Identifiable, target?:Identifiable, payload?:any):void;
+    addListener(listener:IEventListenerFunc<T>, scope:any):void;
+    removeListener(listener:IEventListenerFunc<T>):void;
+    dispatchEvent(event:IEvent<T>):void;
+    dispatch(type:number, source:T, target?:Identifiable, payload?:any):void;
   }
 
-  export class Event<T> implements IEvent<T> {
+  export class Event<T extends Identifiable> implements IEvent<T> {
 
     public type:number;
-    public sourceID:number;
-    public targetID:number;
-    public payload:T;
+    public source:T;
+    public target:Identifiable;
+    public payload:any;
+    public cancelled:boolean;
 
-    constructor (type:number, sourceID:number = -1, targetID:number = -1, payload:T) {
+    constructor (type:number, source:T = null, target:Identifiable = null, payload:any) {
 
       this.type = type;
-      this.sourceID = sourceID;
-      this.targetID = targetID;
+      this.source = source;
+      this.target = target;
       this.payload = payload;
 
     }
 
-    public static fromIDs (type:number, source:Identifiable, target:Identifiable = null, payload:any = null) {
-
-      return new Event(
-        type, 
-        source ? source.id : -1, 
-        target ? target.id : -1, 
-        payload
-      );
-
+    cancel ():void {
+      this.cancelled = true;
     }
 
   }
 
-  export class EventDispatcher implements IEventDispatcher {
+  export class EventDispatcher<T extends Identifiable> implements IEventDispatcher<T> {
     
-    protected listeners:Array<IEventListenerFunc>;
+    protected listeners:Array<IEventListenerFunc<T>>;
     protected listenerScopes:Array<any>;
 
     public init () {
@@ -70,14 +66,14 @@ namespace Models {
       this.listenerScopes = [];
     }
 
-    public addListener(listener:IEventListenerFunc, scope:any):void {
+    public addListener(listener:IEventListenerFunc<T>, scope:any):void {
 
       this.listeners.push(listener);
       this.listenerScopes.push(scope);
 
     }
 
-    public removeListener(listener:IEventListenerFunc):void {
+    public removeListener(listener:IEventListenerFunc<T>):void {
 
       let idx = this.listeners.indexOf(listener);
 
@@ -91,6 +87,10 @@ namespace Models {
     public dispatchEvent(event:IEvent<any>) {
 
       this.listeners.forEach((listener, idx) => {
+
+        if (event.cancelled) {
+          return;
+        }
         
         let scope = this.listenerScopes[idx];
         listener.call(scope, event);
@@ -99,10 +99,9 @@ namespace Models {
 
     }
 
-    public dispatch(type:number, source:Identifiable, target:Identifiable = null, payload:any = null) {
+    public dispatch(type:number, source:Identifiable, target?:Identifiable, payload?:any) {
 
-      let event = Event.fromIDs(type, source, target, payload);
-      this.dispatchEvent(event);
+      this.dispatchEvent(new Event(type, source, target, payload));
 
     }
 

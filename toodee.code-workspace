@@ -4,7 +4,10 @@
 			"path": "engine"
 		},
 		{
-			"path": "tests"
+			"path": "test-starter"
+		},
+		{
+			"path": "test-kitchensink"
 		}
 	],
 	"settings": {}
