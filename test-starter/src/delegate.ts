@@ -4,12 +4,15 @@ class Delegate {
   protected paused:boolean;
   protected started:boolean;
   protected step:number = 0;
+  protected api:Simulation.API<Simulation.Boundary, Simulation.Entity>;
 
   public init(engine:Engine):any {
 
     this.engine = engine;
-    this.engine.simulation.api.addContactListener(this.onContactEvent, this);
-    this.engine.simulation.api.addBoundaryListener(this.onBoundaryEvent, this);
+    this.api = this.engine.api;
+    this.api.addModelListener(this.onModelEvent, this);
+    this.api.addContactListener(this.onContactEvent, this);
+    this.api.addBoundaryCrossListener(this.onBoundaryCrossEvent, this);
 
     return this;
 
@@ -93,13 +96,29 @@ class Delegate {
 
   }
 
+  public onModelEvent(event:Models.IEvent<Simulation.Entity | Simulation.Boundary | Simulation.Projectile>) {
+
+    if (event.source instanceof Simulation.Entity) {
+      console.log("entity event", event.type, event.source.id)
+    }
+
+    if (event.source instanceof Simulation.Boundary) {
+      console.log("boundary event", event.type, event.source.id)
+    }
+
+    if (event.source instanceof Simulation.Projectile) {
+      console.log("projectile event", event.type, event.source.id)
+    }
+ 
+  } 
+
   public onContactEvent(event:Models.IEvent<any>) {
 
    // console.log("contact", event.sourceID, event.targetID)
 
   }
 
-  public onBoundaryEvent(event:Models.IEvent<any>) {
+  public onBoundaryCrossEvent(event:Models.IEvent<any>) {
     
   //  console.log("boundary", event.type, event.sourceID, event.targetID)
 

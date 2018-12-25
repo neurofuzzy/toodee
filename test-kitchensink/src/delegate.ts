@@ -305,7 +305,10 @@ class Delegate {
     if (event.source instanceof Simulation.Boundary) {
       console.log("boundary event", event.type, event.source.id)
     }
-    // console.log("model event", event.type, event.source.id)
+
+    if (event.source instanceof Simulation.Projectile) {
+      console.log("projectile event", event.type, event.source.id)
+    }
  
   } 
 
