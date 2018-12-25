@@ -5,7 +5,7 @@ class Delegate {
   protected started:boolean;
   protected step:number = 0;
   protected api:Simulation.API<Simulation.Boundary, Simulation.Entity>;
-  protected view:Views.View;
+  protected view:Models.IView<Simulation.Model>;
 
   public init(engine:Engine):any {
 
@@ -14,7 +14,7 @@ class Delegate {
     this.api.addModelListener(this.onModelEvent, this);
     this.api.addContactListener(this.onContactEvent, this);
     this.api.addBoundaryCrossListener(this.onBoundaryCrossEvent, this);
-    this.view = new Views.View().initWithModel(this.engine.model);
+    this.view = new Views.TestView().initWithModel(this.engine.model);
 
     return this;
 

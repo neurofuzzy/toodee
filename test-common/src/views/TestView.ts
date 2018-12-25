@@ -1,6 +1,6 @@
 namespace Views {
 
-  export class View implements Models.IView<Simulation.Model> {
+  export class TestView implements Models.IView<Simulation.Model> {
 
     protected model:Simulation.Model;
     protected bodies:Array<PIXI.Graphics>;
@@ -34,7 +34,7 @@ namespace Views {
       this.projectiles = [];
       this.fps = document.getElementById("fps");
 
-      this.model.projectiles.addListener(this.onProjectileEvent, this);
+      this.model.projectiles.addListener(this.onModelEvent, this);
 
       return this;
 
@@ -140,7 +140,7 @@ namespace Views {
         }
       });
 
-      /*
+      
       let r = this.model.ray;
 
       this.ray.clear();
@@ -154,9 +154,7 @@ namespace Views {
       this.testGraphic.clear();
       this.testGraphic.lineStyle(1, 0x00ff00, 0.5);
       
-      let cen = { x: 400, y:300 };
-      cen.x += 200 * Math.sin(Date.now() / 5000);
-      cen.y += 200 * Math.cos(Date.now() / 5000);
+      let cen = r.origin;
       let rad = 150;
       
       let pts = Geom.cellCoordsIntersectingCircle(cen, rad, 100);
@@ -172,13 +170,13 @@ namespace Views {
       // proximity force
       this.testGraphic.lineStyle(1, 0x00ff00);
       this.testGraphic.drawCircle(200, 200, 200);
-      */
+      
 
       this.fps.innerText = this.pixi.ticker.FPS.toString();
 
     }
 
-    onProjectileEvent(event: Models.IEvent<Simulation.Projectile>) {
+    onModelEvent(event: Models.IEvent<Simulation.Entity | Simulation.Boundary | Simulation.Projectile>) {
 
       let gfx:PIXI.Graphics;
       
@@ -186,14 +184,18 @@ namespace Views {
 
         case Models.EventType.Add:
 
-          let p = event.source;
-          gfx = new PIXI.Graphics();
-          gfx.beginFill(this.colors[p.id % 4], 1);
-          gfx.drawRect(0 - p.size * 0.5, 0 - p.size * 0.5, p.size, p.size);
-          gfx.x = p.position.x;
-          gfx.y = p.position.y;
-          this.pixi.stage.addChild(gfx);
-          this.projectiles[event.source.id] = gfx;
+          if (event.source instanceof Simulation.Projectile) {
+
+            let p = event.source as Simulation.Projectile;
+            gfx = new PIXI.Graphics();
+            gfx.beginFill(this.colors[p.id % 4], 1);
+            gfx.drawRect(0 - p.size * 0.5, 0 - p.size * 0.5, p.size, p.size);
+            gfx.x = p.position.x;
+            gfx.y = p.position.y;
+            this.pixi.stage.addChild(gfx);
+            this.projectiles[event.source.id] = gfx;
+
+          }
 
           break;
 
