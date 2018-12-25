@@ -51,7 +51,7 @@ namespace Simulation {
      * @param listener Models.IEventListenerFunc<T>
      * @param scope scope object to use as _this_
      */
-    public addBoundaryListener (listener:Models.IEventListenerFunc<T>, scope:any):void {
+    public addBoundaryCrossListener (listener:Models.IEventListenerFunc<T>, scope:any):void {
 
       this.bodyBoundaryMap.addListener(listener, scope);
 
