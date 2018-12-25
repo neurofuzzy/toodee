@@ -3,12 +3,10 @@
     "target": "es5",
     "sourceMap": true,
     "declaration": true,
-    "outFile": "dist/bundle.js",
     "sourceRoot": "src"
   },
   "include": [
     "../engine/src/**/*.ts",
-    "../test-common/src/**/*.ts",
     "src/**/*.ts"
   ],
   "exclude": [

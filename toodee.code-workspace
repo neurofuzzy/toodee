@@ -4,6 +4,9 @@
 			"path": "engine"
 		},
 		{
+			"path": "test-common"
+		},
+		{
 			"path": "test-starter"
 		},
 		{

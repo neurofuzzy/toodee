@@ -5,6 +5,7 @@ class Delegate {
   protected started:boolean;
   protected step:number = 0;
   protected api:Simulation.API<Simulation.Boundary, Simulation.Entity>;
+  protected view:Views.View;
 
   public init(engine:Engine):any {
 
@@ -13,6 +14,7 @@ class Delegate {
     this.api.addModelListener(this.onModelEvent, this);
     this.api.addContactListener(this.onContactEvent, this);
     this.api.addBoundaryCrossListener(this.onBoundaryCrossEvent, this);
+    this.view = new Views.View().initWithModel(this.engine.model);
 
     return this;
 
@@ -261,7 +263,7 @@ class Delegate {
       }
     }
 
-    this.engine.view.update();
+    this.view.update();
 
     this.step++;
 
@@ -299,15 +301,15 @@ class Delegate {
   public onModelEvent(event:Models.IEvent<Simulation.Entity | Simulation.Boundary | Simulation.Projectile>) {
 
     if (event.source instanceof Simulation.Entity) {
-      console.log("entity event", event.type, event.source.id)
+      //console.log("entity event", event.type, event.source.id)
     }
 
     if (event.source instanceof Simulation.Boundary) {
-      console.log("boundary event", event.type, event.source.id)
+      //console.log("boundary event", event.type, event.source.id)
     }
 
     if (event.source instanceof Simulation.Projectile) {
-      console.log("projectile event", event.type, event.source.id)
+      //console.log("projectile event", event.type, event.source.id)
     }
  
   } 

@@ -2,13 +2,11 @@ class Engine {
 
   public model:Simulation.Model;
   public simulation:Simulation.Controller;
-  public view:Views.View;
 
   public init ():Engine {
 
     this.model = new Simulation.Model().init();
     this.simulation = new Simulation.Controller().initWithModel(this.model);
-    this.view = new Views.View().initWithModel(this.model);
 
     return this;
 
@@ -27,7 +25,9 @@ class Engine {
   }
 
   get api () {
+
     return this.simulation.api;
+    
   }
 
 }

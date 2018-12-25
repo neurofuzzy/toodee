@@ -8,8 +8,8 @@
   },
   "include": [
     "../engine/src/**/*.ts",
-    "src/**/*.ts",
-    "test1/**/*.ts"
+    "../test-common/src/**/*.ts",
+    "src/**/*.ts"
   ],
   "exclude": [
     "node_modules/"
