@@ -18,6 +18,7 @@ namespace Simulation {
       this.contactMask = 0b11111111;
 
       this.segments.forEach(seg => {
+        seg.id = Models.IdentityService.newIdentity();
         seg.parentID = this.id;
       });
 

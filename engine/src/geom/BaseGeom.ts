@@ -59,6 +59,7 @@ namespace Geom {
 
   export class Segment implements ISegment {
 
+    public id:number;
     public parentID:number;
     public ptA:IPoint;
     public ptB:IPoint;

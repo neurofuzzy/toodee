@@ -32,7 +32,7 @@ namespace Geom {
     radius:number;
   }
 
-  export interface ISegment extends Models.IChild {
+  export interface ISegment extends Models.Identifiable, Models.IChild {
     ptA:IPoint;
     ptB:IPoint;
   }

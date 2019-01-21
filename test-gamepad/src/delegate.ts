@@ -20,6 +20,8 @@ class Delegate implements IEngineDelegate {
 
     this.gameControllers.scan();
 
+    Simulation.MAXVEL = 6;
+
     return this;
 
   }
@@ -32,8 +34,8 @@ class Delegate implements IEngineDelegate {
     // make a boundary
 
     let vertices:Array<Geom.IPoint> = [];
-    let len = 12;
-    let radius = 250;
+    let len = 3;
+    let radius = 350;
     let cenX = 400;
     let cenY = 300;
 
@@ -51,15 +53,40 @@ class Delegate implements IEngineDelegate {
     bnd.drag = 0.01;
     model.boundaries.addItem(bnd);
 
-    let b = new Geom.Bounds(400, 300, 10, 10, Math.floor(Math.random() * 2 + 1));
-    let c = new Geom.Constraints();
+    // smaller inverted poly
 
-    b.shape = Geom.SHAPE_ROUND;
-    c.lockX = c.lockY = false;
+    vertices = [];
+    len = 3;
+    radius = 100;
 
-    var item:Simulation.Entity = new Simulation.Entity().initWithBoundsAndConstraints(b, c);
-    
-    model.bodies.addItem(item);
+    for (let i = 0; i < len; i++) {
+
+      let ang = 0 - (i * (360 / len) * Math.PI / 180); 
+      let rr = radius;
+      let x = rr * Math.sin(ang);
+      let y = rr * Math.cos(ang);
+      vertices.push(new Geom.Point(x + cenX, y + cenY));
+
+    }
+
+    bnd = new Simulation.Boundary(vertices);
+    model.boundaries.addItem(bnd);
+
+    len = 10;
+
+    for (let i = 0; i < len; i++) {
+
+      let b = new Geom.Bounds(300 + Math.random() * 200, 150 + Math.random() * 200, 10, 10, Math.floor(Math.random() * 2 + 1));
+      let c = new Geom.Constraints();
+
+      b.shape = Geom.SHAPE_ROUND;
+      c.lockX = c.lockY = false;
+
+      var item:Simulation.Entity = new Simulation.Entity().initWithBoundsAndConstraints(b, c);
+      
+      model.bodies.addItem(item);
+
+    }
   
   }
 
@@ -92,27 +119,33 @@ class Delegate implements IEngineDelegate {
 
       let a = gamepad.axes;
 
-      var item = model.bodies.items[0];
+      for (let i = 0; i < model.bodies.items.length; i++) {
 
-      var deltaX = a[0];
-      var deltaY = a[1];
+        var item = model.bodies.items[i];
 
-      if (Math.abs(deltaX) < 0.1) {
-        deltaX = 0;
+        var deltaX = a[0];
+        var deltaY = a[1];
+
+        if (Math.abs(deltaX) < 0.1) {
+          deltaX = 0;
+        }
+
+        if (Math.abs(deltaY) < 0.1) {
+          deltaY = 0;
+        }
+
+        this.api.applyImpulse(item, deltaX, deltaY);
+
       }
-
-      if (Math.abs(deltaY) < 0.1) {
-        deltaY = 0;
-      }
-
-      this.api.applyImpulse(item, deltaX, deltaY);
 
       //item.velocity.x = a[0];
       //item.velocity.y = a[1];
 
     }
 
+    // double simulation update
     this.engine.simulation.update();
+    this.engine.simulation.update(true);
     
     this.view.update();
 

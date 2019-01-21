@@ -21,7 +21,7 @@ namespace Simulation {
     protected bodyBodyContacts:Array<Physics.BodyBodyContact>;
     protected bodyBodyContactIndices:Array<boolean>;
     protected bodyBoundaryContacts:Array<Physics.BodyBoundaryContact>;
-    protected bodyBoundaryContactIndices:Array<boolean>;
+    protected bodySegmentContactIndices:Array<boolean>;
     protected forces:Array<Physics.IForce>;
     protected dispatcher:Models.IEventDispatcher<Entity>;
 
@@ -142,9 +142,9 @@ namespace Simulation {
         return;
       }
 
-      let contactPairIdx = Util.Pairing.cantorPair(item.id, parentPoly.id);
+      let contactPairIdx = Util.Pairing.cantorPair(item.id, seg.id);
 
-      if (this.bodyBoundaryContactIndices[contactPairIdx]) {
+      if (this.bodySegmentContactIndices[contactPairIdx]) {
         return;
       }
 
@@ -154,7 +154,7 @@ namespace Simulation {
 
       if (penetration) {
 
-        this.bodyBoundaryContactIndices[contactPairIdx] = true;
+        this.bodySegmentContactIndices[contactPairIdx] = true;
         this.bodyBoundaryContacts.push(new Physics.BodyBoundaryContact(penetration, item, seg));
         
         if (this.dispatcher) {
@@ -267,12 +267,12 @@ namespace Simulation {
 
     }
 
-    public update = () => {
+    public update = (secondPass?:boolean) => {
 
       this.bodyBodyContacts = [];
       this.bodyBoundaryContacts = [];
       this.bodyBodyContactIndices = [];
-      this.bodyBoundaryContactIndices = [];
+      this.bodySegmentContactIndices = [];
 
       var items = this.model.bodies.items;
 
@@ -332,6 +332,11 @@ namespace Simulation {
       });
 
       // resove accumulated contacts
+
+      if (secondPass) {
+        this.bodyBodyContacts.reverse();
+        this.bodyBoundaryContacts.reverse();
+      }
 
       this.bodyBodyContacts.forEach(contact => {
         Physics.resolveContact(contact);
