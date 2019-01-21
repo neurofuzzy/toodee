@@ -117,7 +117,7 @@ namespace Simulation {
 
           if (penetration) {
             this.bodyBodyContactIndices[contactPairIdx] = true;
-            this.bodyBodyContacts.push(new Physics.BodyBodyContact(penetration, itemA, itemB));
+            this.bodyBodyContacts.push(new Physics.BodyBodyContact(penetration, itemA, itemB, itemA.cor * itemB.cor));
           }
 
         } 
@@ -155,7 +155,7 @@ namespace Simulation {
       if (penetration) {
 
         this.bodySegmentContactIndices[contactPairIdx] = true;
-        this.bodyBoundaryContacts.push(new Physics.BodyBoundaryContact(penetration, item, seg));
+        this.bodyBoundaryContacts.push(new Physics.BodyBoundaryContact(penetration, item, seg, item.cor * parentPoly.cor));
         
         if (this.dispatcher) {
           this.dispatcher.dispatch(EventType.Contact, item, parentPoly, penetration);

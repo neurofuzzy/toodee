@@ -16,14 +16,16 @@ namespace Physics {
     public penetration:Geom.IPoint;
     public itemA:IBody;
     public itemB:B;
+    public corAB:number;
 
-    constructor (penetration:Geom.IPoint, itemA:IBody, itemB:B) {
+    constructor (penetration:Geom.IPoint, itemA:IBody, itemB:B, corAB:number = 1) {
 
       Geom.normalizePoint(penetration);
 
       this.penetration = penetration;
       this.itemA = itemA;
       this.itemB = itemB;
+      this.corAB = corAB;
 
     }    
 
@@ -48,6 +50,9 @@ namespace Physics {
 
       let iB = contact.itemB;
       let vB = iB.velocity;
+
+      Geom.scalePoint(vA, contact.corAB);
+      Geom.scalePoint(vB, contact.corAB);
 
       if (iA.bounds.shape == Geom.SHAPE_ROUND && iB.bounds.shape == Geom.SHAPE_ROUND) {
 
@@ -90,15 +95,13 @@ namespace Physics {
 
       }
 
-    }
-    
-    if (contact instanceof BodyBoundaryContact) {
+    } else if (contact instanceof BodyBoundaryContact) {
 
       let iB = contact.itemB;
       let angle = Geom.angleBetween(iB.ptA.x, iB.ptA.y, iB.ptB.x, iB.ptB.y);
 
       Geom.rotatePoint(vA, angle);
-      vA.y = 0 - vA.y;
+      vA.y = 0 - vA.y * contact.corAB;
       Geom.rotatePoint(vA, 0 - angle);
 
     }

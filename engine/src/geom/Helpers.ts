@@ -210,6 +210,13 @@ namespace Geom {
 
   };
 
+  export function scalePoint(pt:IPoint, scale:number):void {
+
+    pt.x *= scale;
+    pt.y *= scale;
+
+  };
+
   export function lerp(a:number, b:number, t:number):number {
     t = Math.max(0, Math.min(1, t));
     return a + (b - a) * t;

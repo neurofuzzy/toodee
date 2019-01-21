@@ -51,6 +51,7 @@ class Delegate implements IEngineDelegate {
 
     let bnd = new Simulation.Boundary(vertices);
     bnd.drag = 0.01;
+    bnd.cor = 0.5;
     model.boundaries.addItem(bnd);
 
     // smaller inverted poly
@@ -70,6 +71,7 @@ class Delegate implements IEngineDelegate {
     }
 
     bnd = new Simulation.Boundary(vertices);
+    bnd.cor = 0.5;
     model.boundaries.addItem(bnd);
 
     len = 10;
