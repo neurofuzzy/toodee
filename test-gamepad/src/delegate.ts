@@ -74,7 +74,7 @@ class Delegate implements IEngineDelegate {
     bnd.cor = 0.5;
     model.boundaries.addItem(bnd);
 
-    len = 10;
+    len = 1;
 
     for (let i = 0; i < len; i++) {
 
@@ -96,6 +96,7 @@ class Delegate implements IEngineDelegate {
 
     console.log("starting...");
     this.build();
+    this.view.build();
 
     this.engine.simulation.start();
 
@@ -115,6 +116,25 @@ class Delegate implements IEngineDelegate {
 
     var model = this.engine.model;
 
+    // add new ones
+
+    if (this.step % 120 == 0) {
+
+      let b = new Geom.Bounds(300 + Math.random() * 200, 150 + Math.random() * 200, 10, 10, Math.floor(Math.random() * 2 + 1));
+      let c = new Geom.Constraints();
+
+      b.shape = Geom.SHAPE_ROUND;
+      c.lockX = c.lockY = false;
+
+      let item:Simulation.Entity = new Simulation.Entity().initWithBoundsAndConstraints(b, c);
+      
+      model.bodies.addItem(item);
+
+    }
+
+    // 
+
+
     let gamepad = this.gameControllers.getFirstGamepad();
 
     if (gamepad) {
@@ -123,10 +143,10 @@ class Delegate implements IEngineDelegate {
 
       for (let i = 0; i < model.bodies.items.length; i++) {
 
-        var item = model.bodies.items[i];
+        let item = model.bodies.items[i];
 
-        var deltaX = a[0];
-        var deltaY = a[1];
+        let deltaX = a[0];
+        let deltaY = a[1];
 
         if (Math.abs(deltaX) < 0.1) {
           deltaX = 0;

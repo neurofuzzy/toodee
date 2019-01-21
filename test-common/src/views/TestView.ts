@@ -3,14 +3,17 @@ namespace Views {
   export class TestView implements Models.IView<Simulation.Model> {
 
     protected model:Simulation.Model;
-    protected bodies:Array<PIXI.Graphics>;
     protected boundaries:Array<PIXI.Graphics>;
+    protected boundariesContainer:PIXI.Container;
+    protected bodies:Array<PIXI.Graphics>;
+    protected bodiesContainer:PIXI.Container;
     protected projectiles:Array<PIXI.Graphics>;
     protected ray:PIXI.Graphics;
     protected testGraphic:PIXI.Graphics;
 
     public pixi:PIXI.Application;
     private fps:HTMLElement;
+    protected built:boolean;
 
     private colors = [
       0xff0000,
@@ -34,16 +37,51 @@ namespace Views {
       this.projectiles = [];
       this.fps = document.getElementById("fps");
 
+      this.boundariesContainer = new PIXI.Container();
+      this.pixi.stage.addChild(this.boundariesContainer);
+      this.bodiesContainer = new PIXI.Container();
+      this.pixi.stage.addChild(this.bodiesContainer);
+
+      this.model.bodies.addListener(this.onModelEvent, this);
       this.model.projectiles.addListener(this.onModelEvent, this);
 
       return this;
 
     }
 
-    protected build () {
+    public build () {
 
       this.pixi.stage.interactive = true;
       this.pixi.stage.hitArea = new PIXI.Rectangle(0, 0, 800, 600);
+
+      // boundaries
+
+      this.model.boundaries.items.forEach((boundary, idx) => {
+
+        let gfx = new PIXI.Graphics().lineStyle(2, 0xffffff, 0.5);
+
+        let bs = boundary.segments;
+
+        if (bs.length > 0) {
+
+          gfx.moveTo(bs[0].ptA.x, bs[0].ptA.y);
+
+          for (let i = 1; i < bs.length; i++) {
+
+            gfx.lineTo(bs[i].ptA.x, bs[i].ptA.y);
+
+          }
+
+          gfx.lineTo(bs[0].ptA.x, bs[0].ptA.y);
+
+        }
+
+        // Add to the stage
+        this.boundariesContainer.addChild(gfx);
+        this.boundaries[boundary.id] = gfx;
+        console.log("boundary id", boundary.id)
+
+      });
 
       // bodies 
 
@@ -69,40 +107,13 @@ namespace Views {
         gfx.y = item.bounds.anchor.y;
 
         // Add to the stage
-        this.pixi.stage.addChild(gfx);
+        this.bodiesContainer.addChild(gfx);
         this.bodies[item.id] = gfx;
+        console.log("item id", item.id)
 
         // makeDraggable(item, gfx);
   
       })
-
-      // boundaries
-
-      this.model.boundaries.items.forEach((boundary, idx) => {
-
-        let gfx = new PIXI.Graphics().lineStyle(2, 0xffffff, 0.5);
-
-        let bs = boundary.segments;
-
-        if (bs.length > 0) {
-
-          gfx.moveTo(bs[0].ptA.x, bs[0].ptA.y);
-
-          for (let i = 1; i < bs.length; i++) {
-
-            gfx.lineTo(bs[i].ptA.x, bs[i].ptA.y);
-
-          }
-
-          gfx.lineTo(bs[0].ptA.x, bs[0].ptA.y);
-
-        }
-
-        // Add to the stage
-        this.pixi.stage.addChild(gfx);
-        this.boundaries.push(gfx);
-
-      });
 
       // ray 
       this.ray = new PIXI.Graphics().lineStyle(2, 0x00ff66, 0.5);
@@ -113,14 +124,11 @@ namespace Views {
       this.testGraphic = new PIXI.Graphics();
       this.pixi.stage.addChild(this.testGraphic);
 
+      this.built = true;
+
     }
 
     public update () {
-
-      // temp
-      if (this.bodies.length == 0) {
-        this.build();
-      }
       
       // view update
       this.model.bodies.items.forEach(item => {
@@ -180,6 +188,10 @@ namespace Views {
 
     onModelEvent(event: Models.IEvent<Simulation.Entity | Simulation.Boundary | Simulation.Projectile>) {
 
+      if (!this.built) {
+        return;
+      }
+
       let gfx:PIXI.Graphics;
       
       switch (event.type) {
@@ -194,8 +206,33 @@ namespace Views {
             gfx.drawRect(0 - p.size * 0.5, 0 - p.size * 0.5, p.size, p.size);
             gfx.x = p.position.x;
             gfx.y = p.position.y;
-            this.pixi.stage.addChild(gfx);
-            this.projectiles[event.source.id] = gfx;
+            this.bodiesContainer.addChild(gfx);
+            this.projectiles[p.id] = gfx;
+
+          } else if (event.source instanceof Simulation.Entity) {
+
+            let p = event.source as Simulation.Entity;
+
+            gfx = new PIXI.Graphics()
+            .beginFill(this.colors[p.id % 4], 0.5)
+            .lineStyle(2, this.colors[p.id % 4], 1.0);
+
+            let b = p.bounds;
+  
+            if (b.shape == Geom.SHAPE_ORTHO) {
+              gfx.drawRect(0 - b.hw, 0 - b.hh, b.hw * 2, b.hh * 2);
+            } else {
+              gfx.drawCircle(0, 0, Math.min(b.hw, b.hh));
+              gfx.cacheAsBitmap = true;
+            }
+      
+            gfx.x = b.anchor.x;
+            gfx.y = b.anchor.y;
+    
+            // Add to the stage
+            this.bodiesContainer.addChild(gfx);
+            this.bodies[p.id] = gfx;
+            console.log("body id", p.id)
 
           }
 
@@ -205,7 +242,7 @@ namespace Views {
 
           gfx = this.projectiles[event.source.id];
           if (gfx) {
-            this.pixi.stage.removeChild(gfx);
+            this.bodiesContainer.removeChild(gfx);
           }
 
           break;
