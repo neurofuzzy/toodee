@@ -70,7 +70,7 @@ namespace Views {
 
         // Add to the stage
         this.pixi.stage.addChild(gfx);
-        this.bodies.push(gfx);
+        this.bodies[item.id] = gfx;
 
         // makeDraggable(item, gfx);
   
@@ -140,6 +140,7 @@ namespace Views {
         }
       });
 
+      /*
       
       let r = this.model.ray;
 
@@ -170,6 +171,7 @@ namespace Views {
       // proximity force
       this.testGraphic.lineStyle(1, 0x00ff00);
       this.testGraphic.drawCircle(200, 200, 200);
+      */
       
 
       this.fps.innerText = this.pixi.ticker.FPS.toString();

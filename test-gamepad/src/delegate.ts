@@ -6,6 +6,7 @@ class Delegate implements IEngineDelegate {
   protected step:number = 0;
   protected api:Simulation.API<Simulation.Boundary, Simulation.Entity>;
   protected view:Models.IView<Simulation.Model>;
+  protected gameControllers:GameControllers;
 
   public init(engine:Engine):any {
 
@@ -15,6 +16,9 @@ class Delegate implements IEngineDelegate {
     this.api.addContactListener(this.onContactEvent, this);
     this.api.addBoundaryCrossListener(this.onBoundaryCrossEvent, this);
     this.view = new Views.TestView().initWithModel(this.engine.model);
+    this.gameControllers = new GameControllers();
+
+    this.gameControllers.scan();
 
     return this;
 
@@ -25,6 +29,28 @@ class Delegate implements IEngineDelegate {
     var model = this.engine.model;
     var sim = this.engine.simulation;
 
+    // make a boundary
+
+    let vertices:Array<Geom.IPoint> = [];
+    let len = 12;
+    let radius = 250;
+    let cenX = 400;
+    let cenY = 300;
+
+    for (let i = 0; i < len; i++) {
+
+      let ang = i * (360 / len) * Math.PI / 180; 
+      let rr = radius;
+      let x = rr * Math.sin(ang);
+      let y = rr * Math.cos(ang);
+      vertices.push(new Geom.Point(x + cenX, y + cenY));
+
+    }
+
+    let bnd = new Simulation.Boundary(vertices);
+    bnd.drag = 0.01;
+    model.boundaries.addItem(bnd);
+
     let b = new Geom.Bounds(400, 300, 10, 10, Math.floor(Math.random() * 2 + 1));
     let c = new Geom.Constraints();
 
@@ -32,12 +58,9 @@ class Delegate implements IEngineDelegate {
     c.lockX = c.lockY = false;
 
     var item:Simulation.Entity = new Simulation.Entity().initWithBoundsAndConstraints(b, c);
-
-    item.velocity.x = 0;
-    item.velocity.y = -1;
-
+    
     model.bodies.addItem(item);
-
+  
   }
 
   public start () {
@@ -57,6 +80,36 @@ class Delegate implements IEngineDelegate {
 
     if (this.started) {
       window.requestAnimationFrame(() => { this.update() })
+    } else {
+      return;
+    }
+
+    var model = this.engine.model;
+
+    let gamepad = this.gameControllers.getFirstGamepad();
+
+    if (gamepad) {
+
+      let a = gamepad.axes;
+
+      var item = model.bodies.items[0];
+
+      var deltaX = a[0];
+      var deltaY = a[1];
+
+      if (Math.abs(deltaX) < 0.1) {
+        deltaX = 0;
+      }
+
+      if (Math.abs(deltaY) < 0.1) {
+        deltaY = 0;
+      }
+
+      this.api.applyImpulse(item, deltaX, deltaY);
+
+      //item.velocity.x = a[0];
+      //item.velocity.y = a[1];
+
     }
 
     this.engine.simulation.update();

@@ -12,22 +12,42 @@ class Engine {
 
   }
 
-  public start () {
+  public start ():void {
 
     this.simulation.start();
 
   }
 
-  public stop () {
+  public update ():void {
+
+    this.simulation.update();
+
+  }
+
+  public stop ():void {
 
     this.simulation.stop();
 
   }
 
-  get api () {
+  get api ():Simulation.API<Simulation.Boundary, Simulation.Entity> {
 
     return this.simulation.api;
     
   }
+
+}
+
+interface IEngineDelegate {
+
+  init(engine:Engine):any;
+  start():void;
+  update():void;
+  stop():void;
+  pause():void;
+  resume():void;
+  onModelEvent(event:Models.IEvent<Simulation.Entity | Simulation.Boundary | Simulation.Projectile>):void;
+  onContactEvent(event:Models.IEvent<any>):void;
+  onBoundaryCrossEvent(event:Models.IEvent<any>):void;
 
 }

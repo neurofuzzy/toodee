@@ -5,7 +5,7 @@ class Main {
 
   public static main():void { 
 
-    console.log("Hello from {{projectName}}!");
+    console.log("Hello from test-gamepad!");
 
     Main.engine = new Engine().init();
     Main.delegate = new Delegate().init(this.engine);

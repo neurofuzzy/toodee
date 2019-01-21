@@ -1,7 +1,7 @@
 {
-  "name": "toodee-{{projectName}}",
+  "name": "toodee-test-gamepad",
   "version": "1.0.0",
-  "description": "Toodee project {{projectName}} - generated from test-starter",
+  "description": "Toodee project test-gamepad - generated from test-starter",
   "main": "src/main.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

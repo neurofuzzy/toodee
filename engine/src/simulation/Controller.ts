@@ -9,6 +9,8 @@ namespace Simulation {
     Boundary = 2,
   }
 
+  export var MAXVEL:number = 12;
+
   export class Controller implements Models.IModelController<Model> {
 
     protected model:Model;
@@ -19,6 +21,7 @@ namespace Simulation {
     protected bodyBodyContacts:Array<Physics.BodyBodyContact>;
     protected bodyBodyContactIndices:Array<boolean>;
     protected bodyBoundaryContacts:Array<Physics.BodyBoundaryContact>;
+    protected bodyBoundaryContactIndices:Array<boolean>;
     protected forces:Array<Physics.IForce>;
     protected dispatcher:Models.IEventDispatcher<Entity>;
 
@@ -102,7 +105,7 @@ namespace Simulation {
         return;
       }
 
-      if (this.bodyBodyContacts[contactPairIdx]) {
+      if (this.bodyBodyContactIndices[contactPairIdx]) {
         return;
       }
 
@@ -139,11 +142,19 @@ namespace Simulation {
         return;
       }
 
+      let contactPairIdx = Util.Pairing.cantorPair(item.id, parentPoly.id);
+
+      if (this.bodyBoundaryContactIndices[contactPairIdx]) {
+        return;
+      }
+
       let resolve = (item.resolveMask & parentPoly.resolveMask) > 0;
 
       let penetration = Geom.getPenetrationSegmentRound(seg.ptA, seg.ptB, item.bounds, resolve);
 
       if (penetration) {
+
+        this.bodyBoundaryContactIndices[contactPairIdx] = true;
         this.bodyBoundaryContacts.push(new Physics.BodyBoundaryContact(penetration, item, seg));
         
         if (this.dispatcher) {
@@ -245,8 +256,8 @@ namespace Simulation {
     private applyVelocities () {
 
       this.model.bodies.items.forEach(item => {
-        item.bounds.anchor.x += item.velocity.x;
-        item.bounds.anchor.y += item.velocity.y;
+        item.bounds.anchor.x += Math.max(0 - Simulation.MAXVEL, Math.min(Simulation.MAXVEL, item.velocity.x));
+        item.bounds.anchor.y += Math.max(0 - Simulation.MAXVEL, Math.min(Simulation.MAXVEL, item.velocity.y));
       });
 
       this.model.projectiles.items.forEach(item => {
@@ -261,6 +272,7 @@ namespace Simulation {
       this.bodyBodyContacts = [];
       this.bodyBoundaryContacts = [];
       this.bodyBodyContactIndices = [];
+      this.bodyBoundaryContactIndices = [];
 
       var items = this.model.bodies.items;
 

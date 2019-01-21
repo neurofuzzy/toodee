@@ -67,11 +67,18 @@ namespace Simulation {
 
     }
 
+    public applyImpulse (toEntity:Simulation.Entity, x:number, y:number):void {
+
+      toEntity.velocity.x += x;
+      toEntity.velocity.y += y;
+
+    }
+
     /**
      * Removes forces that act on a particular id
      * @param id
      */
-    public removeForcesByParentID (id:number) {
+    public removeForcesByParentID (id:number):void {
 
       let i = this.forces.length;
 

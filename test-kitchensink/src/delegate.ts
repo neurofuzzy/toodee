@@ -1,4 +1,4 @@
-class Delegate {
+class Delegate implements IEngineDelegate {
   
   protected engine:Engine;
   protected paused:boolean;
@@ -190,7 +190,7 @@ class Delegate {
 
   }
 
-  public update = () => {
+  public update () {
 
     if (this.started) {
       window.requestAnimationFrame(() => { this.update() })
