@@ -16,6 +16,12 @@ namespace Geom {
 
     }
 
+    public clone ():IBounds {
+
+      return new Bounds(this.anchor.x, this.anchor.y, this.hw, this.hh, this.shape);
+
+    }
+
   }
 
   export class Point implements IPoint {
@@ -27,6 +33,19 @@ namespace Geom {
 
       this.x = x;
       this.y = y;
+
+    }
+
+    public add (pt:IPoint):void {
+
+      this.x += pt.x;
+      this.y += pt.y;
+      
+    }
+
+    public clone ():IPoint {
+
+      return new Point(this.x, this.y);
 
     }
 
@@ -55,6 +74,36 @@ namespace Geom {
 
     }
 
+    public clone ():IRay {
+
+      return new Ray(this.origin.x, this.origin.y, this.angle);
+      
+    }
+
+  }
+
+  export class Rectangle implements IRectangle {
+
+    public x1:number;
+    public x2:number;
+    public y1:number;
+    public y2:number;
+
+    constructor (x1:number, x2:number, y1:number, y2:number) {
+
+      this.x1 = x1;
+      this.x2 = x2;
+      this.y1 = y1;
+      this.y2 = y2;
+
+    }
+
+    public clone ():IRectangle {
+
+      return new Rectangle(this.x1, this.x2, this.y1, this.y2);
+
+    }
+
   }
 
   export class Segment implements ISegment {
@@ -72,6 +121,12 @@ namespace Geom {
 
     }
 
+    public clone():ISegment {
+
+      return new Segment(this.ptA.clone(), this.ptB.clone(), this.parentID);
+
+    }
+
   }
 
   export class Polygon implements IPolygon {
@@ -86,7 +141,7 @@ namespace Geom {
 
       this.vertices = vertices;
       this.segments = [];
-      this.boundingBox = { x1: 100000, x2: -100000, y1: 100000, y2: -100000 }
+      this.boundingBox = new Rectangle(100000, -100000, 100000, -100000);
 
       let b = this.boundingBox;
 
@@ -110,6 +165,13 @@ namespace Geom {
 
     }
 
+    public clone ():IPolygon {
+
+      var v = this.vertices.concat();
+      return new Polygon(v);
+
+    }
+
   }
 
   export class PointHit implements IPointHit {
@@ -122,8 +184,10 @@ namespace Geom {
     constructor (origin:IPoint, hitPoint:IPoint, parentID:number = -1) {
 
       this.pt = hitPoint;
-      this.angle = angleBetween(origin.x, origin.y, hitPoint.x, hitPoint.y);
-      this.dist = distanceBetween(origin.x, origin.y, hitPoint.x, hitPoint.y);
+      if (origin) {
+        this.angle = angleBetween(origin.x, origin.y, hitPoint.x, hitPoint.y);
+        this.dist = distanceBetween(origin.x, origin.y, hitPoint.x, hitPoint.y);
+      }
       this.parentID = parentID;
 
     }
@@ -137,6 +201,16 @@ namespace Geom {
         }
         return 0;
       })
+    }
+
+    public clone ():IPointHit {
+
+      let ph = new PointHit(null, this.pt.clone(), this.parentID);
+      ph.angle = this.angle;
+      ph.dist = this.dist;
+
+      return ph;
+
     }
 
   }

@@ -66,20 +66,20 @@ namespace Geom {
 
         if (aA.x < aB.x) {
           doResolve(hx, 0, bA, bB, cA, cB);
-          return { x: hx, y: 0 };
+          return new Point(hx, 0);
         } else {
           doResolve(0 - hx, 0, bA, bB, cA, cB);
-          return { x: 0 - hx, y: 0 };
+          return new Point(0 - hx, 0);
         }
 
       } else {
 
         if (aA.y < aB.y) {
           doResolve(0, hy, bA, bB, cA, cB);
-          return { x: 0, y: hy };
+          return new Point(0, hy);
         } else {
           doResolve(0, 0 - hy, bA, bB, cA, cB);
-          return { x: 0, y: 0 - hy }; 
+          return new Point(0, 0 - hy); 
         }
 
       }
@@ -105,7 +105,7 @@ namespace Geom {
 
     doResolve(deltaX, deltaY, bA, bB, cA, cB);
 
-    return { x: deltaX, y: deltaY };
+    return new Point(deltaX, deltaY);
 
   }
 
@@ -170,7 +170,7 @@ namespace Geom {
       }
 
       doResolve(0, delta, circleb, orthob, circlec, orthoc);
-      return { x: 0, y: delta };
+      return new Point(0, delta);
 
     } else if (cy >= ry1 && cy <= ry2) {
 
@@ -181,7 +181,7 @@ namespace Geom {
       }
 
       doResolve(delta, 0, circleb, orthob, circlec, orthoc);
-      return { x: delta, y: 0 };
+      return new Point(delta, 0);
 
     } else if (cx < rx1 && cy < ry1) {
 
@@ -215,7 +215,7 @@ namespace Geom {
       var deltaY = delta * Math.sin(angle);
 
       doResolve(deltaX, deltaY, circleb, orthob, circlec, orthoc);
-      return { x: deltaX, y: deltaY };
+      return new Point(deltaX, deltaY);
 
     }
 
@@ -250,7 +250,7 @@ namespace Geom {
       a.x += dx;
       a.y += dy;
 
-      return { x: dx, y: dy };
+      return new Point(dx, dy);
 
     }
 

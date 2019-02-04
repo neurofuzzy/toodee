@@ -294,9 +294,6 @@ namespace Simulation {
 
       items.forEach(item => {
 
-        // temp
-        item.rotation = 0.5;
-
         let itemA = item as Entity;
         let cells = this.bodyGrid.getSurroundingCells(itemA);
 
@@ -394,7 +391,9 @@ namespace Simulation {
             if (!(projectile.contactMask & item.contactMask)) {
               return;
             }
-            item.rotation = 0;
+            if (projectile.parentID == item.id) {
+              return;
+            }
             if (projectile.resolveMask & item.resolveMask) {
               didHit = true;
             }
@@ -416,9 +415,6 @@ namespace Simulation {
 
         this.bodyGrid.updateItem(item);
         this.bodyBoundaryMap.updateItem(item);
-
-        // temp
-       // item.rotation = 0.5;
 
         let boundary = this.bodyBoundaryMap.getPolygonByItemID(item.id);
 

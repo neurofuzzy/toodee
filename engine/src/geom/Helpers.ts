@@ -117,6 +117,12 @@ namespace Geom {
 
   };
 
+  export function xyToAngle(x:number, y:number):number {
+
+    return Math.atan2(y, x);
+
+  };
+
   export function orthoRoundBoundsIntersect (bA:IBounds, bB:IBounds):boolean {
 
     var orthob = bA;
@@ -227,22 +233,32 @@ namespace Geom {
     var len = distanceBetween(x1, y1, x2, y2);
     var perc = dist / len;
 
-    return {
-      x: lerp(x2, x1, perc),
-      y: lerp(y2, y1, perc)
-    }
+    return new Point(
+      lerp(x2, x1, perc),
+      lerp(y2, y1, perc)
+    );
 
   }
 
-  export function normalizePoint(pt:IPoint):void {
+  export function normalizePoint(pt:IPoint, scale:number = 1):void {
 
     let len = distanceBetween(0, 0, pt.x, pt.y);
 
     if (len != 0) {
 
-      pt.x /= len;
-      pt.y /= len;
+      pt.x /= len / scale;
+      pt.y /= len / scale;
 
+    }
+
+  }
+
+  export function maxPoint (pt:IPoint, min:number):void {
+
+    let len = Math.sqrt(pt.x * pt.x + pt.y * pt.y);
+
+    if (len < min) {
+      Geom.normalizePoint(pt, min);
     }
 
   }
@@ -289,19 +305,19 @@ namespace Geom {
 
   export function sub (ptA:IPoint, ptB:IPoint):IPoint {
 
-    return {
-      x: ptA.x - ptB.x,
-      y: ptA.y - ptB.y,
-    }
+    return new Point(
+      ptA.x - ptB.x,
+      ptA.y - ptB.y,
+    );
 
   }  
   
   export function add (ptA:IPoint, ptB:IPoint):IPoint {
 
-    return {
-      x: ptA.x + ptB.x,
-      y: ptA.y + ptB.y,
-    }
+    return new Point(
+      ptA.x + ptB.x,
+      ptA.y + ptB.y,
+    );
 
   }
 
@@ -360,7 +376,7 @@ namespace Geom {
     if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {
       var atX = x1 + (t * s1_x);
       var atY = y1 + (t * s1_y);
-      return { x: atX, y: atY };
+      return new Point(atX, atY);
     }
 
     return null;
@@ -412,18 +428,18 @@ namespace Geom {
 
         if (0 <= u2 && u2 <= 1) {
 
-          intPts.push({
-            x: lerp(x1, x2, u2),
-            y: lerp(y1, y2, u2)
-          });
+          intPts.push(new Point(
+            lerp(x1, x2, u2),
+            lerp(y1, y2, u2)
+          ));
 
         }
 
         if (0 <= u1 && u1 <= 1) {
-          intPts.push({
-            x: lerp(x1, x2, u1),
-            y: lerp(y1, y2, u1)
-          });
+          intPts.push(new Point(
+            lerp(x1, x2, u1),
+            lerp(y1, y2, u1)
+          ));
         }
 
       }
@@ -666,7 +682,7 @@ namespace Geom {
       return;
     }
 
-    let startPt:IPoint = { x: poly.boundingBox.x1 - 100, y: poly.boundingBox.y1 - 100 };
+    let startPt:IPoint = new Point(poly.boundingBox.x1 - 100, poly.boundingBox.y1 - 100);
 
     let pts = linePolygonIntersect(startPt, pt, poly);
 
@@ -681,7 +697,7 @@ namespace Geom {
       return;
     }
 
-    let startPt:IPoint = { x: polyB.boundingBox.x1 - 100, y: polyB.boundingBox.y1 - 100 };
+    let startPt:IPoint = new Point(polyB.boundingBox.x1 - 100, polyB.boundingBox.y1 - 100);
 
     for (let i = 0; i < polyA.vertices.length; i++) {
 

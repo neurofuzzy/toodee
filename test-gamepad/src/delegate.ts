@@ -74,6 +74,8 @@ class Delegate implements IEngineDelegate {
     bnd.cor = 0.5;
     model.boundaries.addItem(bnd);
 
+    // add initial objects
+
     len = 1;
 
     for (let i = 0; i < len; i++) {
@@ -118,7 +120,7 @@ class Delegate implements IEngineDelegate {
 
     // add new ones
 
-    if (this.step % 120 == 0) {
+    if (false && this.step % 120 == 0) {
 
       let b = new Geom.Bounds(300 + Math.random() * 200, 150 + Math.random() * 200, 10, 10, Math.floor(Math.random() * 2 + 1));
       let c = new Geom.Constraints();
@@ -145,19 +147,46 @@ class Delegate implements IEngineDelegate {
 
         let item = model.bodies.items[i];
 
-        let deltaX = a[0];
-        let deltaY = a[1];
+        let deltaX = a[0] * 0.25;
+        let deltaY = a[1] * 0.25;
 
         if (Math.abs(deltaX) < 0.1) {
           deltaX = 0;
         }
 
+        
         if (Math.abs(deltaY) < 0.1) {
           deltaY = 0;
         }
 
+        if (deltaX != 0 || deltaY != 0) {
+          let ang = Geom.normalizeAngle(Geom.xyToAngle(deltaX, deltaY) + 90 * Math.PI / 180);
+          item.rotation = ang;
+        }
         this.api.applyImpulse(item, deltaX, deltaY);
 
+      }
+
+
+      if (gamepad.buttons[0].pressed && this.step % 5 == 0) {
+
+        for (let i = 0; i < model.bodies.items.length; i++) {
+
+          let item = model.bodies.items[i];
+
+          let vel = new Geom.Point(, 0);
+          Geom.rotatePoint(vel,0 - item.rotation + 90 * Math.PI / 180);
+          let pos = item.bounds.anchor.clone();
+          let bullet = new Simulation.Projectile();
+          bullet.initWithPositionSizeAndLifespan(pos, 5, 360);
+          bullet.parentID = item.id;
+          bullet.velocity.x = vel.x;
+          bullet.velocity.y = vel.y;
+          bullet.velocity.add(item.velocity);
+          Geom.maxPoint(bullet.velocity, 3);
+          model.projectiles.addItem(bullet);
+
+        }
       }
 
       //item.velocity.x = a[0];

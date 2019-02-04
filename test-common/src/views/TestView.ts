@@ -83,6 +83,8 @@ namespace Views {
 
       });
 
+      return;
+
       // bodies 
 
       this.model.bodies.items.forEach(item => {
@@ -136,7 +138,7 @@ namespace Views {
         if (gfx) {
           gfx.x = item.bounds.anchor.x;
           gfx.y = item.bounds.anchor.y;
-          gfx.alpha = 1 - item.rotation;
+          gfx.rotation = item.rotation;
         }
       });
 
@@ -189,7 +191,7 @@ namespace Views {
     onModelEvent(event: Models.IEvent<Simulation.Entity | Simulation.Boundary | Simulation.Projectile>) {
 
       if (!this.built) {
-        return;
+        //return;
       }
 
       let gfx:PIXI.Graphics;
@@ -223,6 +225,10 @@ namespace Views {
               gfx.drawRect(0 - b.hw, 0 - b.hh, b.hw * 2, b.hh * 2);
             } else {
               gfx.drawCircle(0, 0, Math.min(b.hw, b.hh));
+              gfx.endFill();
+              gfx.beginFill(this.colors[p.id % 4], 1)
+              .lineStyle(0);
+              gfx.drawRect(-2, 3 - b.hh, 4, 4);
               gfx.cacheAsBitmap = true;
             }
       
