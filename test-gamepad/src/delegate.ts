@@ -174,7 +174,7 @@ class Delegate implements IEngineDelegate {
 
           let item = model.bodies.items[i];
 
-          let vel = new Geom.Point(, 0);
+          let vel = new Geom.Point(3, 0);
           Geom.rotatePoint(vel,0 - item.rotation + 90 * Math.PI / 180);
           let pos = item.bounds.anchor.clone();
           let bullet = new Simulation.Projectile();
