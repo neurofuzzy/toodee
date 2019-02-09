@@ -1,0 +1,24 @@
+{
+  "name": "toodee",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/main.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "parcel --no-source-maps index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/neurofuzzy/toodee.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/neurofuzzy/toodee/issues"
+  },
+  "homepage": "https://github.com/neurofuzzy/toodee#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^3.0.3"
+  }
+}

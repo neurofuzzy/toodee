@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"path": "engine"
+		},
+		{
+			"path": "test-common"
+		},
+		{
+			"path": "test-starter"
+		},
+		{
+			"path": "test-kitchensink"
+		},
+		{
+			"path": "test-gamepad"
+		}
+	],
+	"settings": {}
+}

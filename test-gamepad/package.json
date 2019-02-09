@@ -1,0 +1,27 @@
+{
+  "name": "toodee-test-gamepad",
+  "version": "1.0.0",
+  "description": "Toodee project test-gamepad - generated from test-starter",
+  "main": "src/main.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "parcel --no-source-maps index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/neurofuzzy/toodee.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/neurofuzzy/toodee/issues"
+  },
+  "homepage": "https://github.com/neurofuzzy/toodee#readme",
+  "dependencies": {
+    "@types/pixi.js": "^4.8.0",
+    "pixi.js": "^4.8.1"
+  },
+  "devDependencies": {
+    "typescript": "^3.0.3"
+  }
+}
