@@ -134,7 +134,7 @@ namespace Simulation {
      */
     public raycast (ray:Geom.Ray, range:number):Array<Geom.IPointHit> {
       
-      let pt = ray.project(range);
+      let pt = Geom.projectRay(ray, range);
 
       let hitPts:Array<Geom.IPointHit> = [];
 
@@ -147,7 +147,7 @@ namespace Simulation {
           let intPt = Geom.lineLineIntersect(ray.origin.x, ray.origin.y, pt.x, pt.y, seg.ptA.x, seg.ptA.y, seg.ptB.x, seg.ptB.y);
 
           if (intPt != null) {
-            hitPts.push(new Geom.PointHit(ray.origin, intPt, seg.parentID))
+            hitPts.push(new Geom.PointHit(ray.origin, intPt, seg.parentID, Geom.HIT_TYPE_SEGMENT))
           }
         });
       });
@@ -163,7 +163,7 @@ namespace Simulation {
           if (intPts && intPts.length) {
             intPts.forEach(intPt => {
               let item = body;
-              hitPts.push(new Geom.PointHit(ray.origin, intPt, item.id));
+              hitPts.push(new Geom.PointHit(ray.origin, intPt, item.id, Geom.HIT_TYPE_SHAPE));
             })
           }
 

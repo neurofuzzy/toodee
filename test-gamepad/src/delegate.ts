@@ -120,7 +120,7 @@ class Delegate implements IEngineDelegate {
 
     // add new ones
 
-    if (false && this.step % 120 == 0) {
+    if (this.step % 120 == 0) {
 
       let b = new Geom.Bounds(300 + Math.random() * 200, 150 + Math.random() * 200, 10, 10, Math.floor(Math.random() * 2 + 1));
       let c = new Geom.Constraints();
@@ -168,23 +168,55 @@ class Delegate implements IEngineDelegate {
       }
 
 
-      if (gamepad.buttons[0].pressed && this.step % 5 == 0) {
+      if (this.step % 5 == 0) {
 
         for (let i = 0; i < model.bodies.items.length; i++) {
 
           let item = model.bodies.items[i];
 
-          let vel = new Geom.Point(3, 0);
-          Geom.rotatePoint(vel,0 - item.rotation + 90 * Math.PI / 180);
-          let pos = item.bounds.anchor.clone();
-          let bullet = new Simulation.Projectile();
-          bullet.initWithPositionSizeAndLifespan(pos, 5, 360);
-          bullet.parentID = item.id;
-          bullet.velocity.x = vel.x;
-          bullet.velocity.y = vel.y;
-          bullet.velocity.add(item.velocity);
-          Geom.maxPoint(bullet.velocity, 3);
-          model.projectiles.addItem(bullet);
+          let deltaX = a[2] * 0.25;
+          let deltaY = a[3] * 0.25;
+  
+          if (Math.abs(deltaX) < 0.1) {
+            deltaX = 0;
+          }
+  
+          
+          if (Math.abs(deltaY) < 0.1) {
+            deltaY = 0;
+          }
+
+          if (deltaX != 0 || deltaY != 0) {
+
+            let ang = Geom.normalizeAngle(0 - Geom.xyToAngle(deltaX, deltaY));
+
+            let vel = new Geom.Point(3, 0);
+            Geom.rotatePoint(vel, ang);
+            let pos = item.bounds.anchor.clone();
+            let bullet = new Simulation.Projectile();
+            bullet.initWithPositionSizeAndLifespan(pos, 5, 360);
+            bullet.parentID = item.id;
+            let bv = bullet.velocity;
+            let iv = item.velocity;
+            bv.x = vel.x;
+            bv.y = vel.y;
+
+            if (bv.x > 0) {
+              bv.x = Math.max(bv.x, bv.x + iv.x);
+            } else {
+              bv.x = Math.min(bv.x, bv.x + iv.x);
+            }
+
+            if (bv.y > 0) {
+              bv.y = Math.max(bv.y, bv.y + iv.y);
+            } else {
+              bv.y = Math.min(bv.y, bv.y + iv.y);
+            }
+
+            //Geom.maxPoint(bullet.velocity, 3);
+            model.projectiles.addItem(bullet);
+
+          }
 
         }
       }

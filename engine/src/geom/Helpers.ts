@@ -321,6 +321,17 @@ namespace Geom {
 
   }
 
+  export function projectRay (ray:IRay, len:number):IPoint {
+
+    let pt = new Point();
+
+    pt.x = ray.origin.x + len * Math.sin(ray.angle);
+    pt.y = ray.origin.y + len * Math.cos(ray.angle);
+
+    return pt;
+
+  }
+
   export function closestPtPointLine (ptC:IPoint, ptA:IPoint, ptB:IPoint):IPoint {
 
     var pt;

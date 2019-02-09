@@ -2,6 +2,8 @@ namespace Geom {
 
   export const SHAPE_ORTHO:number = 1;
   export const SHAPE_ROUND:number = 2;
+  export const HIT_TYPE_SHAPE:number = 3;
+  export const HIT_TYPE_SEGMENT:number = 4;
 
   export interface IPoint {
     x:number;
@@ -56,7 +58,6 @@ namespace Geom {
   export interface IRay {
     origin:IPoint;
     angle:number;
-    project(len:number):IPoint;
     clone():IRay;
   }
 
@@ -64,7 +65,13 @@ namespace Geom {
     pt:IPoint;
     angle:number;
     dist:number;
+    type:number;
     clone():IPointHit;
+  }
+
+  export interface IRayCastable {
+    ray:IRay;
+    hits:IPointHit[];
   }
 
 }

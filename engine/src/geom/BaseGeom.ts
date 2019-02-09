@@ -63,17 +63,6 @@ namespace Geom {
 
     }
 
-    public project (len:number):IPoint {
-
-      let pt = new Point();
-
-      pt.x = this.origin.x + len * Math.sin(this.angle);
-      pt.y = this.origin.y + len * Math.cos(this.angle);
-
-      return pt;
-
-    }
-
     public clone ():IRay {
 
       return new Ray(this.origin.x, this.origin.y, this.angle);
@@ -180,8 +169,9 @@ namespace Geom {
     public pt:IPoint;
     public angle:number;
     public dist:number;
+    public type:number;
 
-    constructor (origin:IPoint, hitPoint:IPoint, parentID:number = -1) {
+    constructor (origin:IPoint, hitPoint:IPoint, parentID:number = -1, type:number = HIT_TYPE_SHAPE) {
 
       this.pt = hitPoint;
       if (origin) {
@@ -189,6 +179,7 @@ namespace Geom {
         this.dist = distanceBetween(origin.x, origin.y, hitPoint.x, hitPoint.y);
       }
       this.parentID = parentID;
+      this.type = type;
 
     }
 
