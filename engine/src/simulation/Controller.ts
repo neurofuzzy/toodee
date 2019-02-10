@@ -168,6 +168,26 @@ namespace Simulation {
 
     }
 
+    private alignBeam (beam:Beam):void {
+
+      if (beam.parentID >= 0) {
+
+        let parent = this.model.bodies.getItemByID(beam.parentID);
+
+        if (parent) {
+          
+          if (beam.constrainRotationToParent) {
+            beam.ray.align(parent.bounds.anchor, parent.rotation)
+          } else {
+            beam.ray.align(parent.bounds.anchor); //, beam.ray.angle);
+          }
+
+        }
+        
+      }
+
+    }
+
     private getBodyBeamContacts (beam:Beam):void {
 
       beam.hits = this._api.raycast(beam.ray)

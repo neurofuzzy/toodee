@@ -6,6 +6,7 @@ namespace Simulation {
 
     public id:number;
     public parentID:number;
+    public constrainRotationToParent:boolean
 
     public contactMask:number;
     public resolveMask:number;

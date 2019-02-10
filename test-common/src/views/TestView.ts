@@ -44,6 +44,7 @@ namespace Views {
 
       this.model.bodies.addListener(this.onModelEvent, this);
       this.model.projectiles.addListener(this.onModelEvent, this);
+      this.model.beams.addListener(this.onModelEvent, this);
 
       return this;
 
@@ -188,7 +189,7 @@ namespace Views {
 
     }
 
-    onModelEvent(event: Models.IEvent<Simulation.Entity | Simulation.Boundary | Simulation.Projectile>) {
+    onModelEvent(event: Models.IEvent<Simulation.Entity | Simulation.Boundary | Simulation.Projectile | Simulation.Beam>) {
 
       if (!this.built) {
         //return;

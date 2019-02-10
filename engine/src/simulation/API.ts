@@ -32,6 +32,7 @@ namespace Simulation {
       this.model.bodies.addListener(listener, scope)
       this.model.projectiles.addListener(listener, scope)
       this.model.boundaries.addListener(listener, scope)
+      this.model.beams.addListener(listener, scope);
   
     }
 

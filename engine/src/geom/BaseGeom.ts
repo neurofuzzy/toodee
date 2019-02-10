@@ -81,11 +81,12 @@ namespace Geom {
       }
     }
 
-    constructor (ox:number = 0, oy:number = 0, angle:number = 0, length:number = 100) {
+    constructor (ox:number = 0, oy:number = 0, angle:number = 0, length:number = 100, parentID:number = -1) {
 
       this.ptA = new Point(ox, oy);
       this.angle = angle;
       this.length = length;
+      this.parentID = parentID;
 
     }
 
@@ -96,9 +97,19 @@ namespace Geom {
 
     }
 
+    public align (withPosition:IPoint, angle:number = this.angle):void {
+
+      this.ptA.x = withPosition.x;
+      this.ptA.y = withPosition.y;
+      this.angle = angle;
+
+      this.projectRay();
+
+    }
+
     public clone ():IRay {
 
-      return new Ray(this.ptA.x, this.ptB.y, this.angle, this.length);
+      return new Ray(this.ptA.x, this.ptB.y, this.angle, this.length, this.parentID);
       
     }
 
