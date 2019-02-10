@@ -27,7 +27,7 @@ namespace Simulation {
      * @param listener Models.IEventListenerFunc<Entity | Projectile | Boundary>
      * @param scope scope object to use as _this_
      */
-    public addModelListener (listener:Models.IEventListenerFunc<Entity | Projectile | Boundary>, scope:any):void {
+    public addModelListener (listener:Models.IEventListenerFunc<Entity | Projectile | Boundary | Beam>, scope:any):void {
 
       this.model.bodies.addListener(listener, scope)
       this.model.projectiles.addListener(listener, scope)

@@ -120,7 +120,7 @@ class Delegate implements IEngineDelegate {
 
     // add new ones
 
-    if (this.step % 120 == 0) {
+    if (this.step % 120 == 0 && !this.paused) {
 
       let b = new Geom.Bounds(300 + Math.random() * 200, 150 + Math.random() * 200, 10, 10, Math.floor(Math.random() * 2 + 1));
       let c = new Geom.Constraints();

@@ -9,7 +9,7 @@ namespace Views {
     protected bodiesContainer:PIXI.Container;
     protected projectiles:Array<PIXI.Graphics>;
     protected ray:PIXI.Graphics;
-    protected testGraphic:PIXI.Graphics;
+    protected overlay:PIXI.Graphics;
 
     public pixi:PIXI.Application;
     private fps:HTMLElement;
@@ -84,56 +84,17 @@ namespace Views {
 
       });
 
-      return;
-
-      // bodies 
-
-      this.model.bodies.items.forEach(item => {
-  
-        let b = item.bounds;
-        let lineColor = this.colors[item.id % 4];
-        if (item.constraints.lockX) {
-          lineColor = 0xffffff;
-        }
-        let gfx = new PIXI.Graphics()
-          .beginFill(this.colors[item.id % 4], 0.5)
-          .lineStyle(2, lineColor);
-
-        if (item.bounds.shape == Geom.SHAPE_ORTHO) {
-          gfx.drawRect(0 - b.hw, 0 - b.hh, b.hw * 2, b.hh * 2);
-        } else {
-          gfx.drawCircle(0, 0, Math.min(b.hw, b.hh));
-          gfx.cacheAsBitmap = true;
-        }
-  
-        gfx.x = item.bounds.anchor.x;
-        gfx.y = item.bounds.anchor.y;
-
-        // Add to the stage
-        this.bodiesContainer.addChild(gfx);
-        this.bodies[item.id] = gfx;
-        console.log("item id", item.id)
-
-        // makeDraggable(item, gfx);
-  
-      })
-
-      // ray 
-      this.ray = new PIXI.Graphics().lineStyle(2, 0x00ff66, 0.5);
-
-      // Add to the stage
-      this.pixi.stage.addChild(this.ray);
-
-      this.testGraphic = new PIXI.Graphics();
-      this.pixi.stage.addChild(this.testGraphic);
+      this.overlay = new PIXI.Graphics();
+      this.pixi.stage.addChild(this.overlay);
 
       this.built = true;
 
     }
 
     public update () {
-      
-      // view update
+
+      this.overlay.clear();
+
       this.model.bodies.items.forEach(item => {
         let gfx = this.bodies[item.id];
         if (gfx) {
@@ -149,6 +110,14 @@ namespace Views {
           gfx.x = item.position.x;
           gfx.y = item.position.y;
         }
+      });
+
+      this.model.beams.items.forEach(beam => {
+
+        this.overlay.moveTo(beam.ray.ptA.x, beam.ray.ptA.y);
+        this.overlay.lineStyle(1, 0xff00ff);
+        this.overlay.lineTo(beam.ray.ptB.x, beam.ray.ptB.y);
+
       });
 
       /*

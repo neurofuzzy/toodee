@@ -84,9 +84,12 @@ namespace Geom {
     constructor (ox:number = 0, oy:number = 0, angle:number = 0, length:number = 100, parentID:number = -1) {
 
       this.ptA = new Point(ox, oy);
+      this.ptB = new Point(ox, oy);
       this.angle = angle;
       this.length = length;
       this.parentID = parentID;
+
+      this.projectRay();
 
     }
 
