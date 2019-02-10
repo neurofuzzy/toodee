@@ -16,11 +16,13 @@ namespace Physics {
 
     constructor () {
 
+      this.isBoundary = false;
+
     }
 
-    public initWithOriginAndAngle (ox:number, oy:number, angle:number) {
+    public initWithOriginAndAngle (ox:number, oy:number, angle:number, length?:number, parentID?:number) {
 
-      this.ray = new Geom.Ray(ox, oy, angle);
+      this.ray = new Geom.Ray(ox, oy, angle, length, parentID);
 
     }
 

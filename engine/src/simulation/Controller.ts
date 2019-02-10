@@ -177,7 +177,7 @@ namespace Simulation {
         if (parent) {
           
           if (beam.constrainRotationToParent) {
-            beam.ray.align(parent.bounds.anchor, parent.rotation)
+            beam.ray.align(parent.bounds.anchor, Math.PI - parent.rotation)
           } else {
             beam.ray.align(parent.bounds.anchor); //, beam.ray.angle);
           }
@@ -190,12 +190,28 @@ namespace Simulation {
 
     private getBodyBeamContacts (beam:Beam):void {
 
-      beam.hits = this._api.raycast(beam.ray)
+      beam.hits = this._api.raycast(beam.ray);
 
-      beam.hits.forEach(function (hit) {
+      let beamTerminated = false;
+
+      beam.hits.forEach(hit => {
+
+        if (beamTerminated) {
+          return;
+        }
 
         if (hit.parentID == beam.parentID) {
           return;
+        }
+
+        if (hit.type == Geom.HIT_TYPE_SEGMENT) {
+          
+          beam.ray.ptB.x = hit.pt.x;
+          beam.ray.ptB.y = hit.pt.y;
+  
+          beamTerminated = true;
+          return;
+
         }
 
         var item = this.model.bodies.getItemByID(hit.parentID);
@@ -214,8 +230,8 @@ namespace Simulation {
           return;
         }
 
-        let resolve = (item.resolveMask & beam.resolveMask) > 0;
-
+        let resolve:boolean = beam.isBoundary && ((item.resolveMask & beam.resolveMask) > 0);
+       
         let penetration = Geom.getPenetrationSegmentRound(beam.ray.ptA, beam.ray.ptB, item.bounds, resolve);
 
         if (penetration) {
@@ -227,6 +243,11 @@ namespace Simulation {
             this.dispatcher.dispatch(EventType.Contact, item, beam, penetration);
           }
         }
+
+        beam.ray.ptB.x = hit.pt.x;
+        beam.ray.ptB.y = hit.pt.y;
+
+        beamTerminated = true;
 
       });
 
@@ -398,7 +419,7 @@ namespace Simulation {
         }
       });
 
-      // resove accumulated contacts
+      // resolve accumulated contacts
 
       if (secondPass) {
         this.bodyBodyContacts.reverse();
@@ -482,6 +503,21 @@ namespace Simulation {
         }
 
       });
+
+      // beams
+
+      var beams = this.model.beams;
+
+      beams.items.forEach(beam => {
+        
+        this.alignBeam(beam);
+        this.getBodyBeamContacts(beam);
+
+      });
+
+      this.bodyBeamContacts.forEach(contact => {
+        Physics.resolveContact(contact);
+      })
       
       // update cells and sectors
       // apply sector properties to body

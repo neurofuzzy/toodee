@@ -21,6 +21,13 @@ namespace Simulation {
 
     }
 
+    public initWithOriginAndAngle (ox:number, oy:number, angle:number, length?:number, parentID?:number) {
+
+      this.parentID = parentID;
+      this.ray = new Geom.Ray(ox, oy, angle, length, this.id);
+
+    }
+
   }
 
 }

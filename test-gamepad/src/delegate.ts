@@ -167,6 +167,33 @@ class Delegate implements IEngineDelegate {
 
       }
 
+      // beams
+
+      if (gamepad.buttons[0].pressed) {
+
+        for (let i = 0; i < model.bodies.items.length; i++) {
+          
+          let item = model.bodies.items[i];
+          
+          let beam = model.beams.getItemByParentID(item.id);
+
+          if (!beam) {
+            beam = new Simulation.Beam();
+            beam.initWithOriginAndAngle(item.bounds.anchor.x, item.bounds.anchor.y, item.rotation, 500, item.id);
+            // beam.isBoundary = true;
+            beam.constrainRotationToParent = true;
+            model.beams.addItem(beam);
+          }
+
+        }
+
+      } else {
+
+        model.beams.reset();
+
+      }
+
+      // projectiles
 
       if (this.step % 5 == 0) {
 

@@ -43,7 +43,7 @@ namespace Physics {
 
   }
 
-  export function resolveContact (contact:IContact<IBody | Geom.ISegment>):void {
+  export function resolveContact (contact:IContact<IBody | Geom.ISegment | ISegmentBody>):void {
 
     let pen = contact.penetration;
 
@@ -108,7 +108,10 @@ namespace Physics {
       vA.y = 0 - vA.y * contact.corAB;
       Geom.rotatePoint(vA, 0 - angle);
 
+    } else if (contact instanceof BodySegmentBodyContact) {
+    
     }
+    
 
     
   }

@@ -247,8 +247,10 @@ namespace Geom {
         dy = 0 - dy;
       }
 
-      a.x += dx;
-      a.y += dy;
+      if (resolve) {
+        a.x += dx;
+        a.y += dy;
+      }
 
       return new Point(dx, dy);
 

@@ -85,8 +85,8 @@ namespace Geom {
 
       this.ptA = new Point(ox, oy);
       this.ptB = new Point(ox, oy);
-      this.angle = angle;
-      this.length = length;
+      this._angle = angle;
+      this._length = length;
       this.parentID = parentID;
 
       this.projectRay();
