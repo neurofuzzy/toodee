@@ -98,7 +98,7 @@ namespace Geom {
 
     public clone ():IRay {
 
-      return new Ray(this.origin.x, this.origin.y, this.angle, this.length);
+      return new Ray(this.ptA.x, this.ptB.y, this.angle, this.length);
       
     }
 

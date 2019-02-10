@@ -57,6 +57,7 @@ namespace Geom {
 
   export interface IRay extends ISegment {
     angle:number;
+    length:number;
     clone():IRay;
   }
 
