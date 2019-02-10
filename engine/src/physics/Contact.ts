@@ -34,6 +34,10 @@ namespace Physics {
   export class BodyBodyContact extends BaseContact<IBody> {
 
   }
+
+  export class BodySegmentBodyContact extends BaseContact<ISegmentBody> {
+    
+  }
   
   export class BodyBoundaryContact extends BaseContact<Geom.ISegment> {
 

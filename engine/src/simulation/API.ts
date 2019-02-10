@@ -132,22 +132,20 @@ namespace Simulation {
      * @param ray a ray to project
      * @param range how far to project the ray
      */
-    public raycast (ray:Geom.Ray, range:number):Array<Geom.IPointHit> {
+    public raycast (ray:Geom.Ray):Array<Geom.IPointHit> {
       
-      let pt = Geom.projectRay(ray, range);
-
       let hitPts:Array<Geom.IPointHit> = [];
 
-      let coords = Geom.cellCoordsAlongLineWithThickness(ray.origin.x, ray.origin.y, pt.x, pt.y, 100, 20);
+      let coords = Geom.cellCoordsAlongLineWithThickness(ray.ptA.x, ray.ptA.y, ray.ptB.x, ray.ptB.y, 100, 20);
 
       let boundaryCells = this.boundaryGrid.getCellsFromCoords(coords, true);
       
       boundaryCells.forEach(cell => {
         cell.forEach(seg => {
-          let intPt = Geom.lineLineIntersect(ray.origin.x, ray.origin.y, pt.x, pt.y, seg.ptA.x, seg.ptA.y, seg.ptB.x, seg.ptB.y);
+          let intPt = Geom.lineLineIntersect(ray.ptA.x, ray.ptA.y, ray.ptB.x, ray.ptB.y, seg.ptA.x, seg.ptA.y, seg.ptB.x, seg.ptB.y);
 
           if (intPt != null) {
-            hitPts.push(new Geom.PointHit(ray.origin, intPt, seg.parentID, Geom.HIT_TYPE_SEGMENT))
+            hitPts.push(new Geom.PointHit(ray.ptA, intPt, seg.parentID, Geom.HIT_TYPE_SEGMENT))
           }
         });
       });
@@ -158,12 +156,12 @@ namespace Simulation {
 
         cell.forEach(body => {
 
-          let intPts = Geom.boundsLineIntersect(body.bounds, ray.origin, pt);
+          let intPts = Geom.boundsLineIntersect(body.bounds, ray.ptA, ray.ptB);
 
           if (intPts && intPts.length) {
             intPts.forEach(intPt => {
               let item = body;
-              hitPts.push(new Geom.PointHit(ray.origin, intPt, item.id, Geom.HIT_TYPE_SHAPE));
+              hitPts.push(new Geom.PointHit(ray.ptA, intPt, item.id, Geom.HIT_TYPE_SHAPE));
             })
           }
 

@@ -4,6 +4,7 @@ namespace Physics {
 
   export interface ISegmentBody extends Geom.IRayCastable {
     isBoundary:boolean;
+    cor:number;
   }
 
   export class SegmentBody implements ISegmentBody {
@@ -11,6 +12,7 @@ namespace Physics {
     public ray:Geom.Ray;
     public hits:Geom.PointHit[];
     public isBoundary:boolean;
+    public cor:number;
 
     constructor () {
 

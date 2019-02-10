@@ -55,8 +55,7 @@ namespace Geom {
     clone():IPolygon;
   }
 
-  export interface IRay {
-    origin:IPoint;
+  export interface IRay extends ISegment {
     angle:number;
     clone():IRay;
   }

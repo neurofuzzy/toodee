@@ -22,11 +22,14 @@ namespace Simulation {
     protected bodyBodyContactIndices:Array<boolean>;
     protected bodyBoundaryContacts:Array<Physics.BodyBoundaryContact>;
     protected bodySegmentContactIndices:Array<boolean>;
+    protected bodyBeamContacts:Array<Physics.BodySegmentBodyContact>;
+    protected bodyBeamContactIndices:Array<boolean>;
     protected forces:Array<Physics.IForce>;
     protected dispatcher:Models.IEventDispatcher<Entity>;
+    protected _api:API<Boundary, Entity>
 
     get api ():API<Boundary, Entity> {
-      return new API(this.model, this.bodyGrid, this.boundaryGrid, this.bodyBoundaryMap, this.forces, this.dispatcher);
+      return this._api;
     }
 
     public initWithModel(model:Model):any {
@@ -44,6 +47,7 @@ namespace Simulation {
       this.boundaryGrid = new Geom.PolygonGrid(100, 20).init();
       this.bodyBoundaryMap = new Geom.SpatialPolygonMap().init();
       this.forces = [];
+      this._api = new API(this.model, this.bodyGrid, this.boundaryGrid, this.bodyBoundaryMap, this.forces, this.dispatcher);
 
     }
 
@@ -164,6 +168,50 @@ namespace Simulation {
 
     }
 
+    private getBodyBeamContacts (beam:Beam):void {
+
+      beam.hits = this._api.raycast(beam.ray)
+
+      beam.hits.forEach(function (hit) {
+
+        if (hit.parentID == beam.parentID) {
+          return;
+        }
+
+        var item = this.model.bodies.getItemByID(hit.parentID);
+
+        if (item == null) {
+          return;
+        }
+
+        if (!(item.contactMask & beam.contactMask)) {
+          return;
+        }
+
+        let contactPairIdx = Util.Pairing.cantorPair(item.id, beam.id);
+
+        if (this.bodyBeamContactIndices[contactPairIdx]) {
+          return;
+        }
+
+        let resolve = (item.resolveMask & beam.resolveMask) > 0;
+
+        let penetration = Geom.getPenetrationSegmentRound(beam.ray.ptA, beam.ray.ptB, item.bounds, resolve);
+
+        if (penetration) {
+
+          this.bodyBeamContactIndices[contactPairIdx] = true;
+          this.bodyBeamContacts.push(new Physics.BodySegmentBodyContact(penetration, item, beam, item.cor * beam.cor));
+          
+          if (this.dispatcher) {
+            this.dispatcher.dispatch(EventType.Contact, item, beam, penetration);
+          }
+        }
+
+      });
+
+    }
+
     private applyPointAsForce (pt:Geom.IPoint, body:Physics.IBody) {
 
       if (!body.constraints.lockX) {
@@ -271,8 +319,10 @@ namespace Simulation {
 
       this.bodyBodyContacts = [];
       this.bodyBoundaryContacts = [];
+      this.bodyBeamContacts = [];
       this.bodyBodyContactIndices = [];
       this.bodySegmentContactIndices = [];
+      this.bodyBeamContactIndices = [];
 
       var items = this.model.bodies.items;
 
@@ -333,6 +383,7 @@ namespace Simulation {
       if (secondPass) {
         this.bodyBodyContacts.reverse();
         this.bodyBoundaryContacts.reverse();
+        this.bodyBeamContacts.reverse();
       }
 
       this.bodyBodyContacts.forEach(contact => {
@@ -342,6 +393,10 @@ namespace Simulation {
       this.bodyBoundaryContacts.forEach(contact => {
         Physics.resolveContact(contact);
       });
+
+      this.bodyBoundaryContacts.forEach(contact => {
+        Physics.resolveContact(contact);
+      })
 
       // projectiles
 

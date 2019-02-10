@@ -53,19 +53,52 @@ namespace Geom {
 
   export class Ray implements IRay {
 
-    public origin:IPoint;
-    public angle:number;
+    public id:number;
+    public parentID:number;
+    public ptA:IPoint;
+    public ptB:IPoint;
 
-    constructor (ox:number = 0, oy:number = 0, angle:number = 0) {
+    protected _angle:number;
+    protected _length:number;
 
-      this.origin = new Point(ox, oy);
+    get angle ():number {
+      return this._angle;
+    }
+    set angle (val:number) {
+      if (val != this._angle) {
+        this._angle = Geom.normalizeAngle(val);
+        this.projectRay();
+      }
+    }
+
+    get length ():number {
+      return this._length;
+    }
+    set length (val:number) {
+      if (val != this._length) {
+        this._length = Math.max(0, val);
+        this.projectRay();
+      }
+    }
+
+    constructor (ox:number = 0, oy:number = 0, angle:number = 0, length:number = 100) {
+
+      this.ptA = new Point(ox, oy);
       this.angle = angle;
+      this.length = length;
+
+    }
+
+    protected projectRay ():void {
+
+      this.ptB.x = this.ptA.x + this.length * Math.sin(this.angle);
+      this.ptB.y = this.ptA.y + this.length * Math.cos(this.angle);
 
     }
 
     public clone ():IRay {
 
-      return new Ray(this.origin.x, this.origin.y, this.angle);
+      return new Ray(this.origin.x, this.origin.y, this.angle, this.length);
       
     }
 
