@@ -5,6 +5,7 @@ namespace Physics {
   export interface ISegmentBody extends Geom.IRayCastable {
     isBoundary:boolean;
     cor:number;
+    pressure:number;
   }
 
   export class SegmentBody implements ISegmentBody {
@@ -13,10 +14,13 @@ namespace Physics {
     public hits:Geom.PointHit[];
     public isBoundary:boolean;
     public cor:number;
+    public pressure:number;
 
     constructor () {
 
       this.isBoundary = false;
+      this.cor = 1;
+      this.pressure = 0.1;
 
     }
 

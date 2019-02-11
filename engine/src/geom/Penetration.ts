@@ -221,7 +221,7 @@ namespace Geom {
 
   }
 
-  export function getPenetrationSegmentRound (segPtA:IPoint, segPtB:IPoint, b:IBounds, resolve:boolean):IPoint {
+  export function getPenetrationSegmentRound (segPtA:IPoint, segPtB:IPoint, b:IBounds, resolve:boolean, twoSidedSegment:boolean = false):IPoint {
 
     var a = b.anchor;
     let closestPt:IPoint = closestPtPointLine(a, segPtA, segPtB);
@@ -240,11 +240,15 @@ namespace Geom {
       let dx = delta * Math.sin(Math.PI * 0.5 - angle);
       let dy = delta * Math.cos(Math.PI * 0.5 - angle);
 
-      let lsNew = lineSide(a.x + dx, a.y + dy, segPtA.x, segPtA.y, segPtB.x, segPtB.y);
+      if (!twoSidedSegment) {
 
-      if (lsNew != 1) {
-        dx = 0 - dx;
-        dy = 0 - dy;
+        let lsNew = lineSide(a.x + dx, a.y + dy, segPtA.x, segPtA.y, segPtB.x, segPtB.y);
+
+        if (lsNew != 1) {
+          dx = 0 - dx;
+          dy = 0 - dy;
+        }
+        
       }
 
       if (resolve) {

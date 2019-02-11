@@ -36,6 +36,8 @@ namespace Physics {
   }
 
   export class BodySegmentBodyContact extends BaseContact<ISegmentBody> {
+
+    public hitPoint:Geom.IPointHit
     
   }
   
@@ -109,6 +111,28 @@ namespace Physics {
       Geom.rotatePoint(vA, 0 - angle);
 
     } else if (contact instanceof BodySegmentBodyContact) {
+
+      let iB = contact.itemB;
+
+      if (iB.isBoundary) {
+        
+        let angle = Geom.angleBetween(iB.ray.ptA.x, iB.ray.ptA.y, iB.ray.ptB.x, iB.ray.ptB.y);
+        Geom.rotatePoint(vA, angle);
+        vA.y = 0 - vA.y * contact.corAB;
+        Geom.rotatePoint(vA, 0 - angle);
+
+      } else {
+
+        let aA = iA.bounds.anchor;
+        let hp = contact.hitPoint;
+
+        let angle = Geom.angleBetween(aA.x, aA.y, hp.pt.x, hp.pt.y);
+
+        Geom.rotatePoint(vA, angle);
+        vA.x -= iB.pressure;
+        Geom.rotatePoint(vA, 0 - angle);
+
+      }
     
     }
     

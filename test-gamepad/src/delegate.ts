@@ -7,6 +7,7 @@ class Delegate implements IEngineDelegate {
   protected api:Simulation.API<Simulation.Boundary, Simulation.Entity>;
   protected view:Models.IView<Simulation.Model>;
   protected gameControllers:GameControllers;
+  protected beams:Simulation.Beam[]
 
   public init(engine:Engine):any {
 
@@ -17,6 +18,7 @@ class Delegate implements IEngineDelegate {
     this.api.addBoundaryCrossListener(this.onBoundaryCrossEvent, this);
     this.view = new Views.TestView().initWithModel(this.engine.model);
     this.gameControllers = new GameControllers();
+    this.beams = [];
 
     this.gameControllers.scan();
 
@@ -37,7 +39,7 @@ class Delegate implements IEngineDelegate {
     let len = 3;
     let radius = 350;
     let cenX = 400;
-    let cenY = 300;
+    let cenY = 240;
 
     for (let i = 0; i < len; i++) {
 
@@ -62,11 +64,11 @@ class Delegate implements IEngineDelegate {
 
     for (let i = 0; i < len; i++) {
 
-      let ang = 0 - (i * (360 / len) * Math.PI / 180); 
+      let ang = Math.PI - (i * (360 / len) * Math.PI / 180); 
       let rr = radius;
       let x = rr * Math.sin(ang);
       let y = rr * Math.cos(ang);
-      vertices.push(new Geom.Point(x + cenX, y + cenY));
+      vertices.push(new Geom.Point(x + cenX, y + cenY - 40));
 
     }
 
@@ -74,6 +76,31 @@ class Delegate implements IEngineDelegate {
     bnd.cor = 0.5;
     model.boundaries.addItem(bnd);
 
+    // beams
+
+    len = 3;
+    radius = 100;
+
+    for (let i = 0; i < len; i++) {
+
+      let ang = 0 - (i * (360 / len) * Math.PI / 180); 
+      let ang2 = 0 - ((i - 1) * (360 / len) * Math.PI / 180); 
+      let rr = radius;
+      let x = rr * Math.sin(ang);
+      let y = rr * Math.cos(ang);
+      let x2 = rr * Math.sin(ang2);
+      let y2 = rr * Math.cos(ang2);
+      let beam = new Simulation.Beam();
+      beam.initWithOriginAndAngle(x + cenX, y + cenY + 80, 0 - Math.PI * 0.5 - Geom.angleBetween(x2, y2, x, y), radius * 2);
+      beam.isBoundary = true;
+      beam.parentID = 1;
+      model.beams.addItem(beam);
+      this.beams.push(beam);
+
+    }
+
+    console.log(model.beams.items.length)
+    
     // add initial objects
 
     len = 1;
@@ -190,6 +217,9 @@ class Delegate implements IEngineDelegate {
       } else {
 
         model.beams.reset();
+        this.beams.forEach(beam => {
+          model.beams.addItem(beam);
+        });
 
       }
 

@@ -205,7 +205,7 @@ namespace Simulation {
         }
 
         if (hit.type == Geom.HIT_TYPE_SEGMENT) {
-          
+
           beam.ray.ptB.x = hit.pt.x;
           beam.ray.ptB.y = hit.pt.y;
   
@@ -232,22 +232,25 @@ namespace Simulation {
 
         let resolve:boolean = beam.isBoundary && ((item.resolveMask & beam.resolveMask) > 0);
        
-        let penetration = Geom.getPenetrationSegmentRound(beam.ray.ptA, beam.ray.ptB, item.bounds, resolve);
+        let penetration = Geom.getPenetrationSegmentRound(beam.ray.ptA, beam.ray.ptB, item.bounds, resolve, true);
 
         if (penetration) {
 
           this.bodyBeamContactIndices[contactPairIdx] = true;
-          this.bodyBeamContacts.push(new Physics.BodySegmentBodyContact(penetration, item, beam, item.cor * beam.cor));
+          let contact = new Physics.BodySegmentBodyContact(penetration, item, beam, item.cor * beam.cor);
+          contact.hitPoint = hit;
+          this.bodyBeamContacts.push(contact);
           
           if (this.dispatcher) {
             this.dispatcher.dispatch(EventType.Contact, item, beam, penetration);
           }
         }
 
-        beam.ray.ptB.x = hit.pt.x;
-        beam.ray.ptB.y = hit.pt.y;
-
-        beamTerminated = true;
+        if (!beam.isBoundary) {
+          beam.ray.ptB.x = hit.pt.x;
+          beam.ray.ptB.y = hit.pt.y;
+          beamTerminated = true;
+        }
 
       });
 
