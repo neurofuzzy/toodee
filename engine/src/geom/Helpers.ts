@@ -297,6 +297,12 @@ namespace Geom {
 
   }
 
+  export function length (pt:IPoint):number {
+
+    return Math.sqrt(pt.x * pt.x + pt.y * pt.y);
+
+  }
+
   export function cross (ptA:IPoint, ptB:IPoint):number {
 
     return ptA.x * ptB.y - ptA.y * ptB.x;

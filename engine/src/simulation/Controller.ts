@@ -242,6 +242,8 @@ namespace Simulation {
           this.bodyBeamContacts.push(contact);
           
           if (this.dispatcher) {
+            console.log("PEN", Geom.length(penetration))
+            
             this.dispatcher.dispatch(EventType.Contact, item, beam, penetration);
           }
         }

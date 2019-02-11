@@ -147,6 +147,7 @@ class Delegate implements IEngineDelegate {
 
     // add new ones
 
+    /*
     if (this.step % 120 == 0 && !this.paused) {
 
       let b = new Geom.Bounds(300 + Math.random() * 200, 150 + Math.random() * 200, 10, 10, Math.floor(Math.random() * 2 + 1));
@@ -160,6 +161,7 @@ class Delegate implements IEngineDelegate {
       model.bodies.addItem(item);
 
     }
+    */
 
     // 
 
@@ -217,9 +219,12 @@ class Delegate implements IEngineDelegate {
       } else {
 
         model.beams.reset();
-        this.beams.forEach(beam => {
-          model.beams.addItem(beam);
-        });
+
+        if (this.step % 240 < 120) {
+          this.beams.forEach(beam => {
+            model.beams.addItem(beam);
+          });
+        }
 
       }
 

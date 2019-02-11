@@ -20,6 +20,8 @@ namespace Physics {
 
     constructor (penetration:Geom.IPoint, itemA:IBody, itemB:B, corAB:number = 1) {
 
+      penetration = penetration.clone();
+
       Geom.normalizePoint(penetration);
 
       this.penetration = penetration;
