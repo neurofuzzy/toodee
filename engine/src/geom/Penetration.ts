@@ -240,11 +240,6 @@ namespace Geom {
       let dx = delta * Math.sin(Math.PI * 0.5 - angle);
       let dy = delta * Math.cos(Math.PI * 0.5 - angle);
 
-      if (twoSidedSegment)  {
-        console.log("DELTA", delta, dx, dy);
-        
-      }
-
       if (!twoSidedSegment) {
 
         let lsNew = lineSide(a.x + dx, a.y + dy, segPtA.x, segPtA.y, segPtB.x, segPtB.y);

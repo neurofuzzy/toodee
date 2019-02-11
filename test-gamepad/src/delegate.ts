@@ -344,7 +344,10 @@ class Delegate implements IEngineDelegate {
 
   public onContactEvent(event:Models.IEvent<any>) {
 
-   // console.log("contact", event.sourceID, event.targetID)
+    
+
+   console.log("contact", event)
+
 
   }
 
