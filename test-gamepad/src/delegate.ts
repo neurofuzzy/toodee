@@ -56,7 +56,7 @@ class Delegate implements IEngineDelegate {
     bnd.cor = 0.5;
     model.boundaries.addItem(bnd);
 
-    // smaller inverted poly
+    // smalle poly sector
 
     vertices = [];
     len = 3;
@@ -64,7 +64,7 @@ class Delegate implements IEngineDelegate {
 
     for (let i = 0; i < len; i++) {
 
-      let ang = Math.PI - (i * (360 / len) * Math.PI / 180); 
+      let ang = Math.PI + (i * (360 / len) * Math.PI / 180); 
       let rr = radius;
       let x = rr * Math.sin(ang);
       let y = rr * Math.cos(ang);
