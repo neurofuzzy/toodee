@@ -7,9 +7,9 @@ namespace Simulation {
     protected readonly boundaryGrid:Geom.PolygonGrid<T>;
     protected readonly bodyBoundaryMap:Geom.SpatialPolygonMap<T, K>;
     protected forces:Array<Physics.IForce>;
-    protected dispatcher:Models.IEventDispatcher<K>;
+    protected dispatcher:Models.IEventDispatcher<Entity | Projectile | Boundary | Beam>;
 
-    constructor (model:Model, bodyGrid:Geom.SpatialGrid<K>, boundaryGrid:Geom.PolygonGrid<T>, bodyBoundaryMap:Geom.SpatialPolygonMap<T, K>, forces:Array<Physics.IForce>, dispatcher:Models.IEventDispatcher<K>) {
+    constructor (model:Model, bodyGrid:Geom.SpatialGrid<K>, boundaryGrid:Geom.PolygonGrid<T>, bodyBoundaryMap:Geom.SpatialPolygonMap<T, K>, forces:Array<Physics.IForce>, dispatcher:Models.IEventDispatcher<Entity | Projectile | Boundary | Beam>) {
 
       this.model = model;
       this.bodyGrid = bodyGrid;
@@ -38,10 +38,10 @@ namespace Simulation {
 
     /**
      * Adds a listener function to receive events when objects make contact with eachother or boundaries
-     * @param listener Models.IEventListenerFunc<K>
+     * @param listener Models.IEventListenerFunc<Entity | Beam | Projectile>
      * @param scope scope object to use as _this_
      */
-    public addContactListener (listener:Models.IEventListenerFunc<K>, scope:any):void {
+    public addContactListener (listener:Models.IEventListenerFunc<Entity | Projectile | Boundary | Beam>, scope:any):void {
 
       this.dispatcher.addListener(listener, scope);
 

@@ -25,7 +25,7 @@ namespace Simulation {
     protected bodyBeamContacts:Array<Physics.BodySegmentBodyContact>;
     protected bodyBeamContactIndices:Array<boolean>;
     protected forces:Array<Physics.IForce>;
-    protected dispatcher:Models.IEventDispatcher<Entity>;
+    protected dispatcher:Models.IEventDispatcher<Entity | Projectile | Boundary | Beam>;
     protected _api:API<Boundary, Entity>
 
     get api ():API<Boundary, Entity> {
@@ -42,7 +42,7 @@ namespace Simulation {
 
     public reset ():void {
 
-      this.dispatcher = new Models.EventDispatcher<Entity>().init();
+      this.dispatcher = new Models.EventDispatcher<Entity | Projectile | Boundary | Beam>().init();
       this.bodyGrid = new Geom.SpatialGrid(100).init();
       this.boundaryGrid = new Geom.PolygonGrid(100, 20).init();
       this.bodyBoundaryMap = new Geom.SpatialPolygonMap().init();
@@ -206,11 +206,19 @@ namespace Simulation {
 
         if (hit.type == Geom.HIT_TYPE_SEGMENT) {
 
-          beam.ray.ptB.x = hit.pt.x;
-          beam.ray.ptB.y = hit.pt.y;
-  
-          beamTerminated = true;
-          return;
+          var boundary = this.model.boundaries.getItemByID(hit.parentID);
+
+          if (!boundary.isSector) {
+
+            beam.ray.ptB.x = hit.pt.x;
+            beam.ray.ptB.y = hit.pt.y;
+
+            this.dispatcher.dispatch(EventType.Contact, beam, boundary, 0);
+    
+            beamTerminated = true;
+            return;
+
+          }
 
         }
 
@@ -242,7 +250,7 @@ namespace Simulation {
           this.bodyBeamContacts.push(contact);
           
           if (this.dispatcher) {
-            this.dispatcher.dispatch(EventType.Contact, item, beam, penetration);
+            this.dispatcher.dispatch(EventType.Contact, beam, item, penetration);
           }
         }
 
