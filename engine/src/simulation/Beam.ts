@@ -8,6 +8,7 @@ namespace Simulation {
     public parentID:number;
     public constrainRotationToParent:boolean
 
+    public isSoft:boolean;
     public contactMask:number;
     public resolveMask:number;
 

@@ -3,6 +3,8 @@ namespace Views {
   export class TestView implements Models.IView<Simulation.Model> {
 
     protected model:Simulation.Model;
+    protected sectors:Array<PIXI.Graphics>;
+    protected sectorsContainer:PIXI.Container;
     protected boundaries:Array<PIXI.Graphics>;
     protected boundariesContainer:PIXI.Container;
     protected bodies:Array<PIXI.Graphics>;
@@ -32,15 +34,18 @@ namespace Views {
     public initWithModel (model:Simulation.Model):any {
  
       this.model = model;
+      this.sectors = [];
       this.bodies = [];
       this.boundaries = [];
       this.projectiles = [];
       this.fps = document.getElementById("fps");
 
-      this.boundariesContainer = new PIXI.Container();
-      this.pixi.stage.addChild(this.boundariesContainer);
+      this.sectorsContainer = new PIXI.Container();
+      this.pixi.stage.addChild(this.sectorsContainer);
       this.bodiesContainer = new PIXI.Container();
       this.pixi.stage.addChild(this.bodiesContainer);
+      this.boundariesContainer = new PIXI.Container();
+      this.pixi.stage.addChild(this.boundariesContainer);
 
       this.model.bodies.addListener(this.onModelEvent, this);
       this.model.projectiles.addListener(this.onModelEvent, this);
@@ -59,7 +64,9 @@ namespace Views {
 
       this.model.boundaries.items.forEach((boundary, idx) => {
 
-        let gfx = new PIXI.Graphics().lineStyle(2, 0xffffff, 0.5);
+        let color = boundary.isSector ? 0x999999 : 0xffffff;
+
+        let gfx = new PIXI.Graphics().lineStyle(2, color, 1.0);
 
         let bs = boundary.segments;
 
@@ -78,9 +85,13 @@ namespace Views {
         }
 
         // Add to the stage
-        this.boundariesContainer.addChild(gfx);
-        this.boundaries[boundary.id] = gfx;
-        console.log("boundary id", boundary.id)
+        if (boundary.isSector) {
+          this.sectorsContainer.addChild(gfx);
+          this.sectors[boundary.id] = gfx;
+        } else {
+          this.boundariesContainer.addChild(gfx);
+          this.boundaries[boundary.id] = gfx;
+        }
 
       });
 

@@ -74,6 +74,7 @@ class Delegate implements IEngineDelegate {
 
     bnd = new Simulation.Boundary(vertices);
     bnd.cor = 0.5;
+    bnd.isSector = true;
     model.boundaries.addItem(bnd);
 
     // beams
@@ -343,17 +344,14 @@ class Delegate implements IEngineDelegate {
   } 
 
   public onContactEvent(event:Models.IEvent<any>) {
-
     
-
-   console.log("contact", event)
-
+    console.log("contact", event)
 
   }
 
   public onBoundaryCrossEvent(event:Models.IEvent<any>) {
     
-  //  console.log("boundary", event.type, event.sourceID, event.targetID)
+    console.log("boundary", event.type, event.source, event.target)
 
   }
 

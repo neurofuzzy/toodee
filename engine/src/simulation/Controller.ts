@@ -230,7 +230,7 @@ namespace Simulation {
           return;
         }
 
-        let resolve:boolean = beam.isBoundary && ((item.resolveMask & beam.resolveMask) > 0);
+        let resolve:boolean = beam.isBoundary && !beam.isSoft && ((item.resolveMask & beam.resolveMask) > 0);
        
         let penetration = Geom.getPenetrationSegmentRound(beam.ray.ptA, beam.ray.ptB, item.bounds, resolve, true);
 
