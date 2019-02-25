@@ -223,6 +223,16 @@ namespace Simulation {
     
     }
 
+    public castFrom (item:Entity, range:number = 500, beam:Beam = null) {
+
+      beam = new Simulation.Beam();
+      beam.initWithOriginAndAngle(item.bounds.anchor.x, item.bounds.anchor.y, item.rotation, range, item.id);
+
+      beam.constrainRotationToParent = true;
+      this.model.beams.addItem(beam);
+
+    }
+
   }
 
 }
