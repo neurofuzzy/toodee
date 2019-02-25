@@ -178,6 +178,51 @@ namespace Simulation {
 
     }
 
+    public launchFrom (item:Entity, speed:number = 3, angle:number = NaN, projectile:Projectile = null) {
+
+      if (isNaN(angle)) {
+        angle = item.rotation;
+      }
+
+      if (projectile == null) {
+        projectile = new Simulation.Projectile();
+      }
+
+      let pos = item.bounds.anchor.clone();
+      projectile.initWithPositionSizeAndLifespan(pos, 5, 360);
+      projectile.parentID = item.id;
+
+      let vel = new Geom.Point(speed, 0);
+      Geom.rotatePoint(vel, angle);
+      let bv = projectile.velocity;
+      let iv = item.velocity;
+      bv.x = vel.x;
+      bv.y = vel.y;
+
+      if (bv.x > 0) {
+        bv.x = Math.max(bv.x, bv.x + iv.x);
+      } else {
+        bv.x = Math.min(bv.x, bv.x + iv.x);
+      }
+
+      if (bv.y > 0) {
+        bv.y = Math.max(bv.y, bv.y + iv.y);
+      } else {
+        bv.y = Math.min(bv.y, bv.y + iv.y);
+      }
+
+      //Geom.maxPoint(projectile.velocity, 3);
+      this.model.projectiles.addItem(projectile);
+
+    }
+
+    public launchFromWithDeltaXY(item:Entity, speed:number = 3, deltaX:number = 0, deltaY:number = 0, projectile:Projectile = null) {
+
+      let angle = Geom.normalizeAngle(0 - Geom.xyToAngle(deltaX, deltaY));
+      return this.launchFrom(item, speed, angle, projectile);
+    
+    }
+
   }
 
 }

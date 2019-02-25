@@ -251,34 +251,8 @@ class Delegate implements IEngineDelegate {
 
           if (deltaX != 0 || deltaY != 0) {
 
-            let ang = Geom.normalizeAngle(0 - Geom.xyToAngle(deltaX, deltaY));
-
-            let vel = new Geom.Point(3, 0);
-            Geom.rotatePoint(vel, ang);
-            let pos = item.bounds.anchor.clone();
-            let bullet = new Simulation.Projectile();
-            bullet.initWithPositionSizeAndLifespan(pos, 5, 360);
-            bullet.parentID = item.id;
-            let bv = bullet.velocity;
-            let iv = item.velocity;
-            bv.x = vel.x;
-            bv.y = vel.y;
-
-            if (bv.x > 0) {
-              bv.x = Math.max(bv.x, bv.x + iv.x);
-            } else {
-              bv.x = Math.min(bv.x, bv.x + iv.x);
-            }
-
-            if (bv.y > 0) {
-              bv.y = Math.max(bv.y, bv.y + iv.y);
-            } else {
-              bv.y = Math.min(bv.y, bv.y + iv.y);
-            }
-
-            //Geom.maxPoint(bullet.velocity, 3);
-            model.projectiles.addItem(bullet);
-
+            this.api.launchFromWithDeltaXY(item, 3, deltaX, deltaY);
+            
           }
 
         }
