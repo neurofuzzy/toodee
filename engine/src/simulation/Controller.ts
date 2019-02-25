@@ -213,7 +213,9 @@ namespace Simulation {
             beam.ray.ptB.x = hit.pt.x;
             beam.ray.ptB.y = hit.pt.y;
 
-            this.dispatcher.dispatch(EventType.Contact, beam, boundary, 0);
+            if (this.dispatcher) {
+              this.dispatcher.dispatch(EventType.Contact, beam, boundary, 0);
+            }
     
             beamTerminated = true;
             return;
@@ -467,7 +469,10 @@ namespace Simulation {
         let polygon = this.bodyBoundaryMap.getPolygonFromPoint(projectile.position, true);
 
         // if out of bounds
-        if (!polygon) { 
+        if (!polygon) {
+          if (this.dispatcher) {
+            this.dispatcher.dispatch(EventType.Contact, projectile, this.bodyBoundaryMap.getOutermostPolygon(), 0);
+          }
           this.model.projectiles.removeItem(projectile);
           return;
         }
@@ -481,6 +486,9 @@ namespace Simulation {
         if (polygon.inverted) { 
 
           if (projectile.resolveMask & polygon.resolveMask) {
+            if (this.dispatcher) {
+              this.dispatcher.dispatch(EventType.Contact, projectile, polygon, 0);
+            }
             this.model.projectiles.removeItem(projectile);
           }
           return;
@@ -503,6 +511,9 @@ namespace Simulation {
             }
             if (projectile.resolveMask & item.resolveMask) {
               didHit = true;
+              if (this.dispatcher) {
+                this.dispatcher.dispatch(EventType.Contact, projectile, item, 0);
+              }
             }
           });
 

@@ -37,6 +37,12 @@ namespace Geom {
 
     }
 
+    public getOutermostPolygon ():T {
+
+      return this.polygonsSortedByArea[this.polygonsSortedByArea.length - 1];
+
+    }
+
     public getPolygonFromPoint (pt:IPoint, includeInverted:boolean = false):T {
 
       for (let i = 0; i < this.polygonsSortedByArea.length; i++) {

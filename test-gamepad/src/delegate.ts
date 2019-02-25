@@ -104,7 +104,7 @@ class Delegate implements IEngineDelegate {
     
     // add initial objects
 
-    len = 1;
+    len = 2;
 
     for (let i = 0; i < len; i++) {
 
@@ -173,7 +173,7 @@ class Delegate implements IEngineDelegate {
 
       let a = gamepad.axes;
 
-      for (let i = 0; i < model.bodies.items.length; i++) {
+      for (let i = 0; i < 1; i++) { //model.bodies.items.length; i++) {
 
         let item = model.bodies.items[i];
 
@@ -201,7 +201,7 @@ class Delegate implements IEngineDelegate {
 
       if (gamepad.buttons[0].pressed) {
 
-        for (let i = 0; i < model.bodies.items.length; i++) {
+        for (let i = 0; i < 1; i++) { //model.bodies.items.length; i++) {
           
           let item = model.bodies.items[i];
           
@@ -233,7 +233,7 @@ class Delegate implements IEngineDelegate {
 
       if (this.step % 5 == 0) {
 
-        for (let i = 0; i < model.bodies.items.length; i++) {
+        for (let i = 0; i < 1; i++) { //model.bodies.items.length; i++) {
 
           let item = model.bodies.items[i];
 
@@ -345,13 +345,13 @@ class Delegate implements IEngineDelegate {
 
   public onContactEvent(event:Models.IEvent<any>) {
     
-    console.log("contact", event)
+    //console.log("contact", event)
 
   }
 
   public onBoundaryCrossEvent(event:Models.IEvent<any>) {
     
-    console.log("boundary", event.type, event.source, event.target)
+    //console.log("boundary", event.type, event.source, event.target)
 
   }
 
