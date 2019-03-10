@@ -178,7 +178,7 @@ namespace Simulation {
 
     }
 
-    public launchFrom (item:Entity, speed:number = 3, angle:number = NaN, projectile:Projectile = null) {
+    public launchFrom (item:Entity, speed:number = 3, angle:number = NaN, projectile:Projectile = null):Projectile {
 
       if (isNaN(angle)) {
         angle = item.rotation;
@@ -214,22 +214,26 @@ namespace Simulation {
       //Geom.maxPoint(projectile.velocity, 3);
       this.model.projectiles.addItem(projectile);
 
+      return projectile;
+
     }
 
-    public launchFromWithDeltaXY(item:Entity, speed:number = 3, deltaX:number = 0, deltaY:number = 0, projectile:Projectile = null) {
+    public launchFromWithDeltaXY(item:Entity, speed:number = 3, deltaX:number = 0, deltaY:number = 0, projectile:Projectile = null):Projectile {
 
       let angle = Geom.normalizeAngle(0 - Geom.xyToAngle(deltaX, deltaY));
       return this.launchFrom(item, speed, angle, projectile);
     
     }
 
-    public castFrom (item:Entity, range:number = 500, beam:Beam = null) {
+    public castFrom (item:Entity, range:number = 500, beam:Beam = null):Beam {
 
       beam = new Simulation.Beam();
       beam.initWithOriginAndAngle(item.bounds.anchor.x, item.bounds.anchor.y, item.rotation, range, item.id);
 
       beam.constrainRotationToParent = true;
       this.model.beams.addItem(beam);
+
+      return beam;
 
     }
 
