@@ -161,7 +161,7 @@ class Delegate implements IEngineDelegate {
 
     // test ray
     let r = model.ray;
-    let ro = r.origin;
+    let ro = r.ptA;
     ro.x = 400;
     ro.y = 400;
 
@@ -181,6 +181,7 @@ class Delegate implements IEngineDelegate {
 
     console.log("starting...");
     this.build();
+    this.view.build();
 
     this.engine.simulation.start();
 
@@ -217,18 +218,19 @@ class Delegate implements IEngineDelegate {
     let rad = 150;
     let b = 0b00101;
 
-    r.origin.x = cen.x;
-    r.origin.y = cen.y;
+    r.ptA.x = cen.x;
+    r.ptA.y = cen.y;
+    r.length = 400;
     r.angle = Geom.normalizeAngle(Math.PI * 2 - Geom.angleBetween(cen.x, cen.y, 400, 300));
 
-    let nearItems = sim.api.bodiesNearAndInFront(r.origin, 150, r.angle, 0.5);
+    let nearItems = sim.api.bodiesNearAndInFront(r.ptA, 150, r.angle, 0.5);
     nearItems.forEach(item => {
       item.rotation = 0;
     });
 
     // ray check
 
-    let hitPts = sim.api.raycast(r, 400);
+    let hitPts = sim.api.raycast(r);
 
     model.rayHit = hitPts[0];
 

@@ -44,6 +44,7 @@ class Delegate implements IEngineDelegate {
 
     console.log("starting...");
     this.build();
+    this.view.build();
 
     this.engine.simulation.start();
 
