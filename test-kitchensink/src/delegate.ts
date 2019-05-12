@@ -6,6 +6,7 @@ class Delegate implements IEngineDelegate {
   protected step:number = 0;
   protected api:Simulation.API<Simulation.Boundary, Simulation.Entity>;
   protected view:Models.IView<Simulation.Model>;
+  protected beams:Simulation.Beam[]
 
   public init(engine:Engine):any {
 
@@ -15,6 +16,7 @@ class Delegate implements IEngineDelegate {
     this.api.addContactListener(this.onContactEvent, this);
     this.api.addBoundaryCrossListener(this.onBoundaryCrossEvent, this);
     this.view = new Views.TestView().initWithModel(this.engine.model);
+    this.beams = [];
 
     return this;
 
@@ -34,7 +36,7 @@ class Delegate implements IEngineDelegate {
 
     let bndMask = 0b00001111;
 
-    for (let i = 0; i < 600; i++) {
+    for (let i = 0; i < 20; i++) {
 
       let x = 20 + Math.random() * 1480;
       let y = 20 + Math.random() * 560;
@@ -91,6 +93,8 @@ class Delegate implements IEngineDelegate {
 
     let bnd = new Simulation.Boundary(vertices);
     bnd.contactMask = bnd.resolveMask = bndMask;
+    bnd.drag = 0;
+    bnd.cor = 1;
 
     model.boundaries.addItem(bnd);
 
@@ -112,7 +116,7 @@ class Delegate implements IEngineDelegate {
 
     bnd = new Simulation.Boundary(vertices);
     bnd.contactMask = bnd.resolveMask = bndMask;
-    bnd.drag = 0.1;
+    bnd.drag = 0;
 
     model.boundaries.addItem(bnd);
 
@@ -174,6 +178,29 @@ class Delegate implements IEngineDelegate {
 
     //let ppforce = new Physics.PropulsionForce(5).initWithParentID(1);
     //sim.api.addForce(ppforce);
+
+        // beams
+
+      len = 3;
+      radius = 100;
+  
+      for (let i = 0; i < len; i++) {
+  
+        let ang = 0 - (i * (360 / len) * Math.PI / 180); 
+        let ang2 = 0 - ((i - 1) * (360 / len) * Math.PI / 180); 
+        let rr = radius;
+        let x = rr * Math.sin(ang);
+        let y = rr * Math.cos(ang);
+        let x2 = rr * Math.sin(ang2);
+        let y2 = rr * Math.cos(ang2);
+        let beam = new Simulation.Beam();
+        beam.initWithOriginAndAngle(x + cenX, y + cenY + 80, 0 - Math.PI * 0.5 - Geom.angleBetween(x2, y2, x, y), radius * 2);
+        beam.isBoundary = true;
+        //beam.parentID = 1;
+        model.beams.addItem(beam);
+        this.beams.push(beam);
+  
+      }
 
   }
 
@@ -245,6 +272,8 @@ class Delegate implements IEngineDelegate {
 
     // projectile madness
 
+    /*
+
     let masks = [
       0b00000001,
       0b00000010,
@@ -264,6 +293,8 @@ class Delegate implements IEngineDelegate {
         model.projectiles.addItem(bullet);
       }
     }
+
+    */
 
     this.view.update();
 

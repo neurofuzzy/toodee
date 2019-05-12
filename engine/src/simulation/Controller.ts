@@ -448,10 +448,6 @@ namespace Simulation {
         Physics.resolveContact(contact);
       });
 
-      this.bodyBoundaryContacts.forEach(contact => {
-        Physics.resolveContact(contact);
-      })
-
       // projectiles
 
       var projectiles = this.model.projectiles;
