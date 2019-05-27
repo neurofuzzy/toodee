@@ -36,7 +36,7 @@ class Delegate implements IEngineDelegate {
 
     let bndMask = 0b00001111;
 
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 400; i++) {
 
       let x = 20 + Math.random() * 1480;
       let y = 20 + Math.random() * 560;
@@ -272,8 +272,6 @@ class Delegate implements IEngineDelegate {
 
     // projectile madness
 
-    /*
-
     let masks = [
       0b00000001,
       0b00000010,
@@ -293,8 +291,6 @@ class Delegate implements IEngineDelegate {
         model.projectiles.addItem(bullet);
       }
     }
-
-    */
 
     this.view.update();
 
