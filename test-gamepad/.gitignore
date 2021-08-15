@@ -62,6 +62,7 @@ typings/
 
 #parcel cache
 .cache
+.parcel-cache
 
 # compiled bundles
 dist

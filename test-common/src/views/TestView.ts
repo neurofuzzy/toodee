@@ -18,10 +18,10 @@ namespace Views {
     protected built:boolean;
 
     private colors = [
-      0xff0000,
-      0x00ff00,
-      0x00ffff,
-      0xffff00,
+      0xffffff,
+      0xffffff,
+      0xffffff,
+      0xffffff
     ]
 
     constructor () {

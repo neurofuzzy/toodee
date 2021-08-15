@@ -1,19 +1,24 @@
 {
 	"folders": [
 		{
+			"name": "engine",
 			"path": "engine"
 		},
 		{
+			"name": "test-common",
 			"path": "test-common"
 		},
 		{
+			"name": "test-starter",
 			"path": "test-starter"
 		},
 		{
-			"path": "test-kitchensink"
+			"name": "test-gamepad",
+			"path": "test-gamepad"
 		},
 		{
-			"path": "test-gamepad"
+			"name": "test-kitchensink",
+			"path": "test-kitchensink"
 		}
 	],
 	"settings": {}
