@@ -21,7 +21,13 @@ class Delegate implements IEngineDelegate {
     this.view = new Views.TestView().initWithModel(this.engine.model);
     this.beams = [];
 
-    this.prando = new Prando(12345);
+    let seed;
+
+    seed = 978;
+    //seed = 34895;
+    //seed = 361;
+
+    this.prando = new Prando(seed);
 
     return this;
 
@@ -94,7 +100,7 @@ class Delegate implements IEngineDelegate {
 
     // bodies
 
-    if (this.step % 50 === 0 && this.totalObjects < 35) {
+    if (this.step % 50 === 0 && this.totalObjects < 31) {
 
       let cenX = 400;
       let cenY = 300;
@@ -126,7 +132,7 @@ class Delegate implements IEngineDelegate {
     sim.update();
     sim.update();
 
-    if (true || this.step % 10 === 0) {
+    if (this.step % 10 === 0) {
       this.view.update();
     }
 
