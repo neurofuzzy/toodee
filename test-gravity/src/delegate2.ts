@@ -1,4 +1,4 @@
-class Delegate implements IEngineDelegate {
+class Delegate2 implements IEngineDelegate {
 
   protected engine: Engine;
   protected paused: boolean;
@@ -8,7 +8,6 @@ class Delegate implements IEngineDelegate {
   protected view: Models.IView<Simulation.Model>;
   protected beams: Simulation.Beam[];
   protected prando:any;
-  protected aforce:Physics.AreaForce;
 
   protected totalObjects: number = 0;
 
@@ -24,11 +23,7 @@ class Delegate implements IEngineDelegate {
 
     let seed;
 
-    seed = 978;
-    //seed = 34895;
-    //seed = 361;
-    //seed = 346098;
-    seed = 23486;
+    seed = 9827345;
 
     this.prando = new Prando(seed);
 
@@ -46,34 +41,26 @@ class Delegate implements IEngineDelegate {
     let vertices: Array<Geom.IPoint> = [];
     let cenX = 400;
     let cenY = 300;
-    let w = 120;
-    let h = 120;
+    let w = 300;
+    let h = 300;
 
-    // vertices.push(new Geom.Point(cenX - w, cenY - h));
-    // vertices.push(new Geom.Point(cenX - w, cenY + h));
-    // vertices.push(new Geom.Point(cenX + w, cenY + h));
-    // vertices.push(new Geom.Point(cenX + w, cenY - h));
-
-    for (let i = 0; i < 32; i++) {
-      const pt = new Geom.Point(0, h);
-      Geom.rotatePointDeg(pt, i * (360 / 32));
-      pt.x += cenX;
-      pt.y += cenY;
-      vertices.push(pt);
-    }
+    vertices.push(new Geom.Point(cenX - w, cenY - h));
+    vertices.push(new Geom.Point(cenX - w, cenY + h));
+    vertices.push(new Geom.Point(cenX + w, cenY + h));
+    vertices.push(new Geom.Point(cenX + w, cenY - h));
 
     let bnd = new Simulation.Boundary(vertices);
-    bnd.drag = 0.01;
-    bnd.cor = 0.8;
+    bnd.drag = 0;
+    bnd.cor = 0.5;
 
     model.boundaries.addItem(bnd);
 
     // forces
 
-    this.aforce = new Physics.AreaForce(10, 0 - Math.PI * 0.5).initWithParentID(bnd.id);
-    sim.api.addForce(this.aforce);
+    let aforce = new Physics.AreaForce(3, 0 - Math.PI * 0.5).initWithParentID(bnd.id);
+    //sim.api.addForce(aforce);
 
-    const pforce = new Physics.ProximityForce(1, 0).initWithOriginAndRange(new Geom.Point(cenX, cenY), Math.max(w, h));
+    let pforce = new Physics.ProximityForce(3, 0 - Math.PI).initWithOriginAndRange(new Geom.Point(cenX, cenY), Math.max(w, h));
     sim.api.addForce(pforce);
 
     window.addEventListener("keyup", e => {
@@ -114,39 +101,34 @@ class Delegate implements IEngineDelegate {
 
     // bodies
 
-    if (this.step % 10 === 0 && this.totalObjects < 46) {
+    if (this.step % 10 === 0 && this.totalObjects < 24) {
 
       let cenX = 400;
       let cenY = 300;
-      let w = 120;
-      let h = 120;
-      let sizes = [10, 10, 15, 15, 15, 20, 20, 25];
-
-      let x = cenX - w * 0.5 + this.prando.next(0, w);
-      let y = cenY - h * 0.5 + this.prando.next(0, h);
+      let w = 300;
+      let h = 300;
+      let sizes = [50,60];
+ 
+      let x = cenX - w + this.prando.next(50, w * 2 - 100);
+      let y = cenY - h + this.prando.next(50, h * 2 - 100);
 
       let wh = sizes[this.prando.nextInt(0, 123) % sizes.length];
-      wh = sizes[this.totalObjects % sizes.length];
 
-      let b = new Geom.Bounds(x, y, wh, wh, Math.floor(Math.random() * 2 + 1));
+      wh -= Math.log(this.totalObjects + 1) * 12;
+
+      let b = new Geom.Bounds(x, y, wh, wh);
       let c = new Geom.Constraints();
 
       b.shape = Geom.SHAPE_ROUND;
       c.lockX = c.lockY = false;
 
       var item: Simulation.Entity = new Simulation.Entity().initWithBoundsAndConstraints(b, c);
-      item.cor = 0.9;
-
+item.cor = 0.75;
       this.engine.model.bodies.addItem(item);
-
-      const pforce = new Physics.ProximityForce(12, 0).initWithOriginAndRange(item.bounds.anchor, wh * 3);
-      sim.api.addForce(pforce);
 
       this.totalObjects++;
 
     }
-
-    this.aforce.angle += 0.05;
 
     sim.update();
     sim.update();
@@ -228,16 +210,10 @@ class Delegate implements IEngineDelegate {
     const out = [];
 
     this.engine.model.bodies.items.forEach(b => {
-      let mdist = 1000;
-      this.engine.model.bodies.items.forEach(b2 => {
-        if (b2 !== b) {
-          mdist = Math.min(mdist, Geom.distanceBetween(b.bounds.anchor.x, b.bounds.anchor.y, b2.bounds.anchor.x, b2.bounds.anchor.y) - b2.bounds.hw);
-        }
-      });
       out.push({
         x: b.bounds.anchor.x,
         y: b.bounds.anchor.y,
-        r: Math.max(8, mdist),
+        r: b.bounds.hw,
       });
     });
 

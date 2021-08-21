@@ -292,6 +292,10 @@ namespace Simulation {
 
           bodies.forEach(body => {
 
+            if (body.bounds.anchor === force.origin) {
+              return;
+            }
+
             let ptB = body.bounds.anchor;
             let angle = 0 - Geom.angleBetween(ptA.x, ptA.y, ptB.x, ptB.y);
 
