@@ -17,6 +17,10 @@ namespace Views {
     private fps:HTMLElement;
     protected built:boolean;
 
+    public bodiesGraphics ():Array<any> {
+      return this.bodies;
+    }
+
     private colors = [
       0xffffff,
       0xffffff,

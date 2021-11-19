@@ -1,7 +1,38 @@
 <html>
 <body bgcolor="#333333" text="#999999">
   <script src="node_modules/pixi.js/dist/pixi.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/instacam@latest/dist/instacam.umd.js"></script>
   <script src="dist/bundle.js"></script>
+  <script>
+
+    let camera;
+
+    const startCapture = async () => {
+      const canvas = document.querySelector('#canvas2')
+      const ctx = canvas.getContext('2d');
+      canvas.style.transform = "scaleX(2) scaleY(2)";
+      console.log("starting capture...");
+      setInterval(() => {
+        window._img = camera.snap();
+      }, 20);
+    };
+
+    window.addEventListener("load", () => {
+      camera = new Instacam(
+        document.querySelector('#canvas1'),
+        {
+          width: 48,
+          height: 48,
+        }
+      );
+      console.log("starting camera...");
+      startCapture();
+    });
+
+
+  </script>
   <div id="fps"></div>
+  <canvas id="canvas1" width="32" height="32" style="margin: 10px;"></canvas>
+  <canvas id="canvas2" width="32" height="32" style="margin: 10px;"></canvas>
 </body>
 </html>

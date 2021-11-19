@@ -16,17 +16,21 @@ class Main {
 // folderol
 
 
-window.onload = function () {
+window.addEventListener("load", () => {
   Main.main();
   window.document.head.setAttribute("has-main",  "yes");
-}
+});
 
 window.onblur = function () {
-  Main.delegate.pause();
+  if (Main.delegate) {
+    Main.delegate.pause();
+  }
 } 
 
 window.onfocus = function () {
-  Main.delegate.resume();
+  if (Main.delegate) {
+    Main.delegate.resume();
+  }
 }
 
 
@@ -34,3 +38,4 @@ window.onfocus = function () {
 if (document.head.getAttribute("has-main") == "yes") {
   window.location.reload();
 }
+

@@ -47,16 +47,16 @@ class Delegate implements IEngineDelegate {
     let cenX = 400;
     let cenY = 300;
     let w = 120;
-    let h = 120;
+    let h = 240;
 
     // vertices.push(new Geom.Point(cenX - w, cenY - h));
     // vertices.push(new Geom.Point(cenX - w, cenY + h));
     // vertices.push(new Geom.Point(cenX + w, cenY + h));
     // vertices.push(new Geom.Point(cenX + w, cenY - h));
 
-    for (let i = 0; i < 32; i++) {
+    for (let i = 0; i < 64; i++) {
       const pt = new Geom.Point(0, h);
-      Geom.rotatePointDeg(pt, i * (360 / 32));
+      Geom.rotatePointDeg(pt, i * (360 / 64));
       pt.x += cenX;
       pt.y += cenY;
       vertices.push(pt);
@@ -114,13 +114,14 @@ class Delegate implements IEngineDelegate {
 
     // bodies
 
-    if (this.step % 10 === 0 && this.totalObjects < 46) {
+    if (this.step % 2 === 0 && this.totalObjects < 386) {
 
       let cenX = 400;
       let cenY = 300;
       let w = 120;
       let h = 120;
       let sizes = [10, 10, 15, 15, 15, 20, 20, 25];
+      sizes = [12, 12];
 
       let x = cenX - w * 0.5 + this.prando.next(0, w);
       let y = cenY - h * 0.5 + this.prando.next(0, h);
@@ -149,8 +150,32 @@ class Delegate implements IEngineDelegate {
     this.aforce.angle += 0.05;
 
     sim.update();
-    sim.update();
-    sim.update();
+    //sim.update();
+    //sim.update();
+
+    if (this.step % 1 === 0) {
+
+      let cenX = 400;
+      let cenY = 300;
+      let imgSize = 48;
+      let ih = Math.floor(imgSize * 0.5);
+      let circleRadius = 240;
+
+      let gfx = this.view.bodiesGraphics() as PIXI.Graphics[];
+      //let ctx = (document.querySelector("#canvas2") as HTMLCanvasElement).getContext("2d");
+      //let imageData = ctx.getImageData(0, 0, imgSize, imgSize);
+      let imageData = window['_img'];
+      if (imageData) {
+        gfx.forEach(g => {
+          let x = Math.max(0, Math.min(imgSize - 1, Math.floor(ih + (g.position.x - cenX) / (circleRadius / ih))));
+          let y = Math.max(0, Math.min(imgSize - 1, Math.floor(ih + (g.position.y - cenY) / (circleRadius / ih))));
+          let data = imageData.data[y * (imgSize * 4) + x * 4];
+          g.scale.x = 1 - data / 255;
+          g.scale.y = 1 - data / 255;
+        });
+    }
+
+    }
 
     //if (this.step % 10 === 0) {
       this.view.update();

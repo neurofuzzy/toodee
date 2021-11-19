@@ -19,6 +19,7 @@
   "homepage": "https://github.com/neurofuzzy/toodee#readme",
   "dependencies": {
     "@types/pixi.js": "^4.8.0",
+    "instacam": "^1.16.0",
     "pixi.js": "^4.8.1"
   },
   "devDependencies": {
