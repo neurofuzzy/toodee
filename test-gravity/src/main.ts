@@ -6,7 +6,7 @@ class Main {
   public static main():void { 
 
     Main.engine = new Engine().init();
-    Main.delegate = new Delegate().init(this.engine);
+    Main.delegate = new Delegate2().init(this.engine);
     Main.delegate.start();
 
   }
