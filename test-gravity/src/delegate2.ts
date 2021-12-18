@@ -114,7 +114,7 @@ class Delegate2 implements IEngineDelegate {
 
     // bodies
 
-    if (this.step % 2 === 0 && this.totalObjects < 250) {
+    if (this.step % 2 === 0 && this.totalObjects < 230) {
 
       let cenX = 400;
       let cenY = 300;
@@ -173,7 +173,18 @@ class Delegate2 implements IEngineDelegate {
           g.scale.x = 1 - data / 255;
           g.scale.y = 1 - data / 255;
         });
-    }
+      }
+      /*
+      let bodies = this.engine.model.bodies.items;
+      if (imageData) {
+        bodies.forEach(g => {
+          let x = Math.max(0, Math.min(imgSize - 1, Math.floor(ih + (g.bounds.anchor.x - cenX) / (circleRadius / ih))));
+          let y = Math.max(0, Math.min(imgSize - 1, Math.floor(ih + (g.bounds.anchor.y - cenY) / (circleRadius / ih))));
+          let data = imageData.data[y * (imgSize * 4) + x * 4];
+          g.bounds.hw = g.bounds.hh = 20 * (1 - data / 255);
+        });
+      }
+      */
 
     }
 
