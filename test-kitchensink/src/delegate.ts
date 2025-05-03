@@ -36,7 +36,7 @@ class Delegate implements IEngineDelegate {
 
     let bndMask = 0b00001111;
 
-    for (let i = 0; i < 400; i++) {
+    for (let i = 0; i < 4000; i++) {
 
       let x = 20 + Math.random() * 1480;
       let y = 20 + Math.random() * 560;

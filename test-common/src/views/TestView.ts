@@ -1,3 +1,4 @@
+
 namespace Views {
 
   export class TestView implements Models.IView<Simulation.Model> {
@@ -23,9 +24,9 @@ namespace Views {
 
     private colors = [
       0xffffff,
-      0xffffff,
-      0xffffff,
-      0xffffff
+      0xff0000,
+      0x00ff00,
+      0x0000ff
     ]
 
     constructor () {
