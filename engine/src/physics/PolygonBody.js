@@ -18,10 +18,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PolygonBody = void 0;
 // Migrated from namespace Physics to ES module
 var BaseGeom_1 = require("../geom/BaseGeom");
+var Identity_1 = require("../models/Identity");
 var PolygonBody = /** @class */ (function (_super) {
     __extends(PolygonBody, _super);
     function PolygonBody(vertices) {
         var _this = _super.call(this, vertices) || this;
+        _this.id = typeof Identity_1.IdentityService !== 'undefined' ? Identity_1.IdentityService.newIdentity() : Math.random();
+        _this.bounds = null; // TODO: set to actual bounds if available
         _this.drag = 0.01;
         _this.cor = 1;
         return _this;

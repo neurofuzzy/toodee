@@ -522,7 +522,7 @@ function polygonInPolygon(polyA, polyB) {
         var pt = polyA.vertices[i];
         var pts = linePolygonIntersect(startPt, pt, polyB);
         if (!pts)
-            return;
+            return false;
         if (pts.length % 2 == 0) {
             return false;
         }

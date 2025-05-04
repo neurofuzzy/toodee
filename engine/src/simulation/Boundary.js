@@ -14,6 +14,15 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Boundary = void 0;
 // Migrated from namespace Simulation to ES module
@@ -22,8 +31,14 @@ var Identity_1 = require("../models/Identity");
 var Boundary = /** @class */ (function (_super) {
     __extends(Boundary, _super);
     function Boundary(vertices) {
-        var _this = _super.call(this, vertices) || this;
+        var _this = _super.call(this, vertices !== null && vertices !== void 0 ? vertices : []) || this;
+        _this.area = 0;
+        _this.segments = [];
+        _this.inverted = false;
         _this.id = Identity_1.IdentityService.newIdentity();
+        _this.vertices = vertices !== null && vertices !== void 0 ? vertices : [];
+        _this.boundingBox = { x1: 0, y1: 0, x2: 0, y2: 0, clone: function () { return ({ x1: 0, y1: 0, x2: 0, y2: 0, clone: function () { return this; } }); } };
+        _this.bounds = _this.boundingBox;
         _this.resolveMask = 255;
         _this.contactMask = 255;
         _this.segments.forEach(function (seg) {
@@ -32,6 +47,10 @@ var Boundary = /** @class */ (function (_super) {
         });
         return _this;
     }
+    Boundary.prototype.clone = function () {
+        // Implement a proper deep clone as needed
+        return new Boundary(__spreadArray([], this.vertices, true));
+    };
     return Boundary;
 }(PolygonBody_1.PolygonBody));
 exports.Boundary = Boundary;

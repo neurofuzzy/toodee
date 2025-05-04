@@ -38,7 +38,7 @@ var SpatialGrid = /** @class */ (function () {
         return (0, Pairing_1.cantorPair)(x + 1000, y + 1000);
     };
     SpatialGrid.prototype.getCell = function (x, y) {
-        return this.cells.get(this.getCellIndex(x, y));
+        return this.cells.get(this.getCellIndex(x, y)) || [];
     };
     SpatialGrid.prototype.addItem = function (item) {
         if (!this.itemsCellIndexes.has(item.id)) {
@@ -89,25 +89,31 @@ var SpatialGrid = /** @class */ (function () {
     };
     SpatialGrid.prototype.getCellFromPoint = function (pt) {
         var idx = this.getCellIndex(Math.floor(pt.x / this.cellSize), Math.floor(pt.y / this.cellSize));
-        return this.cells.get(idx);
+        return this.cells.get(idx) || [];
+    };
+    SpatialGrid.prototype.getCellItems = function (x, y) {
+        return this.cells.get(this.getCellIndex(x, y)) || [];
+    };
+    SpatialGrid.prototype.getCellItemsByIndex = function (idx) {
+        return this.cells.get(idx) || [];
     };
     SpatialGrid.prototype.getCellsFromCoords = function (coords, removeDupes) {
-        var _this = this;
         if (removeDupes === void 0) { removeDupes = false; }
-        var matchingCells = [];
+        var cells = [];
         var seen = removeDupes ? new Set() : null;
-        coords.forEach(function (coord) {
-            var idx = _this.getCellIndex(coord.x, coord.y);
-            var cell = _this.cells.get(idx);
-            if (cell != null) {
-                if (!removeDupes || !seen.has(cell)) {
-                    matchingCells.push(cell);
-                    if (removeDupes)
-                        seen.add(cell);
+        for (var _i = 0, coords_1 = coords; _i < coords_1.length; _i++) {
+            var pt = coords_1[_i];
+            var cell = this.getCellItems(Math.floor(pt.x), Math.floor(pt.y));
+            for (var _a = 0, cell_1 = cell; _a < cell_1.length; _a++) {
+                var item = cell_1[_a];
+                if (!removeDupes || (seen && !seen.has(item))) {
+                    cells.push(item);
+                    if (removeDupes && seen)
+                        seen.add(item);
                 }
             }
-        });
-        return matchingCells;
+        }
+        return cells;
     };
     SpatialGrid.prototype.getCellsNear = function (center, radius) {
         // TODO: Implement cellCoordsIntersectingCircle and import if needed

@@ -13,8 +13,8 @@ export declare enum EventType {
 }
 export interface IEvent<T extends Identifiable> {
     type: EventType;
-    source: T;
-    target: Identifiable;
+    source?: T;
+    target?: Identifiable;
     payload: any;
     cancelled: boolean;
     cancel(): void;
@@ -30,11 +30,11 @@ export interface IEventDispatcher<T extends Identifiable> {
 }
 export declare class Event<T extends Identifiable> implements IEvent<T> {
     type: EventType;
-    source: T;
-    target: Identifiable;
+    source?: T;
+    target?: Identifiable;
     payload: any;
     cancelled: boolean;
-    constructor(type: EventType, source: T, target: Identifiable, payload: any);
+    constructor(type: EventType, source?: T, target?: Identifiable, payload?: any);
     cancel(): void;
 }
 export declare class EventDispatcher<T extends Identifiable> implements IEventDispatcher<T> {

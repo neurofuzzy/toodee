@@ -67,7 +67,7 @@ export declare class API<T extends IPolygon & Identifiable, K extends Identifiab
      * @param ray a ray to project
      */
     raycast(ray: Ray): Array<PointHit>;
-    launchFrom(item: Entity, speed?: number, angle?: number, projectile?: Projectile): Projectile;
-    launchFromWithDeltaXY(item: Entity, speed?: number, deltaX?: number, deltaY?: number, projectile?: Projectile): Projectile;
-    castFrom(item: Entity, range?: number, beam?: Beam): Beam;
+    launchFrom(item: Entity, speed?: number, angle?: number, projectile?: Projectile | null): Projectile;
+    launchFromWithDeltaXY(item: Entity, speed?: number, deltaX?: number, deltaY?: number, projectile?: Projectile | null): Projectile;
+    castFrom(item: Entity, range?: number, beam?: Beam | null): Beam;
 }

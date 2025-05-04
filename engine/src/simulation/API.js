@@ -104,24 +104,28 @@ var API = /** @class */ (function () {
         var coords = (0, Helpers_1.cellCoordsAlongLineWithThickness)(ray.ptA.x, ray.ptA.y, ray.ptB.x, ray.ptB.y, 100, 20);
         var boundaryCells = this.boundaryGrid.getCellsFromCoords(coords, true);
         boundaryCells.forEach(function (cell) {
-            cell.forEach(function (seg) {
-                var intPt = (0, Helpers_1.lineLineIntersect)(ray.ptA.x, ray.ptA.y, ray.ptB.x, ray.ptB.y, seg.ptA.x, seg.ptA.y, seg.ptB.x, seg.ptB.y);
-                if (intPt != null) {
-                    hitPts.push(new Helpers_1.PointHit(ray.ptA, intPt, seg.parentID, Helpers_1.HIT_TYPE_SEGMENT));
-                }
-            });
+            if (Array.isArray(cell)) {
+                cell.forEach(function (seg) {
+                    var intPt = (0, Helpers_1.lineLineIntersect)(ray.ptA.x, ray.ptA.y, ray.ptB.x, ray.ptB.y, seg.ptA.x, seg.ptA.y, seg.ptB.x, seg.ptB.y);
+                    if (intPt != null) {
+                        hitPts.push(new Helpers_1.PointHit(ray.ptA, intPt, seg.parentID, Helpers_1.HIT_TYPE_SEGMENT));
+                    }
+                });
+            }
         });
         var bodyCells = this.bodyGrid.getCellsFromCoords(coords, true);
         bodyCells.forEach(function (cell) {
-            cell.forEach(function (body) {
-                var intPts = (0, Helpers_1.boundsLineIntersect)(body.bounds, ray.ptA, ray.ptB);
-                if (intPts && intPts.length) {
-                    intPts.forEach(function (intPt) {
-                        var item = body;
-                        hitPts.push(new Helpers_1.PointHit(ray.ptA, intPt, item.id, Helpers_1.HIT_TYPE_SHAPE));
-                    });
-                }
-            });
+            if (Array.isArray(cell)) {
+                cell.forEach(function (body) {
+                    var intPts = (0, Helpers_1.boundsLineIntersect)(body.bounds, ray.ptA, ray.ptB);
+                    if (intPts && intPts.length) {
+                        intPts.forEach(function (intPt) {
+                            var item = body;
+                            hitPts.push(new Helpers_1.PointHit(ray.ptA, intPt, item.id, Helpers_1.HIT_TYPE_SHAPE));
+                        });
+                    }
+                });
+            }
         });
         if (hitPts.length > 0) {
             Helpers_1.PointHit.sort(hitPts);
@@ -174,7 +178,9 @@ var API = /** @class */ (function () {
     API.prototype.castFrom = function (item, range, beam) {
         if (range === void 0) { range = 500; }
         if (beam === void 0) { beam = null; }
-        beam = new Beam_1.Beam();
+        if (beam == null) {
+            beam = new Beam_1.Beam();
+        }
         beam.initWithOriginAndAngle(item.bounds.anchor.x, item.bounds.anchor.y, item.rotation, range, item.id);
         beam.constrainRotationToParent = true;
         this.model.beams.addItem(beam);

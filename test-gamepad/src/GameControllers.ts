@@ -1,4 +1,4 @@
-class GameControllers {
+export class GameControllers {
 
   protected _supported:boolean;
   protected _connected:boolean;

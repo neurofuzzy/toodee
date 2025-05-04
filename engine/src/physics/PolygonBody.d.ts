@@ -6,6 +6,8 @@ export interface IPolygonBody extends IPolygon {
     cor: number;
 }
 export declare class PolygonBody extends Polygon implements IPolygonBody {
+    id: number;
+    bounds: any;
     isSector: boolean;
     drag: number;
     cor: number;

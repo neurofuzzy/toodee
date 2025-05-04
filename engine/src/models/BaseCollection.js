@@ -39,14 +39,14 @@ var BaseCollection = /** @class */ (function (_super) {
     BaseCollection.prototype.addItem = function (item) {
         if (!this.items.has(item.id)) {
             this.items.set(item.id, item);
-            this.dispatch(Events_2.EventType.Add, item, null, item);
+            this.dispatch(Events_2.EventType.Add, item, undefined, item);
             return true;
         }
         return false;
     };
     BaseCollection.prototype.removeItem = function (item) {
         if (this.items.delete(item.id)) {
-            this.dispatch(Events_2.EventType.Remove, item, null, item);
+            this.dispatch(Events_2.EventType.Remove, item, undefined, item);
             return true;
         }
         return false;

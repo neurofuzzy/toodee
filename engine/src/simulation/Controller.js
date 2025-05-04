@@ -104,7 +104,7 @@ var Controller = /** @class */ (function () {
                     return;
                 }
                 // out of bounds by inverted polygon
-                if (polygon.inverted) {
+                if (polygon && polygon.inverted) {
                     if (projectile.resolveMask & polygon.resolveMask) {
                         if (_this.dispatcher) {
                             _this.dispatcher.dispatch(Events_1.EventType.Contact, projectile, polygon, 0);
@@ -182,21 +182,20 @@ var Controller = /** @class */ (function () {
     Controller.prototype.build = function () {
         // add items to grid
         for (var i = 0; i < this.model.bodies.items.size; i++) {
-            this.bodyGrid.addItem(this.model.bodies.items[i]);
+            this.bodyGrid.addItem(this.model.bodies.items.get(i));
         }
         // add boundaries to grid
         for (var i = 0; i < this.model.boundaries.items.size; i++) {
-            this.boundaryGrid.addItem(this.model.boundaries.items[i]);
+            this.boundaryGrid.addItem(this.model.boundaries.items.get(i));
         }
         // compare boundaries to find sectors
         for (var i = 0; i < this.model.boundaries.items.size; i++) {
-            var boundary = this.model.boundaries.items[i];
+            var boundary = this.model.boundaries.items.get(i);
             for (var j = 0; j < this.model.boundaries.items.size; j++) {
-                var otherBoundary = this.model.boundaries.items[j];
-                if (boundary != otherBoundary) {
+                var otherBoundary = this.model.boundaries.items.get(j);
+                if (boundary && otherBoundary && boundary != otherBoundary) {
                     if (!boundary.inverted && (0, Helpers_1.polygonInPolygon)(boundary, otherBoundary)) {
                         boundary.isSector = true;
-                        break;
                     }
                 }
             }
@@ -204,8 +203,8 @@ var Controller = /** @class */ (function () {
         // add boundaries to body-boundary map
         var bs = [];
         for (var i = 0; i < this.model.boundaries.items.size; i++) {
-            if (this.model.boundaries.items[i])
-                bs.push(this.model.boundaries.items[i]);
+            if (this.model.boundaries.items.get(i))
+                bs.push(this.model.boundaries.items.get(i));
         }
         for (var i = 0; i < bs.length; i++) {
             this.bodyBoundaryMap.addPolygon(bs[i]);
@@ -238,20 +237,22 @@ var Controller = /** @class */ (function () {
     };
     Controller.prototype.getBodyBoundaryContacts = function (item, seg) {
         var parentPoly = this.model.boundaries.getItemByID(seg.parentID);
-        if (parentPoly.isSector) {
+        if (parentPoly && parentPoly.isSector) {
             return;
         }
-        if (!(item.contactMask & parentPoly.contactMask)) {
+        if (parentPoly && !(item.contactMask & parentPoly.contactMask)) {
             return;
         }
         var contactPairIdx = (0, Pairing_1.cantorPair)(item.id, seg.id);
         if (this.bodySegmentContactIndices[contactPairIdx]) {
             return;
         }
-        var resolve = (item.resolveMask & parentPoly.resolveMask) > 0;
+        var resolve = parentPoly ? (item.resolveMask & parentPoly.resolveMask) > 0 : false;
         var penetration = (0, Penetration_1.getPenetrationSegmentRound)(seg.ptA, seg.ptB, item.bounds, resolve, true);
-        this.bodySegmentContactIndices[contactPairIdx] = true;
-        this.bodyBoundaryContacts.push(new Contact_1.BodyBoundaryContact(penetration, item, seg, item.cor * parentPoly.cor));
+        if (penetration) {
+            this.bodySegmentContactIndices[contactPairIdx] = true;
+            this.bodyBoundaryContacts.push(new Contact_1.BodyBoundaryContact(penetration, item, seg, item.cor * (parentPoly ? parentPoly.cor : 1)));
+        }
         if (this.dispatcher) {
             this.dispatcher.dispatch(Events_1.EventType.Contact, item, parentPoly);
         }
@@ -282,7 +283,7 @@ var Controller = /** @class */ (function () {
             }
             if (hit.type == Helpers_1.HIT_TYPE_SEGMENT) {
                 var boundary = _this.model.boundaries.getItemByID(hit.parentID);
-                if (!boundary.isSector) {
+                if (boundary && !boundary.isSector) {
                     beam.ray.ptB.x = hit.pt.x;
                     beam.ray.ptB.y = hit.pt.y;
                     if (_this.dispatcher) {
@@ -305,10 +306,12 @@ var Controller = /** @class */ (function () {
             }
             var resolve = beam.isBoundary && !beam.isSoft && ((item.resolveMask & beam.resolveMask) > 0);
             var penetration = (0, Penetration_1.getPenetrationSegmentRound)(beam.ray.ptA, beam.ray.ptB, item.bounds, resolve, true);
-            _this.bodyBeamContactIndices[contactPairIdx] = true;
-            var contact = new Contact_1.BodySegmentBodyContact(penetration, item, beam, item.cor * beam.cor);
-            contact.hitPoint = hit;
-            _this.bodyBeamContacts.push(contact);
+            if (penetration) {
+                _this.bodyBeamContactIndices[contactPairIdx] = true;
+                var contact = new Contact_1.BodySegmentBodyContact(penetration, item, beam, item.cor * beam.cor);
+                contact.hitPoint = hit;
+                _this.bodyBeamContacts.push(contact);
+            }
             if (_this.dispatcher) {
                 _this.dispatcher.dispatch(Events_1.EventType.Contact, beam, item);
             }

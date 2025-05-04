@@ -1,3 +1,6 @@
+import { Engine } from '../../engine/src/Engine';
+import { Delegate } from './delegate';
+
 class Main {
 
   public static engine:Engine;
@@ -30,7 +33,6 @@ window.onblur = function () {
 window.onfocus = function () {
   Main.delegate.resume();
 }
-
 
 // get parcel to refresh on TypeScript bundle export
 if (document.head.getAttribute("has-main") == "yes") {

@@ -37,14 +37,15 @@ var ChildCollection = /** @class */ (function (_super) {
     };
     // Returns the first item only in order to correctly apply this interface
     ChildCollection.prototype.getItemByParentID = function (parentID) {
+        var _a, _b;
         if (this.itemsByParentID.has(parentID)) {
-            return this.itemsByParentID.get(parentID)[0];
+            return (_b = (_a = this.itemsByParentID.get(parentID)) === null || _a === void 0 ? void 0 : _a[0]) !== null && _b !== void 0 ? _b : null;
         }
         return null;
     };
     ChildCollection.prototype.getItemsByParentID = function (parentID) {
         if (this.itemsByParentID.has(parentID)) {
-            return this.itemsByParentID.get(parentID);
+            return this.itemsByParentID.get(parentID) || null;
         }
         return null;
     };
@@ -65,7 +66,7 @@ var ChildCollection = /** @class */ (function (_super) {
             children.push(item);
             this.itemsByParentID.set(item.parentID, children);
         }
-        this.dispatch(Events_1.EventType.Add, item, null, item);
+        this.dispatch(Events_1.EventType.Add, item, undefined, item);
         return true;
     };
     ChildCollection.prototype.removeItem = function (item) {
@@ -82,7 +83,7 @@ var ChildCollection = /** @class */ (function (_super) {
             if (this.items.has(item.id)) {
                 this.items.delete(item.id);
             }
-            this.dispatch(Events_1.EventType.Remove, item, null, item);
+            this.dispatch(Events_1.EventType.Remove, item, undefined, item);
             return true;
         }
         return false;

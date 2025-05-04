@@ -67,7 +67,7 @@ function resolvePenetrationBetweenBounds(bA, bB, cA, cB, useShapes) {
         return resolvePenetrationRoundRound(bA, bB, cA, cB);
     }
     else {
-        return resolvePenetrationOrthoRound(bA, bB, cA, cB);
+        return resolvePenetrationOrthoRound(bA, bB, cA, cB) || new BaseGeom_1.Point(0, 0);
     }
 }
 function resolvePenetrationRoundRound(bA, bB, cA, cB) {
@@ -102,7 +102,7 @@ function resolvePenetrationOrthoRound(bA, bB, cA, cB) {
     var rx2 = rx + orthob.hw;
     var ry2 = ry + orthob.hh;
     if (rx2 < cx1 || ry2 < cy1 || rx1 > cx2 || ry1 > cy2) {
-        return;
+        return undefined;
     }
     var delta, angle;
     var forceX = false;
@@ -157,6 +157,7 @@ function resolvePenetrationOrthoRound(bA, bB, cA, cB) {
         doResolve(deltaX, deltaY, circleb, orthob, circlec, orthoc);
         return new BaseGeom_1.Point(deltaX, deltaY);
     }
+    return undefined;
 }
 function getPenetrationSegmentRound(segPtA, segPtB, b, resolve, twoSidedSegment) {
     if (twoSidedSegment === void 0) { twoSidedSegment = false; }
@@ -184,7 +185,7 @@ function getPenetrationSegmentRound(segPtA, segPtB, b, resolve, twoSidedSegment)
         }
         return new BaseGeom_1.Point(dx, dy);
     }
-    return null;
+    return undefined;
 }
 function doResolve(deltaX, deltaY, bA, bB, cA, cB) {
     var aA = bA.anchor;

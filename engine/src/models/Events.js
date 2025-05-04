@@ -11,12 +11,11 @@ var EventType;
 })(EventType || (exports.EventType = EventType = {}));
 var Event = /** @class */ (function () {
     function Event(type, source, target, payload) {
-        if (source === void 0) { source = null; }
-        if (target === void 0) { target = null; }
         this.type = type;
         this.source = source;
         this.target = target;
         this.payload = payload;
+        this.cancelled = false;
     }
     Event.prototype.cancel = function () {
         this.cancelled = true;

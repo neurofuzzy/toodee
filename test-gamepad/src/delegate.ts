@@ -1,4 +1,11 @@
-class Delegate implements IEngineDelegate {
+import { Engine } from '../../engine/src/Engine';
+import * as Simulation from '../../engine/src/simulation';
+import * as Models from '../../engine/src/models';
+import * as Geom from '../../engine/src/geom';
+import { TestView } from '../../test-common/src/views/TestView';
+import { GameControllers } from './GameControllers';
+
+export class Delegate {
   
   protected engine:Engine;
   protected paused:boolean;
@@ -16,7 +23,7 @@ class Delegate implements IEngineDelegate {
     this.api.addModelListener(this.onModelEvent, this);
     this.api.addContactListener(this.onContactEvent, this);
     this.api.addBoundaryCrossListener(this.onBoundaryCrossEvent, this);
-    this.view = new Views.TestView().initWithModel(this.engine.model);
+    this.view = new TestView().initWithModel(this.engine.model);
     this.gameControllers = new GameControllers();
     this.beams = [];
 
@@ -100,7 +107,7 @@ class Delegate implements IEngineDelegate {
 
     }
 
-    console.log(model.beams.items.length)
+    console.log(model.beams.items.size)
     
     // add initial objects
 

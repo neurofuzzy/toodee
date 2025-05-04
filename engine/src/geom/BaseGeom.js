@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Polygon = exports.Segment = exports.Rectangle = exports.Ray = exports.Point = exports.Bounds = void 0;
 var Helpers_1 = require("./Helpers");
+var Identity_1 = require("../models/Identity");
 var Bounds = /** @class */ (function () {
     function Bounds(x, y, hw, hh, shape) {
         if (x === void 0) { x = 0; }
@@ -122,6 +123,8 @@ var Segment = /** @class */ (function () {
 exports.Segment = Segment;
 var Polygon = /** @class */ (function () {
     function Polygon(vertices) {
+        this.id = Identity_1.IdentityService.newIdentity();
+        this.bounds = null; // TODO: set to actual bounds if available
         this.vertices = vertices;
         this.segments = [];
         this.boundingBox = new Rectangle(100000, -100000, 100000, -100000);

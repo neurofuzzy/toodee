@@ -46,7 +46,7 @@ var SpatialPolygonMap = /** @class */ (function (_super) {
             }
             // TODO: Implement pointInPolygon
             // if (pointInPolygon(pt, poly)) {
-            //   return poly;
+            //   return poly as K;
             // }
         }
         return undefined;
@@ -61,7 +61,7 @@ var SpatialPolygonMap = /** @class */ (function (_super) {
     SpatialPolygonMap.prototype.getContainerFromPoint = function (pt) {
         var polygonId = this.getPolygonId(pt);
         if (polygonId >= 0) {
-            return this.containers.get(polygonId);
+            return this.containers.get(polygonId) || [];
         }
         return undefined;
     };
@@ -69,7 +69,7 @@ var SpatialPolygonMap = /** @class */ (function (_super) {
         this.polygonsByID.set(poly.id, poly);
         this.containers.set(poly.id, []);
         this.polygonsSortedByArea.push(poly);
-        this.polygonsSortedByArea.sort(function (a, b) { return a.area - b.area; });
+        this.polygonsSortedByArea.sort(function (a, b) { var _a, _b; return ((_a = a.area) !== null && _a !== void 0 ? _a : 0) - ((_b = b.area) !== null && _b !== void 0 ? _b : 0); });
     };
     SpatialPolygonMap.prototype.addItem = function (item) {
         if (!this.itemsPolygonIDs.has(item.id)) {
@@ -110,10 +110,14 @@ var SpatialPolygonMap = /** @class */ (function (_super) {
             this.removeItem(item);
             this.addItem(item);
             if (prevPolygonID !== undefined && prevPolygonID >= 0) {
-                this.dispatch(Events_1.EventType.Remove, this.polygonsByID.get(prevPolygonID), item);
+                var prevPoly = this.polygonsByID.get(prevPolygonID);
+                if (prevPoly)
+                    this.dispatch(Events_1.EventType.Remove, prevPoly, item);
             }
             if (polygonID >= 0) {
-                this.dispatch(Events_1.EventType.Add, this.polygonsByID.get(polygonID), item);
+                var poly = this.polygonsByID.get(polygonID);
+                if (poly)
+                    this.dispatch(Events_1.EventType.Add, poly, item);
             }
             return true;
         }
@@ -127,7 +131,7 @@ var SpatialPolygonMap = /** @class */ (function (_super) {
         return undefined;
     };
     SpatialPolygonMap.prototype.getItemsWithinPolygonID = function (polygonID) {
-        return this.containers.get(polygonID);
+        return this.containers.get(polygonID) || [];
     };
     Object.defineProperty(SpatialPolygonMap.prototype, "itemsArray", {
         get: function () {

@@ -34,11 +34,15 @@ export interface ISegment extends Identifiable, IChild {
     ptB: IPoint;
     clone(): ISegment;
 }
-export interface IPolygon {
+export interface IPolygonBase {
+    id: number;
+    bounds: any;
+    area?: number;
+}
+export interface IPolygon extends IPolygonBase {
     vertices: Array<IPoint>;
     segments: Array<ISegment>;
     boundingBox: IRectangle;
-    area: number;
     inverted: boolean;
     clone(): IPolygon;
 }

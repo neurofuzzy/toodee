@@ -47,6 +47,8 @@ export declare class Segment implements ISegment {
     clone(): ISegment;
 }
 export declare class Polygon implements IPolygon {
+    id: number;
+    bounds: any;
     vertices: Array<IPoint>;
     segments: Array<ISegment>;
     boundingBox: IRectangle;

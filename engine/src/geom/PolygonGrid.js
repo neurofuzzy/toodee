@@ -81,7 +81,7 @@ var PolygonGrid = /** @class */ (function () {
     };
     PolygonGrid.prototype.getCellFromPoint = function (pt) {
         var idx = this.getCellIndex(Math.floor(pt.x / this.cellSize), Math.floor(pt.y / this.cellSize));
-        return this.cells.get(idx);
+        return this.getCellByIndex(idx);
     };
     PolygonGrid.prototype.getCellsFromCoords = function (coords, removeDupes) {
         var _this = this;

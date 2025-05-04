@@ -22,7 +22,9 @@ export declare class SpatialGrid<T extends {
     updateItem(item: T): void;
     getSurroundingCells(item: T): Array<Array<T>>;
     getCellFromPoint(pt: IPoint): Array<T>;
-    getCellsFromCoords(coords: Array<IPoint>, removeDupes?: boolean): Array<Array<T>>;
+    getCellItems(x: number, y: number): T[];
+    getCellItemsByIndex(idx: number): T[];
+    getCellsFromCoords(coords: Array<IPoint>, removeDupes?: boolean): T[];
     getCellsNear(center: IPoint, radius: number): Array<Array<T>>;
     getItemsUnderPoint(pt: IPoint): Array<T>;
     getItemsNear(center: IPoint, radius: number): Array<T>;
