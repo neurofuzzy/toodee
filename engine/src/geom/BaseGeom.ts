@@ -1,6 +1,7 @@
 import { IPoint, IBounds, IRectangle, ISegment, IPolygon, IRay, ICircle, IPointHit } from './IGeom';
 import { pointWithinBounds, boundsWithinBounds, boundsIntersect, pointWithinRectangle, rectangleWithinRectangle, rectIntersectsRect, distanceBetween, distanceBetweenSquared, angleBetween, xyToAngle, orthoRoundBoundsIntersect, rotatePointDeg, rotatePoint, scalePoint, lerp, lerpDist, normalizePoint, maxPoint, normalizeAngle, normalizeAngleDeg, dot, length, cross, sub, add, closestPtPointLine, ccw, lineIntersectsLine, lineLineIntersect, lineSide, boundsLineIntersect, circleLineIntersect, rectLineIntersect, cellCoordsAlongLine, cellCoordsAlongLineWithThickness, cellCoordsContainingPolygon, cellCoordsIntersectingCircle, polygonArea, polygonIsClockwise, linePolygonIntersect, pointInPolygon, polygonInPolygon } from './Helpers';
 import { SHAPE_ORTHO, SHAPE_ROUND, HIT_TYPE_SHAPE } from './Helpers';
+import { IdentityService } from '../models/Identity';
 
 export class Bounds implements IBounds {
   public anchor: IPoint;
@@ -129,6 +130,8 @@ export class Segment implements ISegment {
 }
 
 export class Polygon implements IPolygon {
+  public id: number;
+  public bounds: any;
   public vertices: Array<IPoint>;
   public segments: Array<ISegment>;
   public boundingBox: IRectangle;
@@ -136,6 +139,8 @@ export class Polygon implements IPolygon {
   public inverted: boolean;
 
   constructor(vertices: Array<IPoint>) {
+    this.id = IdentityService.newIdentity();
+    this.bounds = null; // TODO: set to actual bounds if available
     this.vertices = vertices;
     this.segments = [];
     this.boundingBox = new Rectangle(100000, -100000, 100000, -100000);

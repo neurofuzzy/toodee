@@ -1,16 +1,16 @@
 // Migrated from namespace Geom to ES module
-import { IPolygon, IPoint } from './IGeom';
+import { IPolygon, IPoint, IPolygonBase } from './IGeom';
 import { EventDispatcher, EventType } from '../models/Events';
 
 export interface IContainer<T> extends Array<T> {}
 
-export interface IPolygonMap<T> {
-  addPolygon(poly: IPolygon & { id: number }): void;
-  getPolygonFromPoint(pt: IPoint): T | undefined;
-  getContainerFromPoint(pt: IPoint): IContainer<T> | undefined;
+export interface IPolygonMap<K extends IPolygonBase> {
+  addPolygon(poly: K): void;
+  getPolygonFromPoint(pt: IPoint): K | undefined;
+  getContainerFromPoint(pt: IPoint): IContainer<K> | undefined;
 }
 
-export class SpatialPolygonMap<T extends IPolygon & { id: number }, K extends { id: number; bounds: any }> extends EventDispatcher<T> implements IPolygonMap<K> {
+export class SpatialPolygonMap<T extends IPolygonBase, K extends IPolygonBase = T> extends EventDispatcher<T> implements IPolygonMap<K> {
   public items!: Map<number, K>;
   protected itemsPolygonIDs!: Map<number, number>;
   protected containers!: Map<number, IContainer<K>>;
@@ -36,7 +36,7 @@ export class SpatialPolygonMap<T extends IPolygon & { id: number }, K extends { 
     return this.polygonsSortedByArea[this.polygonsSortedByArea.length - 1];
   }
 
-  public getPolygonFromPoint(pt: IPoint, includeInverted: boolean = false): T | undefined {
+  public getPolygonFromPoint(pt: IPoint, includeInverted: boolean = false): K | undefined {
     for (let i = 0; i < this.polygonsSortedByArea.length; i++) {
       let poly = this.polygonsSortedByArea[i];
       if ((poly as any).inverted && !includeInverted) {
@@ -44,7 +44,7 @@ export class SpatialPolygonMap<T extends IPolygon & { id: number }, K extends { 
       }
       // TODO: Implement pointInPolygon
       // if (pointInPolygon(pt, poly)) {
-      //   return poly;
+      //   return poly as K;
       // }
     }
     return undefined;
@@ -66,11 +66,11 @@ export class SpatialPolygonMap<T extends IPolygon & { id: number }, K extends { 
     return undefined;
   }
 
-  public addPolygon(poly: T): void {
-    this.polygonsByID.set(poly.id, poly);
+  public addPolygon(poly: K): void {
+    this.polygonsByID.set(poly.id, poly as unknown as T);
     this.containers.set(poly.id, []);
-    this.polygonsSortedByArea.push(poly);
-    this.polygonsSortedByArea.sort((a, b) => a.area - b.area);
+    this.polygonsSortedByArea.push(poly as unknown as T);
+    this.polygonsSortedByArea.sort((a, b) => (a.area ?? 0) - (b.area ?? 0));
   }
 
   public addItem(item: K): boolean {

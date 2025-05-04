@@ -3,7 +3,7 @@ import { SpatialGrid } from '../geom/SpatialGrid';
 import { PolygonGrid } from '../geom/PolygonGrid';
 import { SpatialPolygonMap } from '../geom/SpatialPolygonMap';
 import { boundsIntersect, polygonInPolygon, angleBetween, rotatePoint, SHAPE_ORTHO, SHAPE_ROUND, HIT_TYPE_SEGMENT } from '../geom/Helpers';
-import { IPoint, ISegment } from '../geom/IGeom';
+import { IPoint, ISegment, IPointHit } from '../geom/IGeom';
 import { BodyBodyContact, BodyBoundaryContact, BodySegmentBodyContact, resolveContact } from '../physics/Contact';
 import { IBody } from '../physics/Body';
 import { API } from './API';
@@ -69,8 +69,8 @@ export class Controller {
       let boundary = this.model.boundaries.items.get(i);
       for (let j = 0; j < this.model.boundaries.items.size; j++) {
         let otherBoundary = this.model.boundaries.items.get(j);
-        if (boundary != otherBoundary) {
-          if (boundary && !boundary.inverted && polygonInPolygon(boundary, otherBoundary)) {
+        if (boundary && otherBoundary && boundary != otherBoundary) {
+          if (!boundary.inverted && polygonInPolygon(boundary, otherBoundary)) {
             boundary.isSector = true;
           }
         }
@@ -166,7 +166,7 @@ export class Controller {
 
     let beamTerminated = false;
 
-    beam.hits.forEach(hit => {
+    beam.hits.forEach((hit: IPointHit) => {
 
       if (beamTerminated) {
         return;
@@ -180,7 +180,7 @@ export class Controller {
 
         var boundary = this.model.boundaries.getItemByID(hit.parentID);
 
-        if (!boundary.isSector) {
+        if (boundary && !boundary.isSector) {
 
           beam.ray.ptB.x = hit.pt.x;
           beam.ray.ptB.y = hit.pt.y;
