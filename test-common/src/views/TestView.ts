@@ -4,20 +4,20 @@ import { Model, Entity, Boundary, Projectile, Beam } from '../../../engine/src/s
 import { SHAPE_ORTHO } from '../../../engine/src/geom/Helpers';
 
 export class TestView implements IView<Model> {
-  protected model: Model;
-  protected sectors: Array<Graphics>;
-  protected sectorsContainer: Container;
-  protected boundaries: Array<Graphics>;
-  protected boundariesContainer: Container;
-  protected bodies: Array<Graphics>;
-  protected bodiesContainer: Container;
-  protected projectiles: Array<Graphics>;
-  protected ray: Graphics;
-  protected overlay: Graphics;
+  protected model!: Model;
+  protected sectors!: Array<Graphics>;
+  protected sectorsContainer!: Container;
+  protected boundaries!: Array<Graphics>;
+  protected boundariesContainer!: Container;
+  protected bodies!: Array<Graphics>;
+  protected bodiesContainer!: Container;
+  protected projectiles!: Array<Graphics>;
+  protected ray!: Graphics;
+  protected overlay!: Graphics;
 
   public pixi: Application;
-  private fps: HTMLElement;
-  protected built: boolean;
+  private fps!: HTMLElement;
+  protected built!: boolean;
 
   public bodiesGraphics(): Array<any> {
     return this.bodies;
@@ -36,7 +36,7 @@ export class TestView implements IView<Model> {
     this.bodies = [];
     this.boundaries = [];
     this.projectiles = [];
-    this.fps = document.getElementById('fps');
+    this.fps = document.getElementById('fps') as HTMLElement;
 
     this.sectorsContainer = new Container();
     this.pixi.stage.addChild(this.sectorsContainer);
@@ -53,8 +53,8 @@ export class TestView implements IView<Model> {
   }
 
   public build() {
-    this.pixi.stage.interactive = true;
-    this.pixi.stage.hitArea = new Rectangle(0, 0, 800, 600);
+    (this.pixi.stage as any).interactive = true;
+    (this.pixi.stage as any).hitArea = new Rectangle(0, 0, 800, 600);
 
     this.model.boundaries.items.forEach((boundary, idx) => {
       let color = boundary.isSector ? 0x999999 : 0xffffff;
@@ -111,6 +111,7 @@ export class TestView implements IView<Model> {
     switch (event.type) {
       case EventType.Add:
         if (event.source instanceof Projectile) {
+          if (!event.source) return;
           let p = event.source as Projectile;
           gfx = new Graphics();
           gfx.beginFill(this.colors[p.id % 4], 1);
@@ -120,6 +121,7 @@ export class TestView implements IView<Model> {
           this.bodiesContainer.addChild(gfx);
           this.projectiles[p.id] = gfx;
         } else if (event.source instanceof Entity) {
+          if (!event.source) return;
           let p = event.source as Entity;
           gfx = new Graphics().beginFill(this.colors[p.id % 4], 0.5).lineStyle(2, this.colors[p.id % 4], 1.0);
           let b = p.bounds;
@@ -130,7 +132,7 @@ export class TestView implements IView<Model> {
             gfx.endFill();
             gfx.beginFill(this.colors[p.id % 4], 1).lineStyle(0);
             gfx.drawRect(-2, 3 - b.hh, 4, 4);
-            gfx.cacheAsBitmap = true;
+            (gfx as any).cacheAsBitmap = true;
           }
           gfx.x = b.anchor.x;
           gfx.y = b.anchor.y;
@@ -139,6 +141,7 @@ export class TestView implements IView<Model> {
         }
         break;
       case EventType.Remove:
+        if (!event.source) return;
         gfx = this.projectiles[event.source.id];
         if (gfx) {
           this.bodiesContainer.removeChild(gfx);

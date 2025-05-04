@@ -1,1 +1,0 @@
-{"version":3,"file":"BaseSpatial.js","sourceRoot":"src/","sources":["engine/src/geom/BaseSpatial.ts"],"names":[],"mappings":";;;AAGA;IAIE;IAAe,CAAC;IAET,oCAAc,GAArB,UAAsB,MAAe;QACnC,IAAI,CAAC,MAAM,GAAG,MAAM,CAAC;QACrB,IAAI,CAAC,QAAQ,GAAG,CAAC,CAAC;QAClB,OAAO,IAAI,CAAC;IACd,CAAC;IACH,kBAAC;AAAD,CAAC,AAXD,IAWC;AAXY,kCAAW"}

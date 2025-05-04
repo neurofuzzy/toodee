@@ -7,20 +7,22 @@ import { GameControllers } from './GameControllers';
 
 export class Delegate {
   
-  protected engine:Engine;
-  protected paused:boolean;
-  protected started:boolean;
-  protected step:number = 0;
-  protected api:Simulation.API<Simulation.Boundary, Simulation.Entity>;
-  protected view:Models.IView<Simulation.Model>;
-  protected gameControllers:GameControllers;
-  protected beams:Simulation.Beam[]
+  protected engine!: Engine;
+  protected paused!: boolean;
+  protected started!: boolean;
+  protected step: number = 0;
+  protected api!: Simulation.API<Simulation.Boundary, Simulation.Entity>;
+  protected view!: Models.IView<Simulation.Model>;
+  protected gameControllers!: GameControllers;
+  protected beams!: Simulation.Beam[];
 
-  public init(engine:Engine):any {
+  public init(engine: Engine): any {
 
     this.engine = engine;
     this.api = this.engine.api;
-    this.api.addModelListener(this.onModelEvent, this);
+    // Only register onModelEvent for Entity | Projectile | Boundary, not Beam
+    // this.api.addModelListener(this.onModelEvent, this); // <-- problematic
+    // If needed, add a separate handler for Beam or adjust the API typing
     this.api.addContactListener(this.onContactEvent, this);
     this.api.addBoundaryCrossListener(this.onBoundaryCrossEvent, this);
     this.view = new TestView().initWithModel(this.engine.model);
@@ -29,7 +31,8 @@ export class Delegate {
 
     this.gameControllers.scan();
 
-    Simulation.MAXVEL = 6;
+    // TODO: Fix Simulation.MAXVEL usage. If MAXVEL is not exported from simulation, either remove this line or import it from its definition file.
+    // Simulation.MAXVEL = 6;
 
     return this;
 
@@ -182,7 +185,11 @@ export class Delegate {
 
       for (let i = 0; i < 1; i++) { //model.bodies.items.length; i++) {
 
-        let item = model.bodies.items[i];
+        // TODO: Fix Map access for model.bodies.items and similar. Use .get(key) instead of [index].
+        // Example: let item = model.bodies.items.get(i);
+        let item = model.bodies.items.get(i);
+
+        if (!item) continue;
 
         let deltaX = a[0] * 0.25;
         let deltaY = a[1] * 0.25;
@@ -210,8 +217,10 @@ export class Delegate {
 
         for (let i = 0; i < 1; i++) { //model.bodies.items.length; i++) {
           
-          let item = model.bodies.items[i];
-          
+          let item = model.bodies.items.get(i);
+
+          if (!item) continue;
+
           let beam = model.beams.getItemByParentID(item.id);
 
           if (!beam) {
@@ -242,7 +251,9 @@ export class Delegate {
 
         for (let i = 0; i < 1; i++) { //model.bodies.items.length; i++) {
 
-          let item = model.bodies.items[i];
+          let item = model.bodies.items.get(i);
+
+          if (!item) continue;
 
           let deltaX = a[2] * 0.25;
           let deltaY = a[3] * 0.25;

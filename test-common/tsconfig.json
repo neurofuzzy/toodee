@@ -4,7 +4,7 @@
     "sourceMap": true,
     "declaration": true,
     "sourceRoot": "src",
-    "lib": ["es2015", "dom"],
+    "lib": ["es2015", "dom", "DOM", "ES2022"],
     "esModuleInterop": true
   },
   "include": [

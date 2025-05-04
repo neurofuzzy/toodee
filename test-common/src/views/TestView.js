@@ -93,6 +93,8 @@ var TestView = /** @class */ (function () {
         switch (event.type) {
             case models_1.EventType.Add:
                 if (event.source instanceof simulation_1.Projectile) {
+                    if (!event.source)
+                        return;
                     var p = event.source;
                     gfx = new pixi_js_1.Graphics();
                     gfx.beginFill(this.colors[p.id % 4], 1);
@@ -103,6 +105,8 @@ var TestView = /** @class */ (function () {
                     this.projectiles[p.id] = gfx;
                 }
                 else if (event.source instanceof simulation_1.Entity) {
+                    if (!event.source)
+                        return;
                     var p = event.source;
                     gfx = new pixi_js_1.Graphics().beginFill(this.colors[p.id % 4], 0.5).lineStyle(2, this.colors[p.id % 4], 1.0);
                     var b = p.bounds;
@@ -123,6 +127,8 @@ var TestView = /** @class */ (function () {
                 }
                 break;
             case models_1.EventType.Remove:
+                if (!event.source)
+                    return;
                 gfx = this.projectiles[event.source.id];
                 if (gfx) {
                     this.bodiesContainer.removeChild(gfx);

@@ -2,10 +2,10 @@
   "name": "toodee-test-gamepad",
   "version": "1.0.0",
   "description": "Toodee project test-gamepad - generated from test-starter",
-  "main": "src/main.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "parcel --no-source-maps index.html"
+    "start": "parcel --no-source-maps index.html",
+    "postinstall": "rm -rf node_modules/@types/css-font-loading-module"
   },
   "repository": {
     "type": "git",
@@ -18,7 +18,9 @@
   },
   "homepage": "https://github.com/neurofuzzy/toodee#readme",
   "dependencies": {
-    "pixi.js": "^7.2.4"
+    "@pixi/display": "^7.4.3",
+    "@pixi/events": "^7.4.3",
+    "pixi.js": "^7.4.3"
   },
   "devDependencies": {
     "typescript": "^5.8.3"
