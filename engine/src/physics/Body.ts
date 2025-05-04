@@ -11,8 +11,8 @@ export interface IBody {
 }
 
 export class BaseBody extends BaseSpatial implements IBody {
-  public velocity: IPoint;
-  public cor: number;
+  public velocity!: IPoint;
+  public cor!: number;
   public constraints: any;
 
   public initWithBoundsAndConstraints(bounds: IBounds, constraints: any): this {

@@ -9,12 +9,12 @@ import { Ray } from '../geom/BaseGeom';
 import { PointHit } from '../geom/Helpers';
 
 export class Model {
-  public bodies: BaseCollection<Entity>;
-  public projectiles: BaseCollection<Projectile>;
-  public boundaries: BaseCollection<Boundary>;
-  public beams: ChildCollection<Beam>;
-  public ray: Ray;
-  public rayHit: PointHit;
+  public bodies!: BaseCollection<Entity>;
+  public projectiles!: BaseCollection<Projectile>;
+  public boundaries!: BaseCollection<Boundary>;
+  public beams!: ChildCollection<Beam>;
+  public ray!: Ray;
+  public rayHit!: PointHit;
 
   public init(): this {
     this.boundaries = new BaseCollection<Boundary>().init();

@@ -11,8 +11,8 @@ export interface ISegmentBody extends IRayCastable {
 }
 
 export class SegmentBody implements ISegmentBody {
-  public ray: Ray;
-  public hits: PointHit[];
+  public ray!: Ray;
+  public hits!: PointHit[];
   public isBoundary: boolean;
   public cor: number;
   public pressure: number;

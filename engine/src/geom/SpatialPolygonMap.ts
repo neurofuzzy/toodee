@@ -1,20 +1,21 @@
 // Migrated from namespace Geom to ES module
 import { IPolygon, IPoint } from './IGeom';
 import { EventDispatcher, EventType } from '../models/Events';
-import { IContainer } from '../util/IContainer';
+
+export interface IContainer<T> extends Array<T> {}
 
 export interface IPolygonMap<T> {
   addPolygon(poly: IPolygon & { id: number }): void;
-  getPolygonFromPoint(pt: IPoint): IPolygon & { id: number };
-  getContainerFromPoint(pt: IPoint): IContainer<T>;
+  getPolygonFromPoint(pt: IPoint): T | undefined;
+  getContainerFromPoint(pt: IPoint): IContainer<T> | undefined;
 }
 
 export class SpatialPolygonMap<T extends IPolygon & { id: number }, K extends { id: number; bounds: any }> extends EventDispatcher<T> implements IPolygonMap<K> {
-  public items: Map<number, K>;
-  protected itemsPolygonIDs: Map<number, number>;
-  protected containers: Map<number, IContainer<K>>;
-  protected polygonsByID: Map<number, T>;
-  protected polygonsSortedByArea: Array<T>;
+  public items!: Map<number, K>;
+  protected itemsPolygonIDs!: Map<number, number>;
+  protected containers!: Map<number, IContainer<K>>;
+  protected polygonsByID!: Map<number, T>;
+  protected polygonsSortedByArea!: Array<T>;
 
   public init(): this {
     this.reset();
@@ -35,7 +36,7 @@ export class SpatialPolygonMap<T extends IPolygon & { id: number }, K extends { 
     return this.polygonsSortedByArea[this.polygonsSortedByArea.length - 1];
   }
 
-  public getPolygonFromPoint(pt: IPoint, includeInverted: boolean = false): T {
+  public getPolygonFromPoint(pt: IPoint, includeInverted: boolean = false): T | undefined {
     for (let i = 0; i < this.polygonsSortedByArea.length; i++) {
       let poly = this.polygonsSortedByArea[i];
       if ((poly as any).inverted && !includeInverted) {
@@ -57,10 +58,10 @@ export class SpatialPolygonMap<T extends IPolygon & { id: number }, K extends { 
     return -1;
   }
 
-  public getContainerFromPoint(pt: IPoint): IContainer<K> {
+  public getContainerFromPoint(pt: IPoint): IContainer<K> | undefined {
     let polygonId = this.getPolygonId(pt);
     if (polygonId >= 0) {
-      return this.containers.get(polygonId);
+      return this.containers.get(polygonId) || [];
     }
     return undefined;
   }
@@ -112,17 +113,19 @@ export class SpatialPolygonMap<T extends IPolygon & { id: number }, K extends { 
       this.removeItem(item);
       this.addItem(item);
       if (prevPolygonID !== undefined && prevPolygonID >= 0) {
-        this.dispatch(EventType.Remove, this.polygonsByID.get(prevPolygonID), item);
+        const prevPoly = this.polygonsByID.get(prevPolygonID);
+        if (prevPoly) this.dispatch(EventType.Remove, prevPoly, item);
       }
       if (polygonID >= 0) {
-        this.dispatch(EventType.Add, this.polygonsByID.get(polygonID), item);
+        const poly = this.polygonsByID.get(polygonID);
+        if (poly) this.dispatch(EventType.Add, poly, item);
       }
       return true;
     }
     return false;
   }
 
-  public getPolygonByItemID(itemID: number): T {
+  public getPolygonByItemID(itemID: number): T | undefined {
     let polygonID = this.itemsPolygonIDs.get(itemID);
     if (polygonID !== undefined && polygonID >= 0) {
       return this.polygonsByID.get(polygonID);
@@ -130,8 +133,8 @@ export class SpatialPolygonMap<T extends IPolygon & { id: number }, K extends { 
     return undefined;
   }
 
-  public getItemsWithinPolygonID(polygonID: number): IContainer<K> {
-    return this.containers.get(polygonID);
+  public getItemsWithinPolygonID(polygonID: number): IContainer<K> | undefined {
+    return this.containers.get(polygonID) || [];
   }
 
   public get itemsArray(): K[] {

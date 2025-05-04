@@ -10,7 +10,7 @@ export class Boundary extends PolygonBody implements Identifiable, IContactable 
   public resolveMask: number;
 
   constructor(vertices?: Array<IPoint>) {
-    super(vertices);
+    super(vertices ?? []);
     this.id = IdentityService.newIdentity();
     this.resolveMask = 0b11111111;
     this.contactMask = 0b11111111;

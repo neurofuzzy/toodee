@@ -1,22 +1,21 @@
-import * as PIXI from 'pixi.js';
+import { Application, Container, Graphics, Rectangle } from 'pixi.js';
 import { IView, IEvent, EventType } from '../../../engine/src/models';
 import { Model, Entity, Boundary, Projectile, Beam } from '../../../engine/src/simulation';
 import { SHAPE_ORTHO } from '../../../engine/src/geom/Helpers';
-import { Geom } from '../../../engine/src/geom';
 
 export class TestView implements IView<Model> {
   protected model: Model;
-  protected sectors: Array<PIXI.Graphics>;
-  protected sectorsContainer: PIXI.Container;
-  protected boundaries: Array<PIXI.Graphics>;
-  protected boundariesContainer: PIXI.Container;
-  protected bodies: Array<PIXI.Graphics>;
-  protected bodiesContainer: PIXI.Container;
-  protected projectiles: Array<PIXI.Graphics>;
-  protected ray: PIXI.Graphics;
-  protected overlay: PIXI.Graphics;
+  protected sectors: Array<Graphics>;
+  protected sectorsContainer: Container;
+  protected boundaries: Array<Graphics>;
+  protected boundariesContainer: Container;
+  protected bodies: Array<Graphics>;
+  protected bodiesContainer: Container;
+  protected projectiles: Array<Graphics>;
+  protected ray: Graphics;
+  protected overlay: Graphics;
 
-  public pixi: PIXI.Application;
+  public pixi: Application;
   private fps: HTMLElement;
   protected built: boolean;
 
@@ -27,8 +26,8 @@ export class TestView implements IView<Model> {
   private colors = [0xffffff, 0xff0000, 0x00ff00, 0x0000ff];
 
   constructor() {
-    this.pixi = new PIXI.Application();
-    document.body.appendChild(this.pixi.view);
+    this.pixi = new Application();
+    document.body.appendChild(this.pixi.view as HTMLCanvasElement);
   }
 
   public initWithModel(model: Model): any {
@@ -39,27 +38,27 @@ export class TestView implements IView<Model> {
     this.projectiles = [];
     this.fps = document.getElementById('fps');
 
-    this.sectorsContainer = new PIXI.Container();
+    this.sectorsContainer = new Container();
     this.pixi.stage.addChild(this.sectorsContainer);
-    this.bodiesContainer = new PIXI.Container();
+    this.bodiesContainer = new Container();
     this.pixi.stage.addChild(this.bodiesContainer);
-    this.boundariesContainer = new PIXI.Container();
+    this.boundariesContainer = new Container();
     this.pixi.stage.addChild(this.boundariesContainer);
 
-    this.model.bodies.addListener(this.onModelEvent.bind(this));
-    this.model.projectiles.addListener(this.onModelEvent.bind(this));
-    this.model.beams.addListener(this.onModelEvent.bind(this));
+    this.model.bodies.addListener(this.onModelEvent, this);
+    this.model.projectiles.addListener(this.onModelEvent, this);
+    this.model.beams.addListener(this.onModelEvent, this);
 
     return this;
   }
 
   public build() {
     this.pixi.stage.interactive = true;
-    this.pixi.stage.hitArea = new PIXI.Rectangle(0, 0, 800, 600);
+    this.pixi.stage.hitArea = new Rectangle(0, 0, 800, 600);
 
     this.model.boundaries.items.forEach((boundary, idx) => {
       let color = boundary.isSector ? 0x999999 : 0xffffff;
-      let gfx = new PIXI.Graphics().lineStyle(2, color, 1.0);
+      let gfx = new Graphics().lineStyle(2, color, 1.0);
       let bs = boundary.segments;
       if (bs.length > 0) {
         gfx.moveTo(bs[0].ptA.x, bs[0].ptA.y);
@@ -76,7 +75,7 @@ export class TestView implements IView<Model> {
         this.boundaries[boundary.id] = gfx;
       }
     });
-    this.overlay = new PIXI.Graphics();
+    this.overlay = new Graphics();
     this.pixi.stage.addChild(this.overlay);
     this.built = true;
   }
@@ -108,12 +107,12 @@ export class TestView implements IView<Model> {
 
   public onModelEvent(event: IEvent<Entity | Boundary | Projectile | Beam>) {
     if (!this.built) return;
-    let gfx: PIXI.Graphics;
+    let gfx: Graphics;
     switch (event.type) {
       case EventType.Add:
         if (event.source instanceof Projectile) {
           let p = event.source as Projectile;
-          gfx = new PIXI.Graphics();
+          gfx = new Graphics();
           gfx.beginFill(this.colors[p.id % 4], 1);
           gfx.drawRect(0 - p.size * 0.5, 0 - p.size * 0.5, p.size, p.size);
           gfx.x = p.position.x;
@@ -122,7 +121,7 @@ export class TestView implements IView<Model> {
           this.projectiles[p.id] = gfx;
         } else if (event.source instanceof Entity) {
           let p = event.source as Entity;
-          gfx = new PIXI.Graphics().beginFill(this.colors[p.id % 4], 0.5).lineStyle(2, this.colors[p.id % 4], 1.0);
+          gfx = new Graphics().beginFill(this.colors[p.id % 4], 0.5).lineStyle(2, this.colors[p.id % 4], 1.0);
           let b = p.bounds;
           if (b.shape == SHAPE_ORTHO) {
             gfx.drawRect(0 - b.hw, 0 - b.hh, b.hw * 2, b.hh * 2);

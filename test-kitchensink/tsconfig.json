@@ -5,10 +5,12 @@
     "module": "commonjs",
     "sourceMap": true,
     "outDir": "dist",
-    "rootDir": "src",
+    "rootDir": "../",
     "strict": true
   },
   "include": [
+    "engine/src/**/*.ts",
+    "engine/src/**/*.tsx",
     "src/**/*.ts",
     "src/**/*.tsx"
   ],

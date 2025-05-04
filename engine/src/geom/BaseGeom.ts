@@ -40,7 +40,7 @@ export class Point implements IPoint {
 }
 
 export class Ray implements IRay {
-  public id: number;
+  public id!: number;
   public parentID: number;
   public ptA: IPoint;
   public ptB: IPoint;
@@ -112,7 +112,7 @@ export class Rectangle implements IRectangle {
 }
 
 export class Segment implements ISegment {
-  public id: number;
+  public id!: number;
   public parentID: number;
   public ptA: IPoint;
   public ptB: IPoint;

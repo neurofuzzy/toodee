@@ -2,8 +2,8 @@
 import { IBounds } from './IGeom';
 
 export class BaseSpatial {
-  public bounds: IBounds;
-  public rotation: number;
+  public bounds!: IBounds;
+  public rotation!: number;
 
   constructor() {}
 

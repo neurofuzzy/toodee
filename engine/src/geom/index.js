@@ -14,6 +14,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.resolvePenetrationBetweenBoundsPenetration = exports.getPenetrationSegmentRoundPenetration = void 0;
 __exportStar(require("./BaseGeom"), exports);
 __exportStar(require("./BaseSpatial"), exports);
 __exportStar(require("./Constraints"), exports);
@@ -21,7 +22,11 @@ __exportStar(require("./Helpers"), exports);
 __exportStar(require("./IGeom"), exports);
 __exportStar(require("./IGrid"), exports);
 __exportStar(require("./ISpatial"), exports);
-__exportStar(require("./Penetration"), exports);
+// export * from './Penetration';
+// Explicitly re-export only what is not already exported by Helpers
+var Penetration_1 = require("./Penetration");
+Object.defineProperty(exports, "getPenetrationSegmentRoundPenetration", { enumerable: true, get: function () { return Penetration_1.getPenetrationSegmentRound; } });
+Object.defineProperty(exports, "resolvePenetrationBetweenBoundsPenetration", { enumerable: true, get: function () { return Penetration_1.resolvePenetrationBetweenBounds; } });
 __exportStar(require("./PolygonGrid"), exports);
 __exportStar(require("./SpatialGrid"), exports);
 __exportStar(require("./SpatialPolygonMap"), exports);

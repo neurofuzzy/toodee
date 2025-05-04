@@ -1,12 +1,12 @@
 import { ISpatial } from '../../../engine/src/geom/ISpatial';
-import { DisplayObject, Container, InteractionEvent } from 'pixi.js';
+import { DisplayObject, Container } from 'pixi.js';
 import { ISegment } from '../../../engine/src/geom/IGeom';
 
 export function makeItemDraggable(item: ISpatial, dobj: DisplayObject): void {
-  dobj.interactive = true;
-  dobj.buttonMode = true;
+  (dobj as any).interactive = true;
+  (dobj as any).buttonMode = true;
 
-  const onDragStart = function (this: any, event: InteractionEvent) {
+  const onDragStart = function (this: any, event: any) {
     // store a reference to the data
     // the reason for this is because of multitouch
     // we want to track the movement of this particular touch
@@ -15,14 +15,14 @@ export function makeItemDraggable(item: ISpatial, dobj: DisplayObject): void {
     this.dragging = true;
   };
 
-  const onDragEnd = function (this: any, event: InteractionEvent) {
+  const onDragEnd = function (this: any, event: any) {
     this.alpha = 1;
     this.dragging = false;
     // set the interaction data to null
     this.data = null;
   };
 
-  const onDragMove = function (this: any, event: InteractionEvent) {
+  const onDragMove = function (this: any, event: any) {
     if (this.dragging) {
       var newPosition = this.data.getLocalPosition(this.parent);
       this.x = newPosition.x;
@@ -40,12 +40,12 @@ export function makeItemDraggable(item: ISpatial, dobj: DisplayObject): void {
 }
 
 export function makeSegmentDraggable(ray: ISegment, dobj: DisplayObject, stage: Container): void {
-  dobj.interactive = true;
-  dobj.buttonMode = true;
+  (dobj as any).interactive = true;
+  (dobj as any).buttonMode = true;
 
   let dragOrigin = false;
 
-  const onDragStart = function (this: any, event: InteractionEvent) {
+  const onDragStart = function (this: any, event: any) {
     // store a reference to the data
     // the reason for this is because of multitouch
     // we want to track the movement of this particular touch
@@ -61,7 +61,7 @@ export function makeSegmentDraggable(ray: ISegment, dobj: DisplayObject, stage: 
     }
   };
 
-  const onDragEnd = function (this: any, event: InteractionEvent) {
+  const onDragEnd = function (this: any, event: any) {
     this.alpha = 1;
     this.dragging = false;
     // set the interaction data to null
@@ -69,7 +69,7 @@ export function makeSegmentDraggable(ray: ISegment, dobj: DisplayObject, stage: 
     dragOrigin = !dragOrigin;
   };
 
-  const onDragMove = function (this: any, event: InteractionEvent) {
+  const onDragMove = function (this: any, event: any) {
     if (this.dragging) {
       if (dragOrigin) {
         ray.ptA.x = event.data.global.x;
@@ -81,7 +81,7 @@ export function makeSegmentDraggable(ray: ISegment, dobj: DisplayObject, stage: 
     }
   };
 
-  stage
+  dobj
     .on('pointerdown', onDragStart)
     .on('pointerup', onDragEnd)
     .on('pointerupoutside', onDragEnd)

@@ -28,7 +28,7 @@ export class BaseCollection<T extends Identifiable> extends EventDispatcher<T> i
   public addItem(item: T): boolean {
     if (!this.items.has(item.id)) {
       this.items.set(item.id, item);
-      this.dispatch(EventType.Add, item, null, item);
+      this.dispatch(EventType.Add, item, undefined, item);
       return true;
     }
     return false;
@@ -36,7 +36,7 @@ export class BaseCollection<T extends Identifiable> extends EventDispatcher<T> i
 
   public removeItem(item: T): boolean {
     if (this.items.delete(item.id)) {
-      this.dispatch(EventType.Remove, item, null, item);
+      this.dispatch(EventType.Remove, item, undefined, item);
       return true;
     }
     return false;

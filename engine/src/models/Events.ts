@@ -18,8 +18,8 @@ export enum EventType {
 
 export interface IEvent<T extends Identifiable> {
   type: EventType;
-  source: T;
-  target: Identifiable;
+  source?: T;
+  target?: Identifiable;
   payload: any;
   cancelled: boolean;
   cancel(): void;
@@ -38,17 +38,18 @@ export interface IEventDispatcher<T extends Identifiable> {
 
 export class Event<T extends Identifiable> implements IEvent<T> {
   public type: EventType;
-  public source: T;
-  public target: Identifiable;
+  public source?: T;
+  public target?: Identifiable;
   public payload: any;
-  public cancelled: boolean;
+  public cancelled!: boolean;
 
-  constructor(type: EventType, source: T = null, target: Identifiable = null, payload: any) {
+  constructor(type: EventType, source?: T, target?: Identifiable, payload?: any) {
 
     this.type = type;
     this.source = source;
     this.target = target;
     this.payload = payload;
+    this.cancelled = false;
 
   }
 
@@ -60,7 +61,7 @@ export class Event<T extends Identifiable> implements IEvent<T> {
 
 export class EventDispatcher<T extends Identifiable> implements IEventDispatcher<T> {
   
-  protected listeners: Array<{ listener: IEventListenerFunc<T>; scope: any }>;
+  protected listeners!: Array<{ listener: IEventListenerFunc<T>; scope: any }>;
 
   public init() {
     this.reset();

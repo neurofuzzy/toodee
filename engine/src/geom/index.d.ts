@@ -5,7 +5,7 @@ export * from './Helpers';
 export * from './IGeom';
 export * from './IGrid';
 export * from './ISpatial';
-export * from './Penetration';
+export { getPenetrationSegmentRound as getPenetrationSegmentRoundPenetration, resolvePenetrationBetweenBounds as resolvePenetrationBetweenBoundsPenetration } from './Penetration';
 export * from './PolygonGrid';
 export * from './SpatialGrid';
 export * from './SpatialPolygonMap';

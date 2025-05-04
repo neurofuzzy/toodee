@@ -6,9 +6,9 @@ import { Ray } from '../geom/BaseGeom';
 
 export class Beam extends SegmentBody implements Identifiable, IChild, IContactable {
   public id: number;
-  public parentID: number;
-  public constrainRotationToParent: boolean;
-  public isSoft: boolean;
+  public parentID!: number;
+  public constrainRotationToParent!: boolean;
+  public isSoft!: boolean;
   public contactMask: number;
   public resolveMask: number;
 
@@ -20,7 +20,7 @@ export class Beam extends SegmentBody implements Identifiable, IChild, IContacta
   }
 
   public initWithOriginAndAngle(ox: number, oy: number, angle: number, length?: number, parentID?: number) {
-    this.parentID = parentID;
+    this.parentID = parentID!;
     this.ray = new Ray(ox, oy, angle, length, this.id);
   }
 }

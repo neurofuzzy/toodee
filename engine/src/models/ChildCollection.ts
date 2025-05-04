@@ -35,7 +35,7 @@ export class ChildCollection<T extends Identifiable & IChild> extends EventDispa
   public getItemByParentID (parentID:number):T | null {
 
     if (this.itemsByParentID.has(parentID)) {
-      return this.itemsByParentID.get(parentID)[0];
+      return this.itemsByParentID.get(parentID)?.[0] ?? null;
     }
 
     return null;
@@ -45,7 +45,7 @@ export class ChildCollection<T extends Identifiable & IChild> extends EventDispa
   public getItemsByParentID (parentID:number):T[] | null {
 
     if (this.itemsByParentID.has(parentID)) {
-      return this.itemsByParentID.get(parentID);
+      return this.itemsByParentID.get(parentID) || null;
     }
 
     return null;
@@ -77,7 +77,7 @@ export class ChildCollection<T extends Identifiable & IChild> extends EventDispa
 
     }
 
-    this.dispatch(EventType.Add, item, null, item);
+    this.dispatch(EventType.Add, item, undefined, item);
       
     return true;
 
@@ -103,7 +103,7 @@ export class ChildCollection<T extends Identifiable & IChild> extends EventDispa
       if (this.items.has(item.id)) {
         this.items.delete(item.id);
       }
-      this.dispatch(EventType.Remove, item, null, item);
+      this.dispatch(EventType.Remove, item, undefined, item);
         
       return true;
 

@@ -23,7 +23,7 @@ export class Impulse implements IImpulse {
 
 export class Force extends Impulse implements IForce {
 
-  public parentID:number;
+  public parentID!:number;
   public age:number;
   public lifespan:number;
 
@@ -51,8 +51,8 @@ export class PropulsionForce extends Force {
 
 export class ProximityForce extends Force {
 
-  public origin:IPoint;
-  public range:number;
+  public origin!:IPoint;
+  public range!:number;
 
   public initWithOriginAndRange (origin:IPoint, range:number = 0):ProximityForce {
 

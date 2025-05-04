@@ -36,6 +36,9 @@ var PolygonGrid = /** @class */ (function () {
     PolygonGrid.prototype.getCell = function (x, y) {
         return this.cells.get(this.getCellIndex(x, y));
     };
+    PolygonGrid.prototype.getCellByIndex = function (idx) {
+        return this.cells.get(idx);
+    };
     PolygonGrid.prototype.addItem = function (item) {
         var _this = this;
         if (!this.itemsCellIndexes.has(item.id)) {
@@ -97,6 +100,25 @@ var PolygonGrid = /** @class */ (function () {
             }
         });
         return matchingCells;
+    };
+    PolygonGrid.prototype.getCellsForSegment = function (seg, removeDupes) {
+        var _this = this;
+        if (removeDupes === void 0) { removeDupes = false; }
+        var seen = removeDupes ? new Set() : null;
+        var cells = [];
+        var coords = this.getCellCoords(seg);
+        coords.forEach(function (coord) {
+            var idx = _this.getCellIndex(coord.x, coord.y);
+            var cell = _this.getCellByIndex(idx);
+            if (cell != null) {
+                if (!removeDupes || !seen.has(cell)) {
+                    cells.push(cell);
+                    if (removeDupes)
+                        seen.add(cell);
+                }
+            }
+        });
+        return cells.length ? cells : null;
     };
     return PolygonGrid;
 }());

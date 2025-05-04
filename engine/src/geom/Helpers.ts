@@ -4,8 +4,8 @@ import { Point } from './BaseGeom';
 export class PointHit {
   public parentID: number;
   public pt: IPoint;
-  public angle: number;
-  public dist: number;
+  public angle!: number;
+  public dist!: number;
   public type: number;
 
   constructor(origin: IPoint, hitPoint: IPoint, parentID: number = -1, type: number = 0) {
@@ -30,7 +30,7 @@ export class PointHit {
   }
 
   public clone(): PointHit {
-    let ph = new PointHit(null, this.pt.clone(), this.parentID);
+    let ph = new PointHit(this.pt.clone(), this.pt.clone(), this.parentID);
     ph.angle = this.angle;
     ph.dist = this.dist;
     return ph;
@@ -299,7 +299,7 @@ export function lineIntersectsLine(p1x: number, p1y: number, p2x: number, p2y: n
   );
 }
 
-export function lineLineIntersect(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number): IPoint {
+export function lineLineIntersect(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number): IPoint | null {
   var s1_x: number, s1_y: number, s2_x: number, s2_y: number;
   s1_x = x2 - x1;
   s1_y = y2 - y1;
@@ -320,7 +320,7 @@ export function lineSide(x: number, y: number, x1: number, y1: number, x2: numbe
   return (x - x1) * (y2 - y1) - (y - y1) * (x2 - x1) > 0 ? 1 : -1;
 }
 
-export function boundsLineIntersect(b: IBounds, segPtA: IPoint, segPtB: IPoint): Array<IPoint> {
+export function boundsLineIntersect(b: IBounds, segPtA: IPoint, segPtB: IPoint): Array<IPoint> | null {
   if (b.shape == SHAPE_ROUND) {
     return circleLineIntersect(b, segPtA, segPtB);
   } else {
@@ -328,7 +328,7 @@ export function boundsLineIntersect(b: IBounds, segPtA: IPoint, segPtB: IPoint):
   }
 }
 
-export function circleLineIntersect(bnds: IBounds, segPtA: IPoint, segPtB: IPoint): Array<IPoint> {
+export function circleLineIntersect(bnds: IBounds, segPtA: IPoint, segPtB: IPoint): Array<IPoint> | null {
   let intPts: Array<IPoint> = [];
   var cx = bnds.anchor.x;
   var cy = bnds.anchor.y;
@@ -362,10 +362,10 @@ export function circleLineIntersect(bnds: IBounds, segPtA: IPoint, segPtB: IPoin
       }
     }
   }
-  return intPts;
+  return intPts.length > 0 ? intPts : null;
 }
 
-export function rectLineIntersect(b: IBounds, segPtA: IPoint, segPtB: IPoint, side?: number): Array<IPoint> {
+export function rectLineIntersect(b: IBounds, segPtA: IPoint, segPtB: IPoint, side?: number): Array<IPoint> | null {
   var ax = segPtA.x;
   var ay = segPtA.y;
   var bx = segPtB.x;
@@ -384,26 +384,27 @@ export function rectLineIntersect(b: IBounds, segPtA: IPoint, segPtB: IPoint, si
   var fn2 = lineSide;
   var hits = [];
   if (fn(ax, ay, bx, by, rx, ry, rx2, ry)) {
-    if (isNaN(side) || fn2(ax, ay, rx, ry, rx2, ry) == side) {
+    if (typeof side !== 'number' || isNaN(side) || fn2(ax, ay, rx, ry, rx2, ry) == side) {
       hits.push(lineLineIntersect(ax, ay, bx, by, rx, ry, rx2, ry));
     }
   }
   if (fn(ax, ay, bx, by, rx2, ry, rx2, ry2)) {
-    if (isNaN(side) || fn2(ax, ay, rx2, ry, rx2, ry2) == side) {
+    if (typeof side !== 'number' || isNaN(side) || fn2(ax, ay, rx2, ry, rx2, ry2) == side) {
       hits.push(lineLineIntersect(ax, ay, bx, by, rx2, ry, rx2, ry2));
     }
   }
   if (fn(ax, ay, bx, by, rx2, ry2, rx, ry2)) {
-    if (isNaN(side) || fn2(ax, ay, rx2, ry2, rx, ry2) == side) {
+    if (typeof side !== 'number' || isNaN(side) || fn2(ax, ay, rx2, ry2, rx, ry2) == side) {
       hits.push(lineLineIntersect(ax, ay, bx, by, rx2, ry2, rx, ry2));
     }
   }
   if (fn(ax, ay, bx, by, rx, ry2, rx, ry)) {
-    if (isNaN(side) || fn2(ax, ay, rx, ry2, rx, ry) == side) {
+    if (typeof side !== 'number' || isNaN(side) || fn2(ax, ay, rx, ry2, rx, ry) == side) {
       hits.push(lineLineIntersect(ax, ay, bx, by, rx, ry2, rx, ry));
     }
   }
-  return hits;
+  const filteredHits = hits.filter((h): h is IPoint => h !== null);
+  return filteredHits.length > 0 ? filteredHits : null;
 }
 
 export function cellCoordsAlongLine(x0: number, y0: number, x1: number, y1: number, gridSize: number = 20, intoArr?: Array<IPoint>): Array<IPoint> {
@@ -497,7 +498,7 @@ export function polygonIsClockwise(pts: Array<IPoint>): boolean {
   return polygonArea(pts) > 0;
 }
 
-export function linePolygonIntersect(linePtA: IPoint, linePtB: IPoint, poly: IPolygon): Array<IPoint> {
+export function linePolygonIntersect(linePtA: IPoint, linePtB: IPoint, poly: IPolygon): Array<IPoint> | null {
   let pts: Array<IPoint> = [];
   poly.segments.forEach(seg => {
     let intPt = lineLineIntersect(linePtA.x, linePtA.y, linePtB.x, linePtB.y, seg.ptA.x, seg.ptA.y, seg.ptB.x, seg.ptB.y);
@@ -505,7 +506,7 @@ export function linePolygonIntersect(linePtA: IPoint, linePtB: IPoint, poly: IPo
       pts.push(intPt);
     }
   });
-  return pts;
+  return pts.length > 0 ? pts : null;
 }
 
 export function pointInPolygon(pt: IPoint, poly: IPolygon): boolean {
@@ -514,6 +515,7 @@ export function pointInPolygon(pt: IPoint, poly: IPolygon): boolean {
   }
   let startPt: IPoint = new Point(poly.boundingBox.x1 - 100, poly.boundingBox.y1 - 100);
   let pts = linePolygonIntersect(startPt, pt, poly);
+  if (!pts) return false;
   return !(pts.length % 2 == 0);
 }
 
@@ -525,6 +527,7 @@ export function polygonInPolygon(polyA: IPolygon, polyB: IPolygon): boolean {
   for (let i = 0; i < polyA.vertices.length; i++) {
     let pt = polyA.vertices[i];
     let pts = linePolygonIntersect(startPt, pt, polyB);
+    if (!pts) return false;
     if (pts.length % 2 == 0) {
       return false;
     }
@@ -532,6 +535,8 @@ export function polygonInPolygon(polyA: IPolygon, polyB: IPolygon): boolean {
   return true;
 }
 
-export function resolvePenetrationBetweenBounds() { /* TODO: Implement */ }
+export function resolvePenetrationBetweenBounds(): IPoint | null { return null; }
 
-export function getPenetrationSegmentRound() { /* TODO: Implement */ }
+export function getPenetrationSegmentRound(): IPoint | null { return null; }
+
+export function resolvePenetrationOrthoRound(bA: IBounds, bB: IBounds): IPoint | undefined { return undefined; }

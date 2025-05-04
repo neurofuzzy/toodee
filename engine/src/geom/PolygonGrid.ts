@@ -8,8 +8,8 @@ export interface ISegmentCell extends ICell<ISegment> {}
 export class PolygonGrid<T extends { id: number; segments: ISegment[] } & IPolygon> implements IGrid<T> {
   protected cellSize: number;
   protected segmentThickness: number;
-  protected itemsCellIndexes: Map<number, Array<number>>;
-  protected cells: Map<number, ISegmentCell>;
+  protected itemsCellIndexes!: Map<number, Array<number>>;
+  protected cells!: Map<number, ISegmentCell>;
 
   constructor(cellSize: number = 100, segmentThickness: number = 0) {
     this.cellSize = cellSize;
@@ -40,8 +40,12 @@ export class PolygonGrid<T extends { id: number; segments: ISegment[] } & IPolyg
     return cantorPair(x + 1000, y + 1000);
   }
 
-  protected getCell(x: number, y: number): ISegmentCell {
+  protected getCell(x: number, y: number): ISegmentCell | undefined {
     return this.cells.get(this.getCellIndex(x, y));
+  }
+
+  protected getCellByIndex(idx: number): ISegmentCell | undefined {
+    return this.cells.get(idx);
   }
 
   public addItem(item: T): boolean {
@@ -84,9 +88,9 @@ export class PolygonGrid<T extends { id: number; segments: ISegment[] } & IPolyg
     this.addItem(item);
   }
 
-  public getCellFromPoint(pt: IPoint): ISegmentCell {
+  public getCellFromPoint(pt: IPoint): ISegmentCell | undefined {
     const idx = this.getCellIndex(Math.floor(pt.x / this.cellSize), Math.floor(pt.y / this.cellSize));
-    return this.cells.get(idx);
+    return this.getCellByIndex(idx);
   }
 
   public getCellsFromCoords(coords: Array<IPoint>, removeDupes: boolean = false): Array<ISegmentCell> {
@@ -96,12 +100,29 @@ export class PolygonGrid<T extends { id: number; segments: ISegment[] } & IPolyg
       const idx = this.getCellIndex(coord.x, coord.y);
       const cell = this.cells.get(idx);
       if (cell != null) {
-        if (!removeDupes || !seen.has(cell)) {
+        if (!removeDupes || !seen!.has(cell)) {
           matchingCells.push(cell);
-          if (removeDupes) seen.add(cell);
+          if (removeDupes) seen!.add(cell);
         }
       }
     });
     return matchingCells;
+  }
+
+  public getCellsForSegment(seg: ISegment, removeDupes: boolean = false): ISegmentCell[] | null {
+    let seen: Set<ISegmentCell> | null = removeDupes ? new Set() : null;
+    let cells: ISegmentCell[] = [];
+    const coords = this.getCellCoords(seg);
+    coords.forEach(coord => {
+      const idx = this.getCellIndex(coord.x, coord.y);
+      const cell = this.getCellByIndex(idx);
+      if (cell != null) {
+        if (!removeDupes || !seen!.has(cell)) {
+          cells.push(cell);
+          if (removeDupes) seen!.add(cell);
+        }
+      }
+    });
+    return cells.length ? cells : null;
   }
 }

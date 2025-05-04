@@ -16,12 +16,12 @@ const Views = { TestView: class implements IView<any> {
 
 export class Delegate implements IEngineDelegate {
   
-  protected engine:Engine;
+  protected engine!:Engine;
   protected paused:boolean = false;
   protected started:boolean = false;
   protected step:number = 0;
-  protected api:Simulation.API<Simulation.Boundary, Simulation.Entity>;
-  protected view:Models.IView<Simulation.Model>;
+  protected api!:Simulation.API<Simulation.Boundary, Simulation.Entity>;
+  protected view!:Models.IView<Simulation.Model>;
   protected beams:Simulation.Beam[] = [];
 
   public init(engine:Engine):any {
@@ -38,7 +38,7 @@ export class Delegate implements IEngineDelegate {
 
   }
 
-  protected build () {
+  public build(): void {
 
     var model = this.engine.model;
     var sim = this.engine.simulation;
@@ -343,7 +343,7 @@ export class Delegate implements IEngineDelegate {
 
   }
 
-  public onModelEvent(event:Models.IEvent<Simulation.Entity | Simulation.Boundary | Simulation.Projectile>) {
+  public onModelEvent(event:Models.IEvent<Simulation.Entity | Simulation.Projectile | Simulation.Boundary | Simulation.Beam>) {
 
     if (event.source instanceof Simulation.Entity) {
       //console.log("entity event", event.type, event.source.id)
@@ -355,6 +355,10 @@ export class Delegate implements IEngineDelegate {
 
     if (event.source instanceof Simulation.Projectile) {
       //console.log("projectile event", event.type, event.source.id)
+    }
+
+    if (event.source instanceof Simulation.Beam) {
+      //console.log("beam event", event.type, event.source.id)
     }
  
   } 

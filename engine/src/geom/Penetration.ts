@@ -67,7 +67,7 @@ export function resolvePenetrationBetweenBounds(bA: IBounds, bB: IBounds, cA: IC
   } else if (bA.shape == bB.shape) {
     return resolvePenetrationRoundRound(bA, bB, cA, cB);
   } else {
-    return resolvePenetrationOrthoRound(bA, bB, cA, cB);
+    return resolvePenetrationOrthoRound(bA, bB, cA, cB) || new Point(0, 0);
   }
 }
 
@@ -79,7 +79,7 @@ function resolvePenetrationRoundRound(bA: IBounds, bB: IBounds, cA: IConstraints
   return new Point(deltaX, deltaY);
 }
 
-function resolvePenetrationOrthoRound(bA: IBounds, bB: IBounds, cA: IConstraints, cB: IConstraints): IPoint {
+function resolvePenetrationOrthoRound(bA: IBounds, bB: IBounds, cA: IConstraints, cB: IConstraints): IPoint | undefined {
   var orthob = bA;
   var circleb = bB;
   var orthoc = cA;
@@ -104,7 +104,7 @@ function resolvePenetrationOrthoRound(bA: IBounds, bB: IBounds, cA: IConstraints
   var rx2 = rx + orthob.hw;
   var ry2 = ry + orthob.hh;
   if (rx2 < cx1 || ry2 < cy1 || rx1 > cx2 || ry1 > cy2) {
-    return;
+    return undefined;
   }
   var delta, angle;
   var forceX = false;
@@ -151,9 +151,10 @@ function resolvePenetrationOrthoRound(bA: IBounds, bB: IBounds, cA: IConstraints
     doResolve(deltaX, deltaY, circleb, orthob, circlec, orthoc);
     return new Point(deltaX, deltaY);
   }
+  return undefined;
 }
 
-export function getPenetrationSegmentRound(segPtA: IPoint, segPtB: IPoint, b: IBounds, resolve: boolean, twoSidedSegment: boolean = false): IPoint {
+export function getPenetrationSegmentRound(segPtA: IPoint, segPtB: IPoint, b: IBounds, resolve: boolean, twoSidedSegment: boolean = false): IPoint | undefined {
   var a = b.anchor;
   let closestPt: IPoint = closestPtPointLine(a, segPtA, segPtB);
   let delta = distanceBetween(a.x, a.y, closestPt.x, closestPt.y);
@@ -178,7 +179,7 @@ export function getPenetrationSegmentRound(segPtA: IPoint, segPtB: IPoint, b: IB
     }
     return new Point(dx, dy);
   }
-  return null;
+  return undefined;
 }
 
 function doResolve(deltaX: number, deltaY: number, bA: IBounds, bB: IBounds, cA: IConstraints, cB: IConstraints): void {

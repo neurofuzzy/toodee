@@ -8,10 +8,10 @@ import { SHAPE_ORTHO, distanceBetween, pointWithinBounds } from './Helpers';
 
 export class SpatialGrid<T extends { id: number; bounds: any } & ISpatial> implements IGrid<T> {
   protected cellSize: number;
-  protected itemsCellIndexes: Map<number, number>;
-  protected cells: Map<number, Array<T>>;
-  protected bufferPt: IPoint;
-  protected bufferArr: Array<Array<T>>;
+  protected itemsCellIndexes!: Map<number, number>;
+  protected cells!: Map<number, Array<T>>;
+  protected bufferPt!: IPoint;
+  protected bufferArr!: Array<Array<T>>;
 
   constructor(cellSize: number = 100) {
     this.cellSize = cellSize;
@@ -47,7 +47,7 @@ export class SpatialGrid<T extends { id: number; bounds: any } & ISpatial> imple
   }
 
   protected getCell(x: number, y: number): Array<T> {
-    return this.cells.get(this.getCellIndex(x, y));
+    return this.cells.get(this.getCellIndex(x, y)) || [];
   }
 
   public addItem(item: T): boolean {
@@ -102,23 +102,30 @@ export class SpatialGrid<T extends { id: number; bounds: any } & ISpatial> imple
 
   public getCellFromPoint(pt: IPoint): Array<T> {
     const idx = this.getCellIndex(Math.floor(pt.x / this.cellSize), Math.floor(pt.y / this.cellSize));
-    return this.cells.get(idx);
+    return this.cells.get(idx) || [];
   }
 
-  public getCellsFromCoords(coords: Array<IPoint>, removeDupes: boolean = false): Array<Array<T>> {
-    const matchingCells: Array<Array<T>> = [];
-    const seen = removeDupes ? new Set<Array<T>>() : null;
-    coords.forEach(coord => {
-      const idx = this.getCellIndex(coord.x, coord.y);
-      const cell = this.cells.get(idx);
-      if (cell != null) {
-        if (!removeDupes || !seen.has(cell)) {
-          matchingCells.push(cell);
-          if (removeDupes) seen.add(cell);
+  public getCellItems(x: number, y: number): T[] {
+    return this.cells.get(this.getCellIndex(x, y)) || [];
+  }
+
+  public getCellItemsByIndex(idx: number): T[] {
+    return this.cells.get(idx) || [];
+  }
+
+  public getCellsFromCoords(coords: Array<IPoint>, removeDupes: boolean = false): T[] {
+    let cells: T[] = [];
+    let seen: Set<T> | null = removeDupes ? new Set<T>() : null;
+    for (let pt of coords) {
+      let cell = this.getCellItems(Math.floor(pt.x), Math.floor(pt.y));
+      for (let item of cell) {
+        if (!removeDupes || (seen && !seen.has(item))) {
+          cells.push(item);
+          if (removeDupes && seen) seen.add(item);
         }
       }
-    });
-    return matchingCells;
+    }
+    return cells;
   }
 
   public getCellsNear(center: IPoint, radius: number): Array<Array<T>> {

@@ -10,7 +10,7 @@ export interface IPolygonBody extends IPolygon {
 }
 
 export class PolygonBody extends Polygon implements IPolygonBody {
-  public isSector: boolean;
+  public isSector!: boolean;
   public drag: number;
   public cor: number;
 

@@ -45,6 +45,7 @@ exports.pointInPolygon = pointInPolygon;
 exports.polygonInPolygon = polygonInPolygon;
 exports.resolvePenetrationBetweenBounds = resolvePenetrationBetweenBounds;
 exports.getPenetrationSegmentRound = getPenetrationSegmentRound;
+exports.resolvePenetrationOrthoRound = resolvePenetrationOrthoRound;
 var BaseGeom_1 = require("./BaseGeom");
 var PointHit = /** @class */ (function () {
     function PointHit(origin, hitPoint, parentID, type) {
@@ -70,7 +71,7 @@ var PointHit = /** @class */ (function () {
         });
     };
     PointHit.prototype.clone = function () {
-        var ph = new PointHit(null, this.pt.clone(), this.parentID);
+        var ph = new PointHit(this.pt.clone(), this.pt.clone(), this.parentID);
         ph.angle = this.angle;
         ph.dist = this.dist;
         return ph;
@@ -359,7 +360,7 @@ function circleLineIntersect(bnds, segPtA, segPtB) {
             }
         }
     }
-    return intPts;
+    return intPts.length > 0 ? intPts : null;
 }
 function rectLineIntersect(b, segPtA, segPtB, side) {
     var ax = segPtA.x;
@@ -380,26 +381,27 @@ function rectLineIntersect(b, segPtA, segPtB, side) {
     var fn2 = lineSide;
     var hits = [];
     if (fn(ax, ay, bx, by, rx, ry, rx2, ry)) {
-        if (isNaN(side) || fn2(ax, ay, rx, ry, rx2, ry) == side) {
+        if (typeof side !== 'number' || isNaN(side) || fn2(ax, ay, rx, ry, rx2, ry) == side) {
             hits.push(lineLineIntersect(ax, ay, bx, by, rx, ry, rx2, ry));
         }
     }
     if (fn(ax, ay, bx, by, rx2, ry, rx2, ry2)) {
-        if (isNaN(side) || fn2(ax, ay, rx2, ry, rx2, ry2) == side) {
+        if (typeof side !== 'number' || isNaN(side) || fn2(ax, ay, rx2, ry, rx2, ry2) == side) {
             hits.push(lineLineIntersect(ax, ay, bx, by, rx2, ry, rx2, ry2));
         }
     }
     if (fn(ax, ay, bx, by, rx2, ry2, rx, ry2)) {
-        if (isNaN(side) || fn2(ax, ay, rx2, ry2, rx, ry2) == side) {
+        if (typeof side !== 'number' || isNaN(side) || fn2(ax, ay, rx2, ry2, rx, ry2) == side) {
             hits.push(lineLineIntersect(ax, ay, bx, by, rx2, ry2, rx, ry2));
         }
     }
     if (fn(ax, ay, bx, by, rx, ry2, rx, ry)) {
-        if (isNaN(side) || fn2(ax, ay, rx, ry2, rx, ry) == side) {
+        if (typeof side !== 'number' || isNaN(side) || fn2(ax, ay, rx, ry2, rx, ry) == side) {
             hits.push(lineLineIntersect(ax, ay, bx, by, rx, ry2, rx, ry));
         }
     }
-    return hits;
+    var filteredHits = hits.filter(function (h) { return h !== null; });
+    return filteredHits.length > 0 ? filteredHits : null;
 }
 function cellCoordsAlongLine(x0, y0, x1, y1, gridSize, intoArr) {
     if (gridSize === void 0) { gridSize = 20; }
@@ -499,7 +501,7 @@ function linePolygonIntersect(linePtA, linePtB, poly) {
             pts.push(intPt);
         }
     });
-    return pts;
+    return pts.length > 0 ? pts : null;
 }
 function pointInPolygon(pt, poly) {
     if (!pointWithinRectangle(pt.x, pt.y, poly.boundingBox)) {
@@ -507,6 +509,8 @@ function pointInPolygon(pt, poly) {
     }
     var startPt = new BaseGeom_1.Point(poly.boundingBox.x1 - 100, poly.boundingBox.y1 - 100);
     var pts = linePolygonIntersect(startPt, pt, poly);
+    if (!pts)
+        return false;
     return !(pts.length % 2 == 0);
 }
 function polygonInPolygon(polyA, polyB) {
@@ -517,12 +521,15 @@ function polygonInPolygon(polyA, polyB) {
     for (var i = 0; i < polyA.vertices.length; i++) {
         var pt = polyA.vertices[i];
         var pts = linePolygonIntersect(startPt, pt, polyB);
+        if (!pts)
+            return;
         if (pts.length % 2 == 0) {
             return false;
         }
     }
     return true;
 }
-function resolvePenetrationBetweenBounds() { }
-function getPenetrationSegmentRound() { }
+function resolvePenetrationBetweenBounds() { return null; }
+function getPenetrationSegmentRound() { return null; }
+function resolvePenetrationOrthoRound(bA, bB) { return undefined; }
 //# sourceMappingURL=Helpers.js.map

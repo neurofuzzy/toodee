@@ -16,10 +16,12 @@ export declare class PolygonGrid<T extends {
     get items(): Array<T>;
     protected getCellCoords(item: ISegment): Array<IPoint>;
     protected getCellIndex(x: number, y: number): number;
-    protected getCell(x: number, y: number): ISegmentCell;
+    protected getCell(x: number, y: number): ISegmentCell | undefined;
+    protected getCellByIndex(idx: number): ISegmentCell | undefined;
     addItem(item: T): boolean;
     removeItem(item: T): boolean;
     updateItem(item: T): void;
-    getCellFromPoint(pt: IPoint): ISegmentCell;
+    getCellFromPoint(pt: IPoint): ISegmentCell | undefined;
     getCellsFromCoords(coords: Array<IPoint>, removeDupes?: boolean): Array<ISegmentCell>;
+    getCellsForSegment(seg: ISegment, removeDupes?: boolean): ISegmentCell[] | null;
 }

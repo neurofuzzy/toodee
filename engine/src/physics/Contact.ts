@@ -9,15 +9,15 @@ export interface IContactable {
 }
 
 export class IContact<B> {
-  penetration: IPoint;
-  itemA: BaseBody;
-  itemB: B;
+  penetration!: IPoint;
+  itemA!: BaseBody;
+  itemB!: B;
 }
 
 export class BaseContact<B> implements IContact<B> {
-  public penetration: IPoint;
-  public itemA: BaseBody;
-  public itemB: B;
+  public penetration!: IPoint;
+  public itemA!: BaseBody;
+  public itemB!: B;
   public corAB: number;
 
   constructor(penetration: IPoint, itemA: BaseBody, itemB: B, corAB: number = 1) {
@@ -33,7 +33,7 @@ export class BaseContact<B> implements IContact<B> {
 export class BodyBodyContact extends BaseContact<BaseBody> {}
 
 export class BodySegmentBodyContact extends BaseContact<any> {
-  public hitPoint: IPointHit;
+  public hitPoint!: IPointHit;
 }
 
 export class BodyBoundaryContact extends BaseContact<ISegment> {}

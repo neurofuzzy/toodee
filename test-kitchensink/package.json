@@ -17,8 +17,7 @@
   },
   "homepage": "https://github.com/neurofuzzy/toodee#readme",
   "dependencies": {
-    "@types/pixi.js": "4.8.0",
-    "pixi.js": "4.8.1"
+    "pixi.js": "^7.2.4"
   },
   "devDependencies": {
     "typescript": "^5.8.3"

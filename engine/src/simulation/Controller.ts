@@ -21,10 +21,10 @@ export enum EventContext {
 export const MAXVEL: number = 12;
 
 export class Controller {
-  protected model: Model;
-  protected bodyGrid: SpatialGrid<any>;
-  protected boundaryGrid: PolygonGrid<any>;
-  protected bodyBoundaryMap: SpatialPolygonMap<any, any>;
+  protected model!: Model;
+  protected bodyGrid!: SpatialGrid<any>;
+  protected boundaryGrid!: PolygonGrid<any>;
+  protected bodyBoundaryMap!: SpatialPolygonMap<any, any>;
 
   protected bodyBodyContacts: Array<BodyBodyContact> = [];
   protected bodyBodyContactIndices: Array<boolean> = [];
@@ -33,8 +33,8 @@ export class Controller {
   protected bodyBeamContacts: Array<BodySegmentBodyContact> = [];
   protected bodyBeamContactIndices: Array<boolean> = [];
   protected forces: Array<any> = [];
-  protected dispatcher: EventDispatcher<any>;
-  protected _api: API<any, any>;
+  protected dispatcher!: EventDispatcher<any>;
+  protected _api!: API<any, any>;
 
   get api(): API<any, any> {
     return this._api;
@@ -58,21 +58,20 @@ export class Controller {
   protected build() {
     // add items to grid
     for (let i = 0; i < this.model.bodies.items.size; i++) {
-      this.bodyGrid.addItem(this.model.bodies.items[i]);
+      this.bodyGrid.addItem(this.model.bodies.items.get(i));
     }
     // add boundaries to grid
     for (let i = 0; i < this.model.boundaries.items.size; i++) {
-      this.boundaryGrid.addItem(this.model.boundaries.items[i]);
+      this.boundaryGrid.addItem(this.model.boundaries.items.get(i));
     }
     // compare boundaries to find sectors
     for (let i = 0; i < this.model.boundaries.items.size; i++) {
-      let boundary = this.model.boundaries.items[i];
+      let boundary = this.model.boundaries.items.get(i);
       for (let j = 0; j < this.model.boundaries.items.size; j++) {
-        let otherBoundary = this.model.boundaries.items[j];
+        let otherBoundary = this.model.boundaries.items.get(j);
         if (boundary != otherBoundary) {
-          if (!boundary.inverted && polygonInPolygon(boundary, otherBoundary)) {
+          if (boundary && !boundary.inverted && polygonInPolygon(boundary, otherBoundary)) {
             boundary.isSector = true;
-            break;
           }
         }
       }
@@ -80,7 +79,7 @@ export class Controller {
     // add boundaries to body-boundary map
     let bs = [];
     for (let i = 0; i < this.model.boundaries.items.size; i++) {
-      if (this.model.boundaries.items[i]) bs.push(this.model.boundaries.items[i]);
+      if (this.model.boundaries.items.get(i)) bs.push(this.model.boundaries.items.get(i));
     }
     for (let i = 0; i < bs.length; i++) {
       this.bodyBoundaryMap.addPolygon(bs[i]);
@@ -113,11 +112,11 @@ export class Controller {
   private getBodyBoundaryContacts(item: any, seg: ISegment): void {
     let parentPoly = this.model.boundaries.getItemByID(seg.parentID);
 
-    if (parentPoly.isSector) {
+    if (parentPoly && parentPoly.isSector) {
       return;
     }
 
-    if (!(item.contactMask & parentPoly.contactMask)) {
+    if (parentPoly && !(item.contactMask & parentPoly.contactMask)) {
       return;
     }
 
@@ -127,12 +126,14 @@ export class Controller {
       return;
     }
 
-    let resolve = (item.resolveMask & parentPoly.resolveMask) > 0;
+    let resolve = parentPoly ? (item.resolveMask & parentPoly.resolveMask) > 0 : false;
 
     const penetration = getPenetrationSegmentRound(seg.ptA, seg.ptB, item.bounds, resolve, true);
 
-    this.bodySegmentContactIndices[contactPairIdx] = true;
-    this.bodyBoundaryContacts.push(new BodyBoundaryContact(penetration, item, seg, item.cor * parentPoly.cor));
+    if (penetration) {
+      this.bodySegmentContactIndices[contactPairIdx] = true;
+      this.bodyBoundaryContacts.push(new BodyBoundaryContact(penetration, item, seg, item.cor * (parentPoly ? parentPoly.cor : 1)));
+    }
     
     if (this.dispatcher) {
       this.dispatcher.dispatch(EventType.Contact, item, parentPoly);
@@ -215,10 +216,12 @@ export class Controller {
      
       const penetration = getPenetrationSegmentRound(beam.ray.ptA, beam.ray.ptB, item.bounds, resolve, true);
 
-      this.bodyBeamContactIndices[contactPairIdx] = true;
-      let contact = new BodySegmentBodyContact(penetration, item, beam, item.cor * beam.cor);
-      contact.hitPoint = hit;
-      this.bodyBeamContacts.push(contact);
+      if (penetration) {
+        this.bodyBeamContactIndices[contactPairIdx] = true;
+        let contact = new BodySegmentBodyContact(penetration, item, beam, item.cor * beam.cor);
+        contact.hitPoint = hit;
+        this.bodyBeamContacts.push(contact);
+      }
       
       if (this.dispatcher) {
         this.dispatcher.dispatch(EventType.Contact, beam, item);
@@ -444,7 +447,7 @@ export class Controller {
       }
 
       // out of bounds by inverted polygon
-      if (polygon.inverted) { 
+      if (polygon && polygon.inverted) { 
 
         if (projectile.resolveMask & polygon.resolveMask) {
           if (this.dispatcher) {

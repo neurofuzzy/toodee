@@ -153,32 +153,34 @@ export class API<T extends IPolygon & Identifiable, K extends Identifiable & ISp
     let boundaryCells = this.boundaryGrid.getCellsFromCoords(coords, true);
     
     boundaryCells.forEach(cell => {
-      cell.forEach(seg => {
-        let intPt = lineLineIntersect(ray.ptA.x, ray.ptA.y, ray.ptB.x, ray.ptB.y, seg.ptA.x, seg.ptA.y, seg.ptB.x, seg.ptB.y);
+      if (Array.isArray(cell)) {
+        cell.forEach(seg => {
+          let intPt = lineLineIntersect(ray.ptA.x, ray.ptA.y, ray.ptB.x, ray.ptB.y, seg.ptA.x, seg.ptA.y, seg.ptB.x, seg.ptB.y);
 
-        if (intPt != null) {
-          hitPts.push(new PointHit(ray.ptA, intPt, seg.parentID, HIT_TYPE_SEGMENT))
-        }
-      });
+          if (intPt != null) {
+            hitPts.push(new PointHit(ray.ptA, intPt, seg.parentID, HIT_TYPE_SEGMENT))
+          }
+        });
+      }
     });
 
     let bodyCells = this.bodyGrid.getCellsFromCoords(coords, true);
 
     bodyCells.forEach(cell => {
+      if (Array.isArray(cell)) {
+        cell.forEach(body => {
 
-      cell.forEach(body => {
+          let intPts = boundsLineIntersect(body.bounds, ray.ptA, ray.ptB);
 
-        let intPts = boundsLineIntersect(body.bounds, ray.ptA, ray.ptB);
+          if (intPts && intPts.length) {
+            intPts.forEach(intPt => {
+              let item = body;
+              hitPts.push(new PointHit(ray.ptA, intPt, item.id, HIT_TYPE_SHAPE));
+            })
+          }
 
-        if (intPts && intPts.length) {
-          intPts.forEach(intPt => {
-            let item = body;
-            hitPts.push(new PointHit(ray.ptA, intPt, item.id, HIT_TYPE_SHAPE));
-          })
-        }
-
-      });
-
+        });
+      }
     })
 
     if (hitPts.length > 0) {
@@ -189,7 +191,7 @@ export class API<T extends IPolygon & Identifiable, K extends Identifiable & ISp
 
   }
 
-  public launchFrom (item:Entity, speed:number = 3, angle:number = NaN, projectile:Projectile = null):Projectile {
+  public launchFrom (item:Entity, speed:number = 3, angle:number = NaN, projectile:Projectile | null = null):Projectile {
 
     if (isNaN(angle)) {
       angle = item.rotation;
@@ -229,16 +231,18 @@ export class API<T extends IPolygon & Identifiable, K extends Identifiable & ISp
 
   }
 
-  public launchFromWithDeltaXY(item:Entity, speed:number = 3, deltaX:number = 0, deltaY:number = 0, projectile:Projectile = null):Projectile {
+  public launchFromWithDeltaXY(item:Entity, speed:number = 3, deltaX:number = 0, deltaY:number = 0, projectile:Projectile | null = null):Projectile {
 
     let angle = normalizeAngle(0 - xyToAngle(deltaX, deltaY));
     return this.launchFrom(item, speed, angle, projectile);
   
   }
 
-  public castFrom (item:Entity, range:number = 500, beam:Beam = null):Beam {
+  public castFrom (item:Entity, range:number = 500, beam:Beam | null = null):Beam {
 
-    beam = new Beam();
+    if (beam == null) {
+      beam = new Beam();
+    }
     beam.initWithOriginAndAngle(item.bounds.anchor.x, item.bounds.anchor.y, item.rotation, range, item.id);
 
     beam.constrainRotationToParent = true;

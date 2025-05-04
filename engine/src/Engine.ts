@@ -8,8 +8,8 @@ import { Projectile } from './simulation/Projectile';
 
 export class Engine {
 
-  public model: Model;
-  public simulation: Controller;
+  public model!: Model;
+  public simulation!: Controller;
 
   public init ():Engine {
 
