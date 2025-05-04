@@ -1,11 +1,11 @@
-namespace Models {
+// Migrated from namespace Models to ES module
+import { Identifiable } from './Identity';
 
-  export interface ICollection<T extends Identifiable> {
-    items:Array<T>;
-    init():ICollection<T>;
-    reset():void;
-    addItem(item:T):boolean;
-    removeItem(item:T):boolean;
-  }
-
+export interface ICollection<T extends Identifiable> {
+  items: Map<number, T>;
+  init(): this;
+  reset(): void;
+  addItem(item: T): boolean;
+  removeItem(item: T): boolean;
+  updateItem(item: T): boolean;
 }

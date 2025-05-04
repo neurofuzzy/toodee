@@ -1,12 +1,20 @@
-class Engine {
+import { Model } from './simulation/Model';
+import { Controller } from './simulation/Controller';
+import { API } from './simulation/API';
+import { Boundary } from './simulation/Boundary';
+import { Entity } from './simulation/Entity';
+import { IEvent } from './models/Events';
+import { Projectile } from './simulation/Projectile';
 
-  public model:Simulation.Model;
-  public simulation:Simulation.Controller;
+export class Engine {
+
+  public model: Model;
+  public simulation: Controller;
 
   public init ():Engine {
 
-    this.model = new Simulation.Model().init();
-    this.simulation = new Simulation.Controller().initWithModel(this.model);
+    this.model = new Model().init();
+    this.simulation = new Controller().initWithModel(this.model);
 
     return this;
 
@@ -30,7 +38,7 @@ class Engine {
 
   }
 
-  get api ():Simulation.API<Simulation.Boundary, Simulation.Entity> {
+  get api ():API<Boundary, Entity> {
 
     return this.simulation.api;
     
@@ -38,7 +46,7 @@ class Engine {
 
 }
 
-interface IEngineDelegate {
+export interface IEngineDelegate {
 
   init(engine:Engine):any;
   start():void;
@@ -46,8 +54,8 @@ interface IEngineDelegate {
   stop():void;
   pause():void;
   resume():void;
-  onModelEvent(event:Models.IEvent<Simulation.Entity | Simulation.Boundary | Simulation.Projectile>):void;
-  onContactEvent(event:Models.IEvent<any>):void;
-  onBoundaryCrossEvent(event:Models.IEvent<any>):void;
+  onModelEvent(event:IEvent<Entity | Boundary | Projectile>):void;
+  onContactEvent(event:IEvent<any>):void;
+  onBoundaryCrossEvent(event:IEvent<any>):void;
 
 }

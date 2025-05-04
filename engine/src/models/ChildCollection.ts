@@ -1,114 +1,125 @@
 /// <reference path="./Events.ts" />
 
-namespace Models {
+// Migrated from namespace Models to ES module
+import { Identifiable, IChild } from './Identity';
+import { EventDispatcher, EventType } from './Events';
+import { ICollection } from './ICollection';
 
-  export class ChildCollection<T extends Identifiable & IChild> extends EventDispatcher<T> implements ICollection<T> {
+export class ChildCollection<T extends Identifiable & IChild> extends EventDispatcher<T> implements ICollection<T> {
 
-    public items:Array<Identifiable & IChild & T>;
-    protected itemsByParentID:Array<Array<Identifiable & IChild & T>>;
+  public items:Map<number, T> = new Map();
+  protected itemsByParentID:Map<number, T[]> = new Map();
 
-    constructor () {
+  constructor () {
 
-      super();
+    super();
 
-    }
+  }
 
-    public init ():any {
+  public init ():this {
 
-      this.reset();
-      return this;
+    this.reset();
+    return this;
 
-    }
+  }
 
-    public reset ():void {
+  public reset ():void {
 
-      super.reset();
-      this.items = [];
-      this.itemsByParentID = [];
+    super.reset();
+    this.items = new Map();
+    this.itemsByParentID = new Map();
  
+  }
+
+  // Returns the first item only in order to correctly apply this interface
+  public getItemByParentID (parentID:number):T | null {
+
+    if (this.itemsByParentID.has(parentID)) {
+      return this.itemsByParentID.get(parentID)[0];
     }
 
-    // Returns the first item only in order to correctly apply this interface
-    public getItemByParentID (parentID:number):T {
+    return null;
 
-      if (this.itemsByParentID[parentID] == null) {
-        return null;
+  }
+
+  public getItemsByParentID (parentID:number):T[] | null {
+
+    if (this.itemsByParentID.has(parentID)) {
+      return this.itemsByParentID.get(parentID);
+    }
+
+    return null;
+
+  } 
+
+  public addItem (item:T):boolean {
+
+    if (this.items.has(item.id)) {
+      return false;
+    }
+
+    this.items.set(item.id, item);
+
+    let children = this.itemsByParentID.get(item.parentID);
+
+    if (!children) {
+
+      children = [item];
+      this.itemsByParentID.set(item.parentID, children);
+        
+    } else {
+
+      if (children.indexOf(item) !== -1) {
+        return false;
       }
-
-      return this.itemsByParentID[parentID][0];
+      children.push(item);
+      this.itemsByParentID.set(item.parentID, children);
 
     }
 
-    public getItemsByParentID (parentID:number):T[] {
+    this.dispatch(EventType.Add, item, null, item);
+      
+    return true;
 
-      if (this.itemsByParentID[parentID] == null) {
-        return null;
-      }
+  }
 
-      return this.itemsByParentID[parentID];
+  public removeItem (item:T):boolean {
 
-    } 
+    if (item.parentID >= 0) {
 
-    public addItem (item:T):boolean {
+      let children = this.itemsByParentID.get(item.parentID);
 
-      if (item.parentID < 0) {
+      if (!children) {
         return false;
       }
 
-      this.items.push(item);
+      let childIdx = children.indexOf(item);
 
-      let children = this.itemsByParentID[item.parentID];
-
-      if (children == null) {
-
-        children = this.itemsByParentID[item.parentID] = [];
-        
-      } else {
-
-        let childIdx = children.indexOf(item);
-
-        if (childIdx != -1) {
-          return false;
-        }
-
+      if (childIdx !== -1) {
+        children.splice(childIdx, 1);
+        this.itemsByParentID.set(item.parentID, children);
       }
 
-      children.push(item);
-      this.dispatch(EventType.Add, item, null, item);
-      
+      if (this.items.has(item.id)) {
+        this.items.delete(item.id);
+      }
+      this.dispatch(EventType.Remove, item, null, item);
+        
       return true;
 
     }
 
-    public removeItem (item:T):boolean {
+    return false;
 
-      if (item.parentID >= 0) {
+  }
 
-        let children = this.itemsByParentID[item.parentID];
+  public updateItem (item:T):boolean {
 
-        if (children == null) {
-          return false;
-        }
-
-        let childIdx = children.indexOf(item);
-
-        if (childIdx != -1) {
-          children.splice(childIdx, 1);
-        }
-
-        let i = this.items.indexOf(item);
-        if (i >= 0) {
-          this.items.splice(i, 1);
-        }
-        this.dispatch(EventType.Remove, item, null, item);
-        
-        return true;
-
-      }
-
-      return false;
-
+    if (this.items.has(item.id)) {
+      this.items.set(item.id, item);
+      return true;
     }
+    return false;
 
   }
 

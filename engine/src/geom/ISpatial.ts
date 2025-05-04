@@ -1,9 +1,5 @@
-namespace Geom {
-
-  export interface ISpatial {
-    bounds:IBounds;
-    rotation:number;
-    initWithBounds(bounds:IBounds):any;
-  }
-
+export interface ISpatial {
+  bounds: any;
+  rotation: number;
+  initWithBounds(bounds: any): any;
 }

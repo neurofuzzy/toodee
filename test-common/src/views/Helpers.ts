@@ -1,58 +1,76 @@
-namespace Views {
+import { ISpatial } from '../../../engine/src/geom/ISpatial';
+import { DisplayObject, Container, InteractionEvent } from 'pixi.js';
+import { ISegment } from '../../../engine/src/geom/IGeom';
 
-  export function makeItemDraggable (item:Geom.ISpatial, dobj:PIXI.DisplayObject):void {
+export function makeItemDraggable(item: ISpatial, dobj: DisplayObject): void {
+  dobj.interactive = true;
+  dobj.buttonMode = true;
 
-    dobj.interactive = true;
-    dobj.buttonMode = true;
+  const onDragStart = function (this: any, event: InteractionEvent) {
+    // store a reference to the data
+    // the reason for this is because of multitouch
+    // we want to track the movement of this particular touch
+    this.data = event.data;
+    this.alpha = 0.5;
+    this.dragging = true;
+  };
 
-    var onDragStart = function (event:PIXI.interaction.InteractionEvent) {
-      // store a reference to the data
-      // the reason for this is because of multitouch
-      // we want to track the movement of this particular touch
-      this.data = event.data;
-      this.alpha = 0.5;
-      this.dragging = true;
+  const onDragEnd = function (this: any, event: InteractionEvent) {
+    this.alpha = 1;
+    this.dragging = false;
+    // set the interaction data to null
+    this.data = null;
+  };
+
+  const onDragMove = function (this: any, event: InteractionEvent) {
+    if (this.dragging) {
+      var newPosition = this.data.getLocalPosition(this.parent);
+      this.x = newPosition.x;
+      this.y = newPosition.y;
+      item.bounds.anchor.x = this.x;
+      item.bounds.anchor.y = this.y;
     }
-  
-    var onDragEnd = function (event:PIXI.interaction.InteractionEvent) {
-      this.alpha = 1;
-      this.dragging = false;
-      // set the interaction data to null
-      this.data = null;
-    }
-  
-    var onDragMove = function (event:PIXI.interaction.InteractionEvent) {
-      if (this.dragging) {
-        var newPosition = this.data.getLocalPosition(this.parent);
-        this.x = newPosition.x;
-        this.y = newPosition.y;
-        item.bounds.anchor.x = this.x;
-        item.bounds.anchor.y = this.y;
-      }
-    }
+  };
 
-    dobj
+  dobj
     .on('pointerdown', onDragStart)
     .on('pointerup', onDragEnd)
     .on('pointerupoutside', onDragEnd)
     .on('pointermove', onDragMove);
+}
 
-  }
+export function makeSegmentDraggable(ray: ISegment, dobj: DisplayObject, stage: Container): void {
+  dobj.interactive = true;
+  dobj.buttonMode = true;
 
-  export function makeSegmentDraggable (ray:Geom.ISegment, dobj:PIXI.DisplayObject, stage:PIXI.Container):void {
+  let dragOrigin = false;
 
-    dobj.interactive = true;
-    dobj.buttonMode = true;
+  const onDragStart = function (this: any, event: InteractionEvent) {
+    // store a reference to the data
+    // the reason for this is because of multitouch
+    // we want to track the movement of this particular touch
+    this.data = event.data;
+    this.alpha = 0.5;
+    this.dragging = true;
+    if (dragOrigin) {
+      ray.ptA.x = event.data.global.x;
+      ray.ptA.y = event.data.global.y;
+    } else {
+      ray.ptB.x = event.data.global.x;
+      ray.ptB.y = event.data.global.y;
+    }
+  };
 
-    var dragOrigin = false;
+  const onDragEnd = function (this: any, event: InteractionEvent) {
+    this.alpha = 1;
+    this.dragging = false;
+    // set the interaction data to null
+    this.data = null;
+    dragOrigin = !dragOrigin;
+  };
 
-    var onDragStart = function (event:PIXI.interaction.InteractionEvent) {
-      // store a reference to the data
-      // the reason for this is because of multitouch
-      // we want to track the movement of this particular touch
-      this.data = event.data;
-      this.alpha = 0.5;
-      this.dragging = true;
+  const onDragMove = function (this: any, event: InteractionEvent) {
+    if (this.dragging) {
       if (dragOrigin) {
         ray.ptA.x = event.data.global.x;
         ray.ptA.y = event.data.global.y;
@@ -61,33 +79,11 @@ namespace Views {
         ray.ptB.y = event.data.global.y;
       }
     }
-  
-    var onDragEnd = function (event:PIXI.interaction.InteractionEvent) {
-      this.alpha = 1;
-      this.dragging = false;
-      // set the interaction data to null
-      this.data = null;
-      dragOrigin = !dragOrigin;
-    }
-  
-    var onDragMove = function (event:PIXI.interaction.InteractionEvent) {
-      if (this.dragging) {
-        if (dragOrigin) {
-          ray.ptA.x = event.data.global.x;
-          ray.ptA.y = event.data.global.y;
-        } else {
-          ray.ptB.x = event.data.global.x;
-          ray.ptB.y = event.data.global.y;
-        }
-      }
-    }
+  };
 
-    stage
+  stage
     .on('pointerdown', onDragStart)
     .on('pointerup', onDragEnd)
     .on('pointerupoutside', onDragEnd)
     .on('pointermove', onDragMove);
-
-  }
-
 }

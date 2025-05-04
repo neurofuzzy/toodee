@@ -1,0 +1,25 @@
+import { IGrid, ICell } from './IGrid';
+import { IPolygon, ISegment, IPoint } from './IGeom';
+export interface ISegmentCell extends ICell<ISegment> {
+}
+export declare class PolygonGrid<T extends {
+    id: number;
+    segments: ISegment[];
+} & IPolygon> implements IGrid<T> {
+    protected cellSize: number;
+    protected segmentThickness: number;
+    protected itemsCellIndexes: Map<number, Array<number>>;
+    protected cells: Map<number, ISegmentCell>;
+    constructor(cellSize?: number, segmentThickness?: number);
+    init(): this;
+    reset(): void;
+    get items(): Array<T>;
+    protected getCellCoords(item: ISegment): Array<IPoint>;
+    protected getCellIndex(x: number, y: number): number;
+    protected getCell(x: number, y: number): ISegmentCell;
+    addItem(item: T): boolean;
+    removeItem(item: T): boolean;
+    updateItem(item: T): void;
+    getCellFromPoint(pt: IPoint): ISegmentCell;
+    getCellsFromCoords(coords: Array<IPoint>, removeDupes?: boolean): Array<ISegmentCell>;
+}

@@ -1,23 +1,15 @@
-namespace Geom {
+// Migrated from namespace Geom to ES module
+import { IBounds } from './IGeom';
 
-  export class BaseSpatial implements ISpatial {
+export class BaseSpatial {
+  public bounds: IBounds;
+  public rotation: number;
 
-    public bounds:IBounds;
-    public rotation:number;
+  constructor() {}
 
-    constructor () {
-
-    }
-
-    public initWithBounds(bounds:IBounds):any {
-
-      this.bounds = bounds;
-      this.rotation = 0;
-
-      return this;
-
-    }
-
+  public initWithBounds(bounds: IBounds): this {
+    this.bounds = bounds;
+    this.rotation = 0;
+    return this;
   }
-
 }

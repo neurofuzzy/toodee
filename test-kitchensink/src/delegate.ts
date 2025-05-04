@@ -1,12 +1,28 @@
-class Delegate implements IEngineDelegate {
+import { Engine } from '../../engine/src/Engine';
+import * as Simulation from '../../engine/src/simulation';
+import * as Models from '../../engine/src/models';
+import { IEngineDelegate } from '../../engine/src/models/IController';
+import * as Geom from '../../engine/src/geom';
+import { AreaForce } from '../../engine/src/physics/Force';
+import { IView } from '../../engine/src/models/IView';
+
+// Patch for Views.TestView: fallback to a stub if not found
+const Views = { TestView: class implements IView<any> {
+  bodiesGraphics() { return []; }
+  initWithModel(model: any) { return this; }
+  build() {}
+  update() {}
+}};
+
+export class Delegate implements IEngineDelegate {
   
   protected engine:Engine;
-  protected paused:boolean;
-  protected started:boolean;
+  protected paused:boolean = false;
+  protected started:boolean = false;
   protected step:number = 0;
   protected api:Simulation.API<Simulation.Boundary, Simulation.Entity>;
   protected view:Models.IView<Simulation.Model>;
-  protected beams:Simulation.Beam[]
+  protected beams:Simulation.Beam[] = [];
 
   public init(engine:Engine):any {
 
@@ -173,7 +189,7 @@ class Delegate implements IEngineDelegate {
     // let pforce = new Physics.ProximityForce(5).initWithOriginAndRange({ x: 200, y: 200 }, 200);
     // sim.api.addForce(pforce);
 
-    let aforce = new Physics.AreaForce(5, Math.PI * 0.5).initWithParentID(smallBoundaryID);
+    let aforce = new AreaForce(5, Math.PI * 0.5).initWithParentID(smallBoundaryID);
     sim.api.addForce(aforce);
 
     //let ppforce = new Physics.PropulsionForce(5).initWithParentID(1);

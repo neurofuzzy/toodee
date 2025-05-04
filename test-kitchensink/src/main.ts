@@ -1,3 +1,6 @@
+import { Engine } from '../../engine/src/Engine';
+import { Delegate } from './delegate';
+
 class Main {
 
   public static engine:Engine;

@@ -1,26 +1,27 @@
-namespace Simulation {
+// Migrated from namespace Simulation to ES module
+import { BaseCollection } from '../models/BaseCollection';
+import { ChildCollection } from '../models/ChildCollection';
+import { Entity } from './Entity';
+import { Projectile } from './Projectile';
+import { Boundary } from './Boundary';
+import { Beam } from './Beam';
+import { Ray } from '../geom/BaseGeom';
+import { PointHit } from '../geom/Helpers';
 
-  export class Model {
+export class Model {
+  public bodies: BaseCollection<Entity>;
+  public projectiles: BaseCollection<Projectile>;
+  public boundaries: BaseCollection<Boundary>;
+  public beams: ChildCollection<Beam>;
+  public ray: Ray;
+  public rayHit: PointHit;
 
-    public bodies:Models.BaseCollection<Entity>;
-    public projectiles:Models.BaseCollection<Projectile>;
-    public boundaries:Models.BaseCollection<Boundary>;
-    public beams:Models.ChildCollection<Beam>;
-    public ray:Geom.Ray;
-    public rayHit:Geom.IPointHit;
- 
-    public init ():any {
-      
-      this.boundaries = new Models.BaseCollection().init();
-      this.projectiles = new Models.BaseCollection().init();
-      this.bodies = new Models.BaseCollection().init();
-      this.beams = new Models.ChildCollection().init();
-      this.ray = new Geom.Ray();
-
-      return this;
-
-    }
-
+  public init(): this {
+    this.boundaries = new BaseCollection<Boundary>().init();
+    this.projectiles = new BaseCollection<Projectile>().init();
+    this.bodies = new BaseCollection<Entity>().init();
+    this.beams = new ChildCollection<Beam>().init();
+    this.ray = new Ray();
+    return this;
   }
-
 }

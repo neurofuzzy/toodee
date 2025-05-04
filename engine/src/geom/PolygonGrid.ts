@@ -1,156 +1,107 @@
-namespace Geom {
+import { IGrid, ICell } from './IGrid';
+import { IPolygon, ISegment, IPoint } from './IGeom';
+import { cellCoordsAlongLineWithThickness } from './Helpers';
+import { cantorPair } from '../util/Pairing';
 
-  export interface ISegmentCell extends ICell<ISegment> {
- 
+export interface ISegmentCell extends ICell<ISegment> {}
+
+export class PolygonGrid<T extends { id: number; segments: ISegment[] } & IPolygon> implements IGrid<T> {
+  protected cellSize: number;
+  protected segmentThickness: number;
+  protected itemsCellIndexes: Map<number, Array<number>>;
+  protected cells: Map<number, ISegmentCell>;
+
+  constructor(cellSize: number = 100, segmentThickness: number = 0) {
+    this.cellSize = cellSize;
+    this.segmentThickness = segmentThickness;
   }
 
-  export class PolygonGrid<T extends Models.Identifiable & IPolygon> implements IGrid<T>, Models.ICollection<T> {
+  public init(): this {
+    this.reset();
+    return this;
+  }
 
-    protected cellSize:number;
-    protected segmentThickness:number;
-    protected itemsCellIndexes:Array<Array<number>>;
-    protected cells:Array<ISegmentCell>;
+  public reset(): void {
+    this.itemsCellIndexes = new Map();
+    this.cells = new Map();
+  }
 
-    constructor (cellSize:number = 100, segmentThickness:number = 0) {
+  public get items(): Array<T> {
+    const outArr: Array<T> = [];
+    // TODO: return items if necessary
+    return outArr;
+  }
 
-      this.cellSize = cellSize;
-      this.segmentThickness = segmentThickness;
+  protected getCellCoords(item: ISegment): Array<IPoint> {
+    return cellCoordsAlongLineWithThickness(item.ptA.x, item.ptA.y, item.ptB.x, item.ptB.y, this.cellSize, this.segmentThickness);
+  }
 
-    }
+  protected getCellIndex(x: number, y: number): number {
+    return cantorPair(x + 1000, y + 1000);
+  }
 
-    public init ():any {
+  protected getCell(x: number, y: number): ISegmentCell {
+    return this.cells.get(this.getCellIndex(x, y));
+  }
 
-      this.reset();
-      return this;
-
-    }
-
-    public reset ():void {
-
-      this.itemsCellIndexes = [];
-      this.cells = [];
-
-    }
-
-    public get items ():Array<T> {
-
-      var outArr:Array<T> = [];
-
-      // TODO: return items if necessary
-
-      return outArr;
-
-    }
-
-    protected getCellCoords (item:ISegment):Array<IPoint> {
-
-      return cellCoordsAlongLineWithThickness(item.ptA.x, item.ptA.y, item.ptB.x, item.ptB.y, this.cellSize, this.segmentThickness);
-
-    }
-
-    protected getCellIndex (x:number, y:number):number {
-
-      return Util.Pairing.cantorPair(x + 1000, y + 1000); // doesn't work for non-negative numbers, so pad for now
-
-    }
-
-    protected getCell (x:number, y:number):ISegmentCell {
-
-      return this.cells[this.getCellIndex(x, y)];
-
-    }
-
-    public addItem (item:T):boolean {
-
-      if (this.itemsCellIndexes[item.id] == null) {
-
-        this.itemsCellIndexes[item.id] = [];
-
-        item.segments.forEach(seg => { 
-      
-          var coords = this.getCellCoords(seg);
-
-          coords.forEach(coord => {
-
-            var cidx = this.getCellIndex(coord.x, coord.y);
-
-            if (this.cells[cidx] == null) {
-              this.cells[cidx] = [];
-            }
-
-            this.itemsCellIndexes[item.id].push(cidx);
-            this.cells[cidx].push(seg);
-
-          });
-
-        });
-
-        return true;
-
-      }
-
-      return false;
-
-
-    }
-
-    public removeItem (item:T):boolean {
-
-      if (this.itemsCellIndexes[item.id] != null) {
-
-        item.segments.forEach(seg => { 
-
-          var cidxs = this.itemsCellIndexes[item.id];
-
-          cidxs.forEach(cidx => {
-            var cell = this.cells[cidx];
-            cell.splice(cell.indexOf(seg), 1);
-          });
-
-        });
-
-        this.itemsCellIndexes[item.id] = null;
-
-        return true;
-
-      }
-
-      return false;
-      
-    }
-
-    public updateItem (item:(T)) {
-
-      this.removeItem(item);
-      this.addItem(item);
-
-    }
-
-    public getCellFromPoint (pt:IPoint):ISegmentCell {
-
-      var idx = this.getCellIndex(Math.floor(pt.x / this.cellSize), Math.floor(pt.y / this.cellSize));
-      return this.cells[idx];
-      
-    }
-
-    public getCellsFromCoords (coords:Array<IPoint>, removeDupes:boolean = false):Array<ISegmentCell> {
-
-      var matchingCells:Array<ISegmentCell> = [];
-
-      coords.forEach(coord => {
-        var idx = this.getCellIndex(coord.x, coord.y);
-        var cell = this.cells[idx];
-        if (cell != null) {
-          if (!removeDupes || matchingCells.indexOf(cell) == -1) {
-            matchingCells.push(cell);
+  public addItem(item: T): boolean {
+    if (!this.itemsCellIndexes.has(item.id)) {
+      this.itemsCellIndexes.set(item.id, []);
+      item.segments.forEach(seg => {
+        const coords = this.getCellCoords(seg);
+        coords.forEach(coord => {
+          const cidx = this.getCellIndex(coord.x, coord.y);
+          if (!this.cells.has(cidx)) {
+            this.cells.set(cidx, [] as unknown as ISegmentCell);
           }
-        }
+          this.itemsCellIndexes.get(item.id)!.push(cidx);
+          (this.cells.get(cidx)! as unknown as ISegment[]).push(seg);
+        });
       });
-
-      return matchingCells;
-
+      return true;
     }
-
+    return false;
   }
 
+  public removeItem(item: T): boolean {
+    if (this.itemsCellIndexes.has(item.id)) {
+      item.segments.forEach(seg => {
+        const cidxs = this.itemsCellIndexes.get(item.id)!;
+        cidxs.forEach(cidx => {
+          const cell = this.cells.get(cidx)!;
+          const idx = (cell as unknown as ISegment[]).indexOf(seg);
+          if (idx !== -1) (cell as unknown as ISegment[]).splice(idx, 1);
+        });
+      });
+      this.itemsCellIndexes.delete(item.id);
+      return true;
+    }
+    return false;
+  }
+
+  public updateItem(item: T) {
+    this.removeItem(item);
+    this.addItem(item);
+  }
+
+  public getCellFromPoint(pt: IPoint): ISegmentCell {
+    const idx = this.getCellIndex(Math.floor(pt.x / this.cellSize), Math.floor(pt.y / this.cellSize));
+    return this.cells.get(idx);
+  }
+
+  public getCellsFromCoords(coords: Array<IPoint>, removeDupes: boolean = false): Array<ISegmentCell> {
+    const matchingCells: Array<ISegmentCell> = [];
+    const seen = removeDupes ? new Set<ISegmentCell>() : null;
+    coords.forEach(coord => {
+      const idx = this.getCellIndex(coord.x, coord.y);
+      const cell = this.cells.get(idx);
+      if (cell != null) {
+        if (!removeDupes || !seen.has(cell)) {
+          matchingCells.push(cell);
+          if (removeDupes) seen.add(cell);
+        }
+      }
+    });
+    return matchingCells;
+  }
 }

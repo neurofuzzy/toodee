@@ -1,0 +1,1 @@
+{"version":3,"file":"PolygonBody.js","sourceRoot":"src/","sources":["engine/src/physics/PolygonBody.ts"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;AAAA,+CAA+C;AAC/C,6CAA2C;AAU3C;IAAiC,+BAAO;IAKtC,qBAAY,QAAuB;QACjC,YAAA,MAAK,YAAC,QAAQ,CAAC,SAAC;QAChB,KAAI,CAAC,IAAI,GAAG,IAAI,CAAC;QACjB,KAAI,CAAC,GAAG,GAAG,CAAC,CAAC;;IACf,CAAC;IACH,kBAAC;AAAD,CAAC,AAVD,CAAiC,kBAAO,GAUvC;AAVY,kCAAW"}

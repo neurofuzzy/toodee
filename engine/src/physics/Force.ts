@@ -1,83 +1,79 @@
-namespace Physics {
+import { IImpulse } from './Impulse';
+import { ITemporal } from '../models/Events';
+import { IChild } from '../models/IChild';
+import { IPoint } from '../geom/IGeom';
 
-  export interface IImpulse {
-    power:number;
-    angle:number;
-  }
+export interface IForce extends IImpulse, ITemporal, IChild {
+  // mixed interface
+}
 
-  export interface IForce extends IImpulse, ITemporal, Models.IChild {
-    // mixed interface
-  }
+export class Impulse implements IImpulse {
 
-  export class Impulse implements IImpulse {
+  public power:number;
+  public angle:number;
 
-    public power:number;
-    public angle:number;
+  constructor (power:number, angle:number = 0) {
 
-    constructor (power:number, angle:number = 0) {
-
-      this.power = power;
-      this.angle = angle;
-
-    }
+    this.power = power;
+    this.angle = angle;
 
   }
 
-  export class Force extends Impulse implements IForce {
+}
 
-    public parentID:number;
-    public age:number;
-    public lifespan:number;
+export class Force extends Impulse implements IForce {
 
-    constructor (power:number, angle:number = 0, lifespan:number = 0) {
+  public parentID:number;
+  public age:number;
+  public lifespan:number;
 
-      super(power, angle);
+  constructor (power:number, angle:number = 0, lifespan:number = 0) {
 
-      this.age = 0;
-      this.lifespan = lifespan;
+    super(power, angle);
 
-    }
-
-  }
-
-  export class PropulsionForce extends Force {
-
-    public initWithParentID(parentID:number):PropulsionForce {
-
-      this.parentID = parentID;
-      return this;
-
-    }
+    this.age = 0;
+    this.lifespan = lifespan;
 
   }
 
-  export class ProximityForce extends Force {
+}
 
-    public origin:Geom.IPoint;
-    public range:number;
+export class PropulsionForce extends Force {
 
-    public initWithOriginAndRange (origin:Geom.IPoint, range:number = 0):ProximityForce {
+  public initWithParentID(parentID:number):PropulsionForce {
 
-      this.origin = origin;
-      this.range = range;
-
-      return this;
-
-    }
+    this.parentID = parentID;
+    return this;
 
   }
 
-  export class AreaForce extends Force {
+}
 
-    public initWithParentID (parentID:number):AreaForce {
+export class ProximityForce extends Force {
 
-      this.parentID = parentID;
+  public origin:IPoint;
+  public range:number;
 
-      return this;
+  public initWithOriginAndRange (origin:IPoint, range:number = 0):ProximityForce {
 
-    }
+    this.origin = origin;
+    this.range = range;
 
+    return this;
 
   }
+
+}
+
+export class AreaForce extends Force {
+
+  public initWithParentID (parentID:number):AreaForce {
+
+    this.parentID = parentID;
+
+    return this;
+
+  }
+
 
 }

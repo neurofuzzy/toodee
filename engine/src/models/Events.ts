@@ -1,109 +1,102 @@
-namespace Models {
+// Migrated from namespace Models to ES module
 
-  export enum EventType {
-    Change = 1,
-    Add,
-    Remove,
+export interface Identifiable {
+  id: number;
+}
+
+export interface ITemporal {
+  age: number;
+  lifespan: number;
+}
+
+export enum EventType {
+  Add = 'add',
+  Remove = 'remove',
+  Update = 'update',
+  Contact = 'contact',
+}
+
+export interface IEvent<T extends Identifiable> {
+  type: EventType;
+  source: T;
+  target: Identifiable;
+  payload: any;
+  cancelled: boolean;
+  cancel(): void;
+}
+
+export type IEventListenerFunc<T extends Identifiable> = (event: IEvent<T>) => void;
+
+export interface IEventDispatcher<T extends Identifiable> {
+  init(): any;
+  reset(): void;
+  addListener(listener: IEventListenerFunc<T>, scope: any): void;
+  removeListener(listener: IEventListenerFunc<T>): void;
+  dispatchEvent(event: IEvent<T>): void;
+  dispatch(type: EventType, source: T, target?: Identifiable, payload?: any): void;
+}
+
+export class Event<T extends Identifiable> implements IEvent<T> {
+  public type: EventType;
+  public source: T;
+  public target: Identifiable;
+  public payload: any;
+  public cancelled: boolean;
+
+  constructor(type: EventType, source: T = null, target: Identifiable = null, payload: any) {
+
+    this.type = type;
+    this.source = source;
+    this.target = target;
+    this.payload = payload;
+
   }
 
-  export interface IEvent<T extends Identifiable> {
-    type:number;
-    source:T;
-    target:Identifiable;
-    payload:any;
-    cancelled:boolean;
-    cancel():void;
+  cancel(): void {
+    this.cancelled = true;
   }
 
-  export interface IEventListenerFunc<T extends Identifiable> {
-    (event:IEvent<T>):void;
+}
+
+export class EventDispatcher<T extends Identifiable> implements IEventDispatcher<T> {
+  
+  protected listeners: Array<{ listener: IEventListenerFunc<T>; scope: any }>;
+
+  public init() {
+    this.reset();
+    return this;
   }
 
-  export interface IEventDispatcher<T extends Identifiable> {
-    init():any;
-    reset():void;
-    addListener(listener:IEventListenerFunc<T>, scope:any):void;
-    removeListener(listener:IEventListenerFunc<T>):void;
-    dispatchEvent(event:IEvent<T>):void;
-    dispatch(type:number, source:T, target?:Identifiable, payload?:any):void;
+  public reset() {
+    this.listeners = [];
   }
 
-  export class Event<T extends Identifiable> implements IEvent<T> {
+  public addListener(listener: IEventListenerFunc<T>, scope: any): void {
 
-    public type:number;
-    public source:T;
-    public target:Identifiable;
-    public payload:any;
-    public cancelled:boolean;
-
-    constructor (type:number, source:T = null, target:Identifiable = null, payload:any) {
-
-      this.type = type;
-      this.source = source;
-      this.target = target;
-      this.payload = payload;
-
-    }
-
-    cancel ():void {
-      this.cancelled = true;
-    }
+    this.listeners.push({ listener, scope });
 
   }
 
-  export class EventDispatcher<T extends Identifiable> implements IEventDispatcher<T> {
-    
-    protected listeners:Array<IEventListenerFunc<T>>;
-    protected listenerScopes:Array<any>;
+  public removeListener(listener: IEventListenerFunc<T>): void {
 
-    public init () {
-      this.reset();
-      return this;
-    }
+    this.listeners = this.listeners.filter(l => l.listener !== listener);
 
-    public reset () {
-      this.listeners = [];
-      this.listenerScopes = [];
-    }
+  }
 
-    public addListener(listener:IEventListenerFunc<T>, scope:any):void {
+  public dispatchEvent(event: IEvent<T>) {
 
-      this.listeners.push(listener);
-      this.listenerScopes.push(scope);
-
-    }
-
-    public removeListener(listener:IEventListenerFunc<T>):void {
-
-      let idx = this.listeners.indexOf(listener);
-
-      if (idx >= 0) {
-        this.listeners.splice(idx, 1);
-        this.listenerScopes.splice(idx, 1);
+    for (const { listener, scope } of this.listeners) {
+      if (event.cancelled) {
+        return;
       }
-
+      listener.call(scope, event);
     }
 
-    public dispatchEvent(event:IEvent<any>) {
+  }
 
-      this.listeners.forEach((listener, idx) => {
+  public dispatch(type: EventType, source: T, target?: Identifiable, payload?: any) {
 
-        if (event.cancelled) {
-          return;
-        }
-        
-        let scope = this.listenerScopes[idx];
-        listener.call(scope, event);
-
-      });
-
-    }
-
-    public dispatch(type:number, source:Identifiable, target?:Identifiable, payload?:any) {
-
-      this.dispatchEvent(new Event(type, source, target, payload));
-
-    }
+    this.dispatchEvent(new Event(type, source, target, payload));
 
   }
 

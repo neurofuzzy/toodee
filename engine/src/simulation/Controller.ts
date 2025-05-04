@@ -1,571 +1,528 @@
-namespace Simulation {
+// Migrated from namespace Simulation to ES module
+import { SpatialGrid } from '../geom/SpatialGrid';
+import { PolygonGrid } from '../geom/PolygonGrid';
+import { SpatialPolygonMap } from '../geom/SpatialPolygonMap';
+import { boundsIntersect, polygonInPolygon, angleBetween, rotatePoint, SHAPE_ORTHO, SHAPE_ROUND, HIT_TYPE_SEGMENT } from '../geom/Helpers';
+import { IPoint, ISegment } from '../geom/IGeom';
+import { BodyBodyContact, BodyBoundaryContact, BodySegmentBodyContact, resolveContact } from '../physics/Contact';
+import { IBody } from '../physics/Body';
+import { API } from './API';
+import { cantorPair } from '../util/Pairing';
+import { EventDispatcher, EventType } from '../models/Events';
+import { Model } from './Model';
+import { Point } from '../geom/BaseGeom';
+import { resolvePenetrationBetweenBounds, getPenetrationSegmentRound } from '../geom/Penetration';
 
-  export enum EventType {
-    Contact = 4,
+export enum EventContext {
+  Simulation = 1,
+  Boundary = 2,
+}
+
+export const MAXVEL: number = 12;
+
+export class Controller {
+  protected model: Model;
+  protected bodyGrid: SpatialGrid<any>;
+  protected boundaryGrid: PolygonGrid<any>;
+  protected bodyBoundaryMap: SpatialPolygonMap<any, any>;
+
+  protected bodyBodyContacts: Array<BodyBodyContact> = [];
+  protected bodyBodyContactIndices: Array<boolean> = [];
+  protected bodyBoundaryContacts: Array<BodyBoundaryContact> = [];
+  protected bodySegmentContactIndices: Array<boolean> = [];
+  protected bodyBeamContacts: Array<BodySegmentBodyContact> = [];
+  protected bodyBeamContactIndices: Array<boolean> = [];
+  protected forces: Array<any> = [];
+  protected dispatcher: EventDispatcher<any>;
+  protected _api: API<any, any>;
+
+  get api(): API<any, any> {
+    return this._api;
   }
 
-  export enum EventContext {
-    Simulation = 1,
-    Boundary = 2,
+  public initWithModel(model: Model): this {
+    this.model = model;
+    this.reset();
+    return this;
   }
 
-  export var MAXVEL:number = 12;
+  public reset(): void {
+    this.dispatcher = new EventDispatcher<any>().init();
+    this.bodyGrid = new SpatialGrid(100).init();
+    this.boundaryGrid = new PolygonGrid(100, 20).init();
+    this.bodyBoundaryMap = new SpatialPolygonMap().init();
+    this.forces = [];
+    this._api = new API(this.model, this.bodyGrid, this.boundaryGrid, this.bodyBoundaryMap, this.forces, this.dispatcher);
+  }
 
-  export class Controller implements Models.IModelController<Model> {
-
-    protected model:Model;
-    protected bodyGrid:Geom.SpatialGrid<Entity>;
-    protected boundaryGrid:Geom.PolygonGrid<Boundary>;
-    protected bodyBoundaryMap:Geom.SpatialPolygonMap<Boundary, Entity>;
-
-    protected bodyBodyContacts:Array<Physics.BodyBodyContact>;
-    protected bodyBodyContactIndices:Array<boolean>;
-    protected bodyBoundaryContacts:Array<Physics.BodyBoundaryContact>;
-    protected bodySegmentContactIndices:Array<boolean>;
-    protected bodyBeamContacts:Array<Physics.BodySegmentBodyContact>;
-    protected bodyBeamContactIndices:Array<boolean>;
-    protected forces:Array<Physics.IForce>;
-    protected dispatcher:Models.IEventDispatcher<Entity | Projectile | Boundary | Beam>;
-    protected _api:API<Boundary, Entity>
-
-    get api ():API<Boundary, Entity> {
-      return this._api;
+  protected build() {
+    // add items to grid
+    for (let i = 0; i < this.model.bodies.items.size; i++) {
+      this.bodyGrid.addItem(this.model.bodies.items[i]);
     }
-
-    public initWithModel(model:Model):any {
-
-      this.model = model;
-      this.reset();
-      return this;
-
+    // add boundaries to grid
+    for (let i = 0; i < this.model.boundaries.items.size; i++) {
+      this.boundaryGrid.addItem(this.model.boundaries.items[i]);
     }
-
-    public reset ():void {
-
-      this.dispatcher = new Models.EventDispatcher<Entity | Projectile | Boundary | Beam>().init();
-      this.bodyGrid = new Geom.SpatialGrid(100).init();
-      this.boundaryGrid = new Geom.PolygonGrid(100, 20).init();
-      this.bodyBoundaryMap = new Geom.SpatialPolygonMap().init();
-      this.forces = [];
-      this._api = new API(this.model, this.bodyGrid, this.boundaryGrid, this.bodyBoundaryMap, this.forces, this.dispatcher);
-
-    }
-
-    protected build () {
-
-      // add items to grid
-
-      this.model.bodies.items.forEach(body => {
-        this.bodyGrid.addItem(body);
-      });
-
-      // add boundaries to grid
-
-      this.model.boundaries.items.forEach(boundary => {
-        this.boundaryGrid.addItem(boundary);
-      });
-
-      // compare boundaries to find sectors (normal boundaries within normal boundaries)
-
-      this.model.boundaries.items.forEach(boundary => {
-        this.model.boundaries.items.forEach(otherBoundary => {
-          if (boundary != otherBoundary) {
-            if (!boundary.inverted && Geom.polygonInPolygon(boundary, otherBoundary)) {
-              boundary.isSector = true;
-              return;
-            }
+    // compare boundaries to find sectors
+    for (let i = 0; i < this.model.boundaries.items.size; i++) {
+      let boundary = this.model.boundaries.items[i];
+      for (let j = 0; j < this.model.boundaries.items.size; j++) {
+        let otherBoundary = this.model.boundaries.items[j];
+        if (boundary != otherBoundary) {
+          if (!boundary.inverted && polygonInPolygon(boundary, otherBoundary)) {
+            boundary.isSector = true;
+            break;
           }
-        })
-      });
-
-      // add boundaries to body-boundary map (map of which bodies are inside which boundaries)
-
-      let bs = this.model.boundaries.items.filter(n => n); // get rid of empty values
-      bs.forEach(boundary => {
-        this.bodyBoundaryMap.addPolygon(boundary);
-      })
-
-    }
-
-    public start () {
-
-      this.build();
-
-    }
-
-    private getBodyBodyContacts (itemA:Entity, itemB:Entity):Physics.BodyBodyContact {
-
-      if (itemA == itemB) {
-        return;
-      }
-
-      if (!(itemA.contactMask & itemB.contactMask)) {
-        return;
-      }
-
-      let contactPairIdx = Util.Pairing.cantorPair(itemA.id, itemB.id);
-
-      if (itemA.bounds.shape == Geom.SHAPE_ORTHO) {
-        return;
-      }
-
-      if (this.bodyBodyContactIndices[contactPairIdx]) {
-        return;
-      }
-
-      if (Geom.boundsIntersect(itemA.bounds, itemB.bounds, true)) {
-
-        if (itemA.resolveMask & itemB.resolveMask) {
-
-          let penetration = Geom.resolvePenetrationBetweenBounds(itemA.bounds, itemB.bounds, itemA.constraints, itemB.constraints, true);
-
-          if (penetration) {
-            this.bodyBodyContactIndices[contactPairIdx] = true;
-            this.bodyBodyContacts.push(new Physics.BodyBodyContact(penetration, itemA, itemB, itemA.cor * itemB.cor));
-          }
-
-        } 
-        
-        if (this.dispatcher) {
-          this.dispatcher.dispatch(EventType.Contact, itemA, itemB);
-        }
-
-      }
-
-    }
-
-    private getBodyBoundaryContacts (item:Entity, seg:Geom.ISegment):void {
-
-      let parentPoly = this.model.boundaries.getItemByID(seg.parentID);
-
-      if (parentPoly.isSector) {
-        return;
-      }
-
-      if (!(item.contactMask & parentPoly.contactMask)) {
-        return;
-      }
-
-      let contactPairIdx = Util.Pairing.cantorPair(item.id, seg.id);
-
-      if (this.bodySegmentContactIndices[contactPairIdx]) {
-        return;
-      }
-
-      let resolve = (item.resolveMask & parentPoly.resolveMask) > 0;
-
-      let penetration = Geom.getPenetrationSegmentRound(seg.ptA, seg.ptB, item.bounds, resolve);
-
-      if (penetration) {
-
-        this.bodySegmentContactIndices[contactPairIdx] = true;
-        this.bodyBoundaryContacts.push(new Physics.BodyBoundaryContact(penetration, item, seg, item.cor * parentPoly.cor));
-        
-        if (this.dispatcher) {
-          this.dispatcher.dispatch(EventType.Contact, item, parentPoly, penetration);
         }
       }
-
     }
+    // add boundaries to body-boundary map
+    let bs = [];
+    for (let i = 0; i < this.model.boundaries.items.size; i++) {
+      if (this.model.boundaries.items[i]) bs.push(this.model.boundaries.items[i]);
+    }
+    for (let i = 0; i < bs.length; i++) {
+      this.bodyBoundaryMap.addPolygon(bs[i]);
+    }
+  }
 
-    private alignBeam (beam:Beam):void {
+  public start() {
+    this.build();
+  }
 
-      if (beam.parentID >= 0) {
-
-        let parent = this.model.bodies.getItemByID(beam.parentID);
-
-        if (parent) {
-          
-          if (beam.constrainRotationToParent) {
-            beam.ray.align(parent.bounds.anchor, Math.PI - parent.rotation)
-          } else {
-            beam.ray.align(parent.bounds.anchor); //, beam.ray.angle);
-          }
-
-        }
-        
+  private getBodyBodyContacts(itemA: any, itemB: any): BodyBodyContact | undefined {
+    if (itemA == itemB) return;
+    if (!(itemA.contactMask & itemB.contactMask)) return;
+    let contactPairIdx = cantorPair(itemA.id, itemB.id);
+    if (itemA.bounds.shape == SHAPE_ORTHO) return;
+    if (this.bodyBodyContactIndices[contactPairIdx]) return;
+    if (boundsIntersect(itemA.bounds, itemB.bounds, true)) {
+      if (itemA.resolveMask & itemB.resolveMask) {
+        const penetration = resolvePenetrationBetweenBounds(itemA.bounds, itemB.bounds, itemA.cor, itemB.cor, true);
+        this.bodyBodyContactIndices[contactPairIdx] = true;
+        this.bodyBodyContacts.push(new BodyBodyContact(penetration, itemA, itemB, itemA.cor * itemB.cor));
       }
+      if (this.dispatcher) {
+        this.dispatcher.dispatch(EventType.Contact, itemA, itemB);
+      }
+    }
+    return;
+  }
 
+  private getBodyBoundaryContacts(item: any, seg: ISegment): void {
+    let parentPoly = this.model.boundaries.getItemByID(seg.parentID);
+
+    if (parentPoly.isSector) {
+      return;
     }
 
-    private getBodyBeamContacts (beam:Beam):void {
+    if (!(item.contactMask & parentPoly.contactMask)) {
+      return;
+    }
 
-      beam.hits = this._api.raycast(beam.ray);
+    let contactPairIdx = cantorPair(item.id, seg.id);
 
-      let beamTerminated = false;
+    if (this.bodySegmentContactIndices[contactPairIdx]) {
+      return;
+    }
 
-      beam.hits.forEach(hit => {
+    let resolve = (item.resolveMask & parentPoly.resolveMask) > 0;
 
-        if (beamTerminated) {
-          return;
-        }
+    const penetration = getPenetrationSegmentRound(seg.ptA, seg.ptB, item.bounds, resolve, true);
 
-        if (hit.parentID == beam.parentID) {
-          return;
-        }
-
-        if (hit.type == Geom.HIT_TYPE_SEGMENT) {
-
-          var boundary = this.model.boundaries.getItemByID(hit.parentID);
-
-          if (!boundary.isSector) {
-
-            beam.ray.ptB.x = hit.pt.x;
-            beam.ray.ptB.y = hit.pt.y;
-
-            if (this.dispatcher) {
-              this.dispatcher.dispatch(EventType.Contact, beam, boundary, 0);
-            }
+    this.bodySegmentContactIndices[contactPairIdx] = true;
+    this.bodyBoundaryContacts.push(new BodyBoundaryContact(penetration, item, seg, item.cor * parentPoly.cor));
     
-            beamTerminated = true;
-            return;
+    if (this.dispatcher) {
+      this.dispatcher.dispatch(EventType.Contact, item, parentPoly);
+    }
+  }
 
-          }
+  private alignBeam(beam: any): void {
 
+    if (beam.parentID >= 0) {
+
+      let parent = this.model.bodies.getItemByID(beam.parentID);
+
+      if (parent) {
+        
+        if (beam.constrainRotationToParent) {
+          beam.ray.align(parent.bounds.anchor, Math.PI - parent.rotation)
+        } else {
+          beam.ray.align(parent.bounds.anchor); //, beam.ray.angle);
         }
 
-        var item = this.model.bodies.getItemByID(hit.parentID);
+      }
+      
+    }
 
-        if (item == null) {
-          return;
-        }
+  }
 
-        if (!(item.contactMask & beam.contactMask)) {
-          return;
-        }
+  private getBodyBeamContacts(beam: any): void {
 
-        let contactPairIdx = Util.Pairing.cantorPair(item.id, beam.id);
+    beam.hits = this._api.raycast(beam.ray);
 
-        if (this.bodyBeamContactIndices[contactPairIdx]) {
-          return;
-        }
+    let beamTerminated = false;
 
-        let resolve:boolean = beam.isBoundary && !beam.isSoft && ((item.resolveMask & beam.resolveMask) > 0);
-       
-        let penetration = Geom.getPenetrationSegmentRound(beam.ray.ptA, beam.ray.ptB, item.bounds, resolve, true);
+    beam.hits.forEach(hit => {
 
-        if (penetration) {
+      if (beamTerminated) {
+        return;
+      }
 
-          this.bodyBeamContactIndices[contactPairIdx] = true;
-          let contact = new Physics.BodySegmentBodyContact(penetration, item, beam, item.cor * beam.cor);
-          contact.hitPoint = hit;
-          this.bodyBeamContacts.push(contact);
-          
-          if (this.dispatcher) {
-            this.dispatcher.dispatch(EventType.Contact, beam, item, penetration);
-          }
-        }
+      if (hit.parentID == beam.parentID) {
+        return;
+      }
 
-        if (!beam.isBoundary) {
+      if (hit.type == HIT_TYPE_SEGMENT) {
+
+        var boundary = this.model.boundaries.getItemByID(hit.parentID);
+
+        if (!boundary.isSector) {
+
           beam.ray.ptB.x = hit.pt.x;
           beam.ray.ptB.y = hit.pt.y;
+
+          if (this.dispatcher) {
+            this.dispatcher.dispatch(EventType.Contact, beam, boundary, 0);
+          }
+  
           beamTerminated = true;
+          return;
+
         }
 
-      });
-
-    }
-
-    private applyPointAsForce (pt:Geom.IPoint, body:Physics.IBody) {
-
-      if (!body.constraints.lockX) {
-        body.velocity.x += pt.x;
       }
 
-      if (!body.constraints.lockY) {
-        body.velocity.y += pt.y;
+      var item = this.model.bodies.getItemByID(hit.parentID);
+
+      if (item == null) {
+        return;
       }
 
+      if (!(item.contactMask & beam.contactMask)) {
+        return;
+      }
+
+      let contactPairIdx = cantorPair(item.id, beam.id);
+
+      if (this.bodyBeamContactIndices[contactPairIdx]) {
+        return;
+      }
+
+      let resolve:boolean = beam.isBoundary && !beam.isSoft && ((item.resolveMask & beam.resolveMask) > 0);
+     
+      const penetration = getPenetrationSegmentRound(beam.ray.ptA, beam.ray.ptB, item.bounds, resolve, true);
+
+      this.bodyBeamContactIndices[contactPairIdx] = true;
+      let contact = new BodySegmentBodyContact(penetration, item, beam, item.cor * beam.cor);
+      contact.hitPoint = hit;
+      this.bodyBeamContacts.push(contact);
+      
+      if (this.dispatcher) {
+        this.dispatcher.dispatch(EventType.Contact, beam, item);
+      }
+    });
+
+  }
+
+  private applyPointAsForce(pt: IPoint, body: IBody) {
+
+    if (!body.constraints.lockX) {
+      body.velocity.x += pt.x;
     }
 
-    private applyForces () {
+    if (!body.constraints.lockY) {
+      body.velocity.y += pt.y;
+    }
 
-      let forcePt = new Geom.Point();
+  }
 
-      this.forces.forEach(force => {
+  private applyForces() {
 
-        if (force instanceof Physics.ProximityForce) {
+    let forcePt = new Point();
 
-          let bodies = this.api.bodiesNear(force.origin, force.range);
+    this.forces.forEach(force => {
 
-          let ptA = force.origin;
+      if (force instanceof Object && force.type === 'ProximityForce') {
+
+        let bodies = this.api.bodiesNear(force.origin, force.range);
+
+        let ptA = force.origin;
+
+        bodies.forEach(body => {
+
+          if (body.bounds.anchor === force.origin) {
+            return;
+          }
+
+          let ptB = body.bounds.anchor;
+          let angle = 0 - angleBetween(ptA.x, ptA.y, ptB.x, ptB.y);
+
+          forcePt.y = 0;
+          forcePt.x = force.power * 0.0166; // 60 frames per second
+
+          rotatePoint(forcePt, force.angle);
+          rotatePoint(forcePt, angle);
+          this.applyPointAsForce(forcePt, body);
+
+        })
+
+      } else if (force instanceof Object && force.type === 'AreaForce') {
+
+        let bodies = this.bodyBoundaryMap.getItemsWithinPolygonID(force.parentID);
+
+        if (bodies) {
+
+          forcePt.y = 0;
+          forcePt.x = force.power * 0.0166; // 60 frames per second
+          rotatePoint(forcePt, force.angle);
 
           bodies.forEach(body => {
-
-            if (body.bounds.anchor === force.origin) {
-              return;
-            }
-
-            let ptB = body.bounds.anchor;
-            let angle = 0 - Geom.angleBetween(ptA.x, ptA.y, ptB.x, ptB.y);
-
-            forcePt.y = 0;
-            forcePt.x = force.power * 0.0166; // 60 frames per second
-
-            Geom.rotatePoint(forcePt, force.angle);
-            Geom.rotatePoint(forcePt, angle);
             this.applyPointAsForce(forcePt, body);
-
-          })
-
-        } else if (force instanceof Physics.AreaForce) {
-
-          let bodies = this.bodyBoundaryMap.getItemsWithinPolygonID(force.parentID);
-
-          if (bodies) {
-
-            forcePt.y = 0;
-            forcePt.x = force.power * 0.0166; // 60 frames per second
-            Geom.rotatePoint(forcePt, force.angle);
-
-            bodies.forEach(body => {
-              this.applyPointAsForce(forcePt, body);
-            });
-
-          }
-
-        } else if (force instanceof Physics.PropulsionForce) {
-
-          let body = this.model.bodies.getItemByID(force.parentID);
-
-          if (body) {
-
-            forcePt.y = 0;
-            forcePt.x = force.power * 0.0166; // 60 frames per second
-            Geom.rotatePoint(forcePt, force.angle);
-            Geom.rotatePoint(forcePt, body.rotation);
-            this.applyPointAsForce(forcePt, body);
-
-          }
-
-        }
-
-        if (force.lifespan > 0) {
-          force.age++;
-        }
-
-      });
-
-      // remove spent forces
-
-      let i = this.forces.length;
-
-      while (i--) {
-        let force = this.forces[i];
-        if (force.lifespan > 0 && force.age > force.lifespan) {
-          this.forces.splice(i, 1);
-        }
-      }
-
-    }
-
-    private applyVelocities () {
-
-      this.model.bodies.items.forEach(item => {
-        item.bounds.anchor.x += Math.max(0 - Simulation.MAXVEL, Math.min(Simulation.MAXVEL, item.velocity.x));
-        item.bounds.anchor.y += Math.max(0 - Simulation.MAXVEL, Math.min(Simulation.MAXVEL, item.velocity.y));
-      });
-
-      this.model.projectiles.items.forEach(item => {
-        item.position.x += item.velocity.x;
-        item.position.y += item.velocity.y;
-      });
-
-    }
-
-    public update = (secondPass?:boolean) => {
-
-      this.bodyBodyContacts = [];
-      this.bodyBoundaryContacts = [];
-      this.bodyBeamContacts = [];
-      this.bodyBodyContactIndices = [];
-      this.bodySegmentContactIndices = [];
-      this.bodyBeamContactIndices = [];
-
-      var items = this.model.bodies.items;
-
-      // apply forces to velocities
-
-      this.applyForces();
-
-      // apply velocities to positions
-
-      this.applyVelocities();
-
-      // update cells
-      
-      items.forEach(item => {
-        this.bodyGrid.updateItem(item);
-      });
-
-      // body-body collision check
-
-      items.forEach(item => {
-
-        let itemA = item as Entity;
-        let cells = this.bodyGrid.getSurroundingCells(itemA);
-
-        cells.forEach(cell => {
-  
-          if (cell != null) {
-  
-            cell.forEach(item => {
-  
-              var itemB = item as Entity;
-              this.getBodyBodyContacts(itemA, itemB);
-
-            });
-
-          }
-
-        });
-
-      });
-
-      // body-boundary collision check
-
-      items.forEach(item => {
-        if (item.bounds.shape == Geom.SHAPE_ROUND) {
-          let itemA = item as Entity;
-          let cell = this.boundaryGrid.getCellFromPoint(item.bounds.anchor);
-          if (cell) {
-            cell.forEach(seg => {
-              this.getBodyBoundaryContacts(itemA, seg);
-            })
-          }
-        }
-      });
-
-      // resolve accumulated contacts
-
-      if (secondPass) {
-        this.bodyBodyContacts.reverse();
-        this.bodyBoundaryContacts.reverse();
-        this.bodyBeamContacts.reverse();
-      }
-
-      this.bodyBodyContacts.forEach(contact => {
-        Physics.resolveContact(contact);
-      });
-
-      this.bodyBoundaryContacts.forEach(contact => {
-        Physics.resolveContact(contact);
-      });
-
-      // projectiles
-
-      var projectiles = this.model.projectiles;
-
-      projectiles.items.forEach(projectile => {
-
-        projectile.age++;
-
-        // if end of lifespan
-        if (projectile.age > projectile.lifespan) {
-          this.model.projectiles.removeItem(projectile);
-          return;
-        }
-
-        let polygon = this.bodyBoundaryMap.getPolygonFromPoint(projectile.position, true);
-
-        // if out of bounds
-        if (!polygon) {
-          if (this.dispatcher) {
-            this.dispatcher.dispatch(EventType.Contact, projectile, this.bodyBoundaryMap.getOutermostPolygon(), 0);
-          }
-          this.model.projectiles.removeItem(projectile);
-          return;
-        }
-
-        // masked out
-        if (!(projectile.contactMask & polygon.contactMask)) {
-          return;
-        }
-
-        // out of bounds by inverted polygon
-        if (polygon.inverted) { 
-
-          if (projectile.resolveMask & polygon.resolveMask) {
-            if (this.dispatcher) {
-              this.dispatcher.dispatch(EventType.Contact, projectile, polygon, 0);
-            }
-            this.model.projectiles.removeItem(projectile);
-          }
-          return;
-
-        }
-
-        let hitItems = this.bodyGrid.getItemsUnderPoint(projectile.position);
-
-        // if hit an object
-        if (hitItems.length > 0) { 
-          
-          let didHit = false;
-
-          hitItems.forEach(item => {
-            if (!(projectile.contactMask & item.contactMask)) {
-              return;
-            }
-            if (projectile.parentID == item.id) {
-              return;
-            }
-            if (projectile.resolveMask & item.resolveMask) {
-              didHit = true;
-              if (this.dispatcher) {
-                this.dispatcher.dispatch(EventType.Contact, projectile, item, 0);
-              }
-            }
           });
 
-          if (didHit) {
-            this.model.projectiles.removeItem(projectile);
-          }
-
-          return;
         }
 
-      });
+      } else if (force instanceof Object && force.type === 'PropulsionForce') {
 
-      // beams
+        let body = this.model.bodies.getItemByID(force.parentID);
 
-      var beams = this.model.beams;
+        if (body) {
 
-      beams.items.forEach(beam => {
-        
-        this.alignBeam(beam);
-        this.getBodyBeamContacts(beam);
+          forcePt.y = 0;
+          forcePt.x = force.power * 0.0166; // 60 frames per second
+          rotatePoint(forcePt, force.angle);
+          rotatePoint(forcePt, body.rotation);
+          this.applyPointAsForce(forcePt, body);
 
-      });
+        }
 
-      this.bodyBeamContacts.forEach(contact => {
-        Physics.resolveContact(contact);
-      })
+      }
+
+      if (force.lifespan > 0) {
+        force.age++;
+      }
+
+    });
+
+    // remove spent forces
+
+    let i = this.forces.length;
+
+    while (i--) {
+      let force = this.forces[i];
+      if (force.lifespan > 0 && force.age > force.lifespan) {
+        this.forces.splice(i, 1);
+      }
+    }
+
+  }
+
+  private applyVelocities() {
+
+    this.model.bodies.items.forEach(item => {
+      item.bounds.anchor.x += Math.max(0 - MAXVEL, Math.min(MAXVEL, item.velocity.x));
+      item.bounds.anchor.y += Math.max(0 - MAXVEL, Math.min(MAXVEL, item.velocity.y));
+    });
+
+    this.model.projectiles.items.forEach(item => {
+      item.position.x += item.velocity.x;
+      item.position.y += item.velocity.y;
+    });
+
+  }
+
+  public update = (secondPass?:boolean) => {
+
+    this.bodyBodyContacts = [];
+    this.bodyBoundaryContacts = [];
+    this.bodyBeamContacts = [];
+    this.bodyBodyContactIndices = [];
+    this.bodySegmentContactIndices = [];
+    this.bodyBeamContactIndices = [];
+
+    var items = this.model.bodies.items;
+
+    // apply forces to velocities
+
+    this.applyForces();
+
+    // apply velocities to positions
+
+    this.applyVelocities();
+
+    // update cells
       
-      // update cells and sectors
-      // apply sector properties to body
+    items.forEach(item => {
+      this.bodyGrid.updateItem(item);
+    });
 
-      items.forEach(item => {
+    // body-body collision check
 
-        this.bodyGrid.updateItem(item);
-        this.bodyBoundaryMap.updateItem(item);
+    items.forEach(item => {
 
-        let boundary = this.bodyBoundaryMap.getPolygonByItemID(item.id);
+      let itemA = item as any;
+      let cells = this.bodyGrid.getSurroundingCells(itemA);
 
-        if (boundary) {
-          item.velocity.x *= 1 - boundary.drag;
-          item.velocity.y *= 1 - boundary.drag;
+      cells.forEach(cell => {
+  
+        if (cell != null) {
+  
+          cell.forEach(item => {
+  
+            var itemB = item as any;
+            this.getBodyBodyContacts(itemA, itemB);
+
+          });
+
         }
 
       });
 
+    });
+
+    // body-boundary collision check
+
+    items.forEach(item => {
+      if (item.bounds.shape == SHAPE_ROUND) {
+        let itemA = item as any;
+        let cell = this.boundaryGrid.getCellFromPoint(item.bounds.anchor);
+        if (cell) {
+          cell.forEach(seg => {
+            this.getBodyBoundaryContacts(itemA, seg);
+          })
+        }
+      }
+    });
+
+    // resolve accumulated contacts
+
+    if (secondPass) {
+      this.bodyBodyContacts.reverse();
+      this.bodyBoundaryContacts.reverse();
+      this.bodyBeamContacts.reverse();
     }
+
+    this.bodyBodyContacts.forEach(contact => {
+      resolveContact(contact);
+    });
+
+    this.bodyBoundaryContacts.forEach(contact => {
+      resolveContact(contact);
+    });
+
+    // projectiles
+
+    var projectiles = this.model.projectiles;
+
+    projectiles.items.forEach(projectile => {
+
+      projectile.age++;
+
+      // if end of lifespan
+      if (projectile.age > projectile.lifespan) {
+        this.model.projectiles.removeItem(projectile);
+        return;
+      }
+
+      let polygon = this.bodyBoundaryMap.getPolygonFromPoint(projectile.position, true);
+
+      // if out of bounds
+      if (!polygon) {
+        if (this.dispatcher) {
+          this.dispatcher.dispatch(EventType.Contact, projectile, this.bodyBoundaryMap.getOutermostPolygon(), 0);
+        }
+        this.model.projectiles.removeItem(projectile);
+        return;
+      }
+
+      // masked out
+      if (!(projectile.contactMask & polygon.contactMask)) {
+        return;
+      }
+
+      // out of bounds by inverted polygon
+      if (polygon.inverted) { 
+
+        if (projectile.resolveMask & polygon.resolveMask) {
+          if (this.dispatcher) {
+            this.dispatcher.dispatch(EventType.Contact, projectile, polygon, 0);
+          }
+          this.model.projectiles.removeItem(projectile);
+        }
+        return;
+
+      }
+
+      let hitItems = this.bodyGrid.getItemsUnderPoint(projectile.position);
+
+      // if hit an object
+      if (hitItems.length > 0) { 
+        
+        let didHit = false;
+
+        hitItems.forEach(item => {
+          if (!(projectile.contactMask & item.contactMask)) {
+            return;
+          }
+          if (projectile.parentID == item.id) {
+            return;
+          }
+          if (projectile.resolveMask & item.resolveMask) {
+            didHit = true;
+            if (this.dispatcher) {
+              this.dispatcher.dispatch(EventType.Contact, projectile, item, 0);
+            }
+          }
+        });
+
+        if (didHit) {
+          this.model.projectiles.removeItem(projectile);
+        }
+
+        return;
+      }
+
+    });
+
+    // beams
+
+    var beams = this.model.beams;
+
+    beams.items.forEach(beam => {
+      
+      this.alignBeam(beam);
+      this.getBodyBeamContacts(beam);
+
+    });
+
+    this.bodyBeamContacts.forEach(contact => {
+      resolveContact(contact);
+    })
     
-    public stop () {
+    // update cells and sectors
+    // apply sector properties to body
 
-      console.log("stopping...");
+    items.forEach(item => {
 
-    }
+      this.bodyGrid.updateItem(item);
+      this.bodyBoundaryMap.updateItem(item);
 
+      let boundary = this.bodyBoundaryMap.getPolygonByItemID(item.id);
+
+      if (boundary) {
+        item.velocity.x *= 1 - boundary.drag;
+        item.velocity.y *= 1 - boundary.drag;
+      }
+
+    });
+
+  }
+  
+  public stop() {
+    console.log('stopping...');
   }
 
 }

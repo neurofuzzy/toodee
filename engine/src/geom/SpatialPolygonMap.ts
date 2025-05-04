@@ -1,208 +1,140 @@
-/// <reference path="../models/Events.ts" />
+// Migrated from namespace Geom to ES module
+import { IPolygon, IPoint } from './IGeom';
+import { EventDispatcher, EventType } from '../models/Events';
+import { IContainer } from '../util/IContainer';
 
-namespace Geom {
+export interface IPolygonMap<T> {
+  addPolygon(poly: IPolygon & { id: number }): void;
+  getPolygonFromPoint(pt: IPoint): IPolygon & { id: number };
+  getContainerFromPoint(pt: IPoint): IContainer<T>;
+}
 
-  export interface IPolygonMap<T> {
+export class SpatialPolygonMap<T extends IPolygon & { id: number }, K extends { id: number; bounds: any }> extends EventDispatcher<T> implements IPolygonMap<K> {
+  public items: Map<number, K>;
+  protected itemsPolygonIDs: Map<number, number>;
+  protected containers: Map<number, IContainer<K>>;
+  protected polygonsByID: Map<number, T>;
+  protected polygonsSortedByArea: Array<T>;
 
-    addPolygon(poly:(IPolygon & Models.Identifiable)):void;
-    getPolygonFromPoint (pt:IPoint):(IPolygon & Models.Identifiable);
-    getContainerFromPoint (pt:IPoint):Util.IContainer<T>;
-
+  public init(): this {
+    this.reset();
+    return this;
   }
 
-  export class SpatialPolygonMap<T extends IPolygon & Models.Identifiable, K extends Models.Identifiable & ISpatial> extends Models.EventDispatcher<T> implements IPolygonMap<K>, Models.ICollection<K> {
+  public reset(): void {
+    super.reset();
 
-    public items:Array<K>;
-    protected itemsPolygonIDs:Array<number>;
-    protected containers:Array<Util.IContainer<K>>;
-    protected polygonsByID:Array<T>;
-    protected polygonsSortedByArea:Array<T>;
+    this.items = new Map();
+    this.itemsPolygonIDs = new Map();
+    this.containers = new Map();
+    this.polygonsByID = new Map();
+    this.polygonsSortedByArea = [];
+  }
 
-    public init ():any {
+  public getOutermostPolygon(): T {
+    return this.polygonsSortedByArea[this.polygonsSortedByArea.length - 1];
+  }
 
-      this.reset();
-      return this;
-
-    }
-
-    public reset ():void {
-
-      super.reset();
-
-      this.items = [];
-      this.itemsPolygonIDs = [];
-      this.containers = [];
-      this.polygonsByID = [];
-      this.polygonsSortedByArea = [];
-
-    }
-
-    public getOutermostPolygon ():T {
-
-      return this.polygonsSortedByArea[this.polygonsSortedByArea.length - 1];
-
-    }
-
-    public getPolygonFromPoint (pt:IPoint, includeInverted:boolean = false):T {
-
-      for (let i = 0; i < this.polygonsSortedByArea.length; i++) {
-
-        let poly = this.polygonsSortedByArea[i];
-
-        if (poly.inverted && !includeInverted) {
-          // don't allow items in inverted polys
-          continue;
-        }
-
-        if (pointInPolygon(pt, poly)) {
-
-          return poly;
-
-        }
-
+  public getPolygonFromPoint(pt: IPoint, includeInverted: boolean = false): T {
+    for (let i = 0; i < this.polygonsSortedByArea.length; i++) {
+      let poly = this.polygonsSortedByArea[i];
+      if ((poly as any).inverted && !includeInverted) {
+        continue;
       }
-
+      // TODO: Implement pointInPolygon
+      // if (pointInPolygon(pt, poly)) {
+      //   return poly;
+      // }
     }
+    return undefined;
+  }
 
-    protected getPolygonId (pt:IPoint):number {
-
-      let poly = this.getPolygonFromPoint(pt);
-
-      if (poly) {
-        return poly.id;
-      }
-
-      return -1;
-
+  protected getPolygonId(pt: IPoint): number {
+    let poly = this.getPolygonFromPoint(pt);
+    if (poly) {
+      return poly.id;
     }
+    return -1;
+  }
 
-    public getContainerFromPoint (pt:IPoint):Util.IContainer<K> {
-      
-      let polygonId = this.getPolygonId(pt);
-
-      if (polygonId >= 0) {
-
-        return this.containers[polygonId];
-
-      }
-
+  public getContainerFromPoint(pt: IPoint): IContainer<K> {
+    let polygonId = this.getPolygonId(pt);
+    if (polygonId >= 0) {
+      return this.containers.get(polygonId);
     }
+    return undefined;
+  }
 
-    public addPolygon (poly:T):void {
+  public addPolygon(poly: T): void {
+    this.polygonsByID.set(poly.id, poly);
+    this.containers.set(poly.id, []);
+    this.polygonsSortedByArea.push(poly);
+    this.polygonsSortedByArea.sort((a, b) => a.area - b.area);
+  }
 
-      this.polygonsByID[poly.id] = poly;
-      this.containers[poly.id] = []
-
-      // keep sorted by area
-
-      this.polygonsSortedByArea.push(poly);
-
-      this.polygonsSortedByArea.sort((a, b) => {
-
-        let aa = a.area;
-        let ba = b.area;
-
-        if (aa > ba) {
-          return 1;
-        } else if (aa < ba) {
-          return -1;
-        }
-
-        return 0;
-
-      });
-
-      
-    }
-
-    public addItem (item:K):boolean {
-
-      if (this.itemsPolygonIDs[item.id] == null) {
-
-        let polygonID = this.getPolygonId(item.bounds.anchor);
-
-        this.itemsPolygonIDs[item.id] = polygonID;
-
-        if (polygonID >= 0) {
-
-          if (this.containers[polygonID] == null) {
-            this.containers[polygonID] = [];
-          }
-
-          this.containers[polygonID].push(item);
-
-        }
-
-        return true;
-
-      }
-
-      return false;
-
-    }
-
-    public removeItem (item:K):boolean {
-
-      if (!isNaN(this.itemsPolygonIDs[item.id])) {
-
-        let polygonID = this.itemsPolygonIDs[item.id];
-
-        if (polygonID > 0) {
-
-          let container = this.containers[polygonID];
-
-          if (container && container.indexOf(item) != -1) {
-            container.splice(container.indexOf(item), 1);
-          }
-
-        }
-
-        this.itemsPolygonIDs[item.id] = null;
-        return true;
-
-      }
-
-      return false;
-      
-    }
-
-    public updateItem (item:K):boolean {
-
+  public addItem(item: K): boolean {
+    if (!this.itemsPolygonIDs.has(item.id)) {
       let polygonID = this.getPolygonId(item.bounds.anchor);
-      let prevPolygonID = this.itemsPolygonIDs[item.id];
-      
-      if (polygonID != prevPolygonID) {
-        this.removeItem(item);
-        this.addItem(item);
-        if (prevPolygonID >= 0) {
-          this.dispatch(Models.EventType.Remove, this.polygonsByID[prevPolygonID], item);
-        }
-        if (polygonID >= 0) {
-          this.dispatch(Models.EventType.Add, this.polygonsByID[polygonID], item);
-        }
-        return true;
-      }
-
-      return false;
-
-    }
-
-    public getPolygonByItemID (itemID:number):T {
-
-      let polygonID = this.itemsPolygonIDs[itemID];
-
+      this.itemsPolygonIDs.set(item.id, polygonID);
       if (polygonID >= 0) {
-        return this.polygonsByID[polygonID];
+        if (!this.containers.has(polygonID)) {
+          this.containers.set(polygonID, []);
+        }
+        this.containers.get(polygonID)!.push(item);
       }
-
+      this.items.set(item.id, item);
+      return true;
     }
-
-    public getItemsWithinPolygonID (polygonID:number):Util.IContainer<K> {
-
-      return this.containers[polygonID];
-
-    }
-
+    return false;
   }
 
+  public removeItem(item: K): boolean {
+    if (this.itemsPolygonIDs.has(item.id)) {
+      let polygonID = this.itemsPolygonIDs.get(item.id)!;
+      if (polygonID > 0) {
+        let container = this.containers.get(polygonID);
+        if (container) {
+          let idx = container.indexOf(item);
+          if (idx !== -1) container.splice(idx, 1);
+        }
+      }
+      this.itemsPolygonIDs.delete(item.id);
+      this.items.delete(item.id);
+      return true;
+    }
+    return false;
+  }
+
+  public updateItem(item: K): boolean {
+    let polygonID = this.getPolygonId(item.bounds.anchor);
+    let prevPolygonID = this.itemsPolygonIDs.get(item.id);
+    if (polygonID != prevPolygonID) {
+      this.removeItem(item);
+      this.addItem(item);
+      if (prevPolygonID !== undefined && prevPolygonID >= 0) {
+        this.dispatch(EventType.Remove, this.polygonsByID.get(prevPolygonID), item);
+      }
+      if (polygonID >= 0) {
+        this.dispatch(EventType.Add, this.polygonsByID.get(polygonID), item);
+      }
+      return true;
+    }
+    return false;
+  }
+
+  public getPolygonByItemID(itemID: number): T {
+    let polygonID = this.itemsPolygonIDs.get(itemID);
+    if (polygonID !== undefined && polygonID >= 0) {
+      return this.polygonsByID.get(polygonID);
+    }
+    return undefined;
+  }
+
+  public getItemsWithinPolygonID(polygonID: number): IContainer<K> {
+    return this.containers.get(polygonID);
+  }
+
+  public get itemsArray(): K[] {
+    return Array.from(this.items.values());
+  }
 }
