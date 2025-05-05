@@ -30,8 +30,12 @@ namespace Physics {
 
     init (penetration:Geom.IPoint, itemA:IBody, itemB:B, corAB:number = 1) {
 
+      // Create a copy of the penetration vector using Geom.Point constructor
+      this.penetration = new Geom.Point(penetration.x, penetration.y);
+      // Normalize the copy
+      Geom.normalizePoint(this.penetration);
 
-      this.penetration = penetration;
+      // Assign other properties
       this.itemA = itemA;
       this.itemB = itemB;
       this.corAB = corAB;
