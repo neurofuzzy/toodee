@@ -49,6 +49,7 @@ export class PolygonGrid<T extends { id: number; segments: ISegment[] } & IPolyg
   }
 
   public addItem(item: T): boolean {
+    if (!item) return false;
     if (!this.itemsCellIndexes.has(item.id)) {
       this.itemsCellIndexes.set(item.id, []);
       item.segments.forEach(seg => {

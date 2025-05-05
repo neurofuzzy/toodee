@@ -5,14 +5,7 @@ import { IEngineDelegate } from '../../engine/src/models/IController';
 import * as Geom from '../../engine/src/geom';
 import { AreaForce } from '../../engine/src/physics/Force';
 import { IView } from '../../engine/src/models/IView';
-
-// Patch for Views.TestView: fallback to a stub if not found
-const Views = { TestView: class implements IView<any> {
-  bodiesGraphics() { return []; }
-  initWithModel(model: any) { return this; }
-  build() {}
-  update() {}
-}};
+import { TestView } from '../../test-common/src/views/TestView';
 
 export class Delegate implements IEngineDelegate {
   
@@ -31,7 +24,7 @@ export class Delegate implements IEngineDelegate {
     this.api.addModelListener(this.onModelEvent, this);
     this.api.addContactListener(this.onContactEvent, this);
     this.api.addBoundaryCrossListener(this.onBoundaryCrossEvent, this);
-    this.view = new Views.TestView().initWithModel(this.engine.model);
+    this.view = new TestView().initWithModel(this.engine.model);
     this.beams = [];
 
     return this;
@@ -52,7 +45,7 @@ export class Delegate implements IEngineDelegate {
 
     let bndMask = 0b00001111;
 
-    for (let i = 0; i < 4000; i++) {
+    for (let i = 0; i < 400; i++) {
 
       let x = 20 + Math.random() * 1480;
       let y = 20 + Math.random() * 560;

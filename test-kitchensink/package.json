@@ -4,7 +4,8 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "parcel --no-source-maps index.html"
+    "start": "parcel --no-source-maps index.html",
+    "postinstall": "rm -rf node_modules/@types/css-font-loading-module"
   },
   "repository": {
     "type": "git",
@@ -16,10 +17,11 @@
     "url": "https://github.com/neurofuzzy/toodee/issues"
   },
   "homepage": "https://github.com/neurofuzzy/toodee#readme",
-  "dependencies": {
-    "pixi.js": "^7.2.4"
-  },
   "devDependencies": {
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vite": "^6.3.4"
+  },
+  "dependencies": {
+    "pixi.js": "^4.8.9"
   }
 }

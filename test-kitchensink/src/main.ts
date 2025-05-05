@@ -1,3 +1,4 @@
+
 import { Engine } from '../../engine/src/Engine';
 import { Delegate } from './delegate';
 
@@ -11,7 +12,7 @@ class Main {
     Main.engine = new Engine().init();
     Main.delegate = new Delegate().init(this.engine);
     Main.delegate.start();
-
+console.log("YO")
   }
 
 }

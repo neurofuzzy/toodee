@@ -1,6 +1,5 @@
 import { ISpatial } from '../../../engine/src/geom/ISpatial';
-import { DisplayObject, Container } from '@pixi/display';
-import type { DisplayObjectEvents } from '@pixi/display';
+import { DisplayObject, Container } from 'pixi.js';
 import { ISegment } from '../../../engine/src/geom/IGeom';
 
 export function makeItemDraggable(item: ISpatial, dobj: DisplayObject): void {
@@ -33,11 +32,7 @@ export function makeItemDraggable(item: ISpatial, dobj: DisplayObject): void {
     }
   };
 
-  dobj
-    .on('pointerdown' as keyof DisplayObjectEvents, onDragStart)
-    .on('pointerup' as keyof DisplayObjectEvents, onDragEnd)
-    .on('pointerupoutside' as keyof DisplayObjectEvents, onDragEnd)
-    .on('pointermove' as keyof DisplayObjectEvents, onDragMove);
+
 }
 
 export function makeSegmentDraggable(ray: ISegment, dobj: DisplayObject, stage: Container): void {
@@ -81,10 +76,4 @@ export function makeSegmentDraggable(ray: ISegment, dobj: DisplayObject, stage: 
       }
     }
   };
-
-  dobj
-    .on('pointerdown' as keyof DisplayObjectEvents, onDragStart)
-    .on('pointerup' as keyof DisplayObjectEvents, onDragEnd)
-    .on('pointerupoutside' as keyof DisplayObjectEvents, onDragEnd)
-    .on('pointermove' as keyof DisplayObjectEvents, onDragMove);
 }
