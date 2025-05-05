@@ -54,32 +54,36 @@ namespace Geom {
 
     if (!useShapes || (bA.shape == SHAPE_ORTHO && bB.shape == SHAPE_ORTHO)) {
 
-      let pt = getPenetrationBetweenBounds(bA, bB);
+      getPenetrationBetweenBounds(bA, bB);
 
       var aA = bA.anchor;
       var aB = bB.anchor;
 
-      var hx = 0 - pt.x;
+      var hx = 0 - pt.x; 
       var hy = 0 - pt.y;
 
       if (hx > hy) {
 
         if (aA.x < aB.x) {
           doResolve(hx, 0, bA, bB, cA, cB);
-          return new Point(hx, 0);
+          pt.x = hx; pt.y = 0; 
+          return pt;
         } else {
           doResolve(0 - hx, 0, bA, bB, cA, cB);
-          return new Point(0 - hx, 0);
+          pt.x = 0 - hx; pt.y = 0; 
+          return pt;
         }
 
       } else {
 
         if (aA.y < aB.y) {
           doResolve(0, hy, bA, bB, cA, cB);
-          return new Point(0, hy);
+          pt.x = 0; pt.y = hy; 
+          return pt;
         } else {
           doResolve(0, 0 - hy, bA, bB, cA, cB);
-          return new Point(0, 0 - hy); 
+          pt.x = 0; pt.y = 0 - hy; 
+          return pt; 
         }
 
       }
@@ -98,14 +102,16 @@ namespace Geom {
 
   function resolvePenetrationRoundRound(bA:IBounds, bB:IBounds, cA:IConstraints, cB:IConstraints):IPoint {
 
-    let pt = getPenetrationRoundRound(bA, bB);
+    getPenetrationRoundRound(bA, bB);
 
     var deltaX = 0 - pt.x;
     var deltaY = 0 - pt.y;
 
     doResolve(deltaX, deltaY, bA, bB, cA, cB);
 
-    return new Point(deltaX, deltaY);
+    pt.x = deltaX;
+    pt.y = deltaY;
+    return pt; 
 
   }
 
@@ -170,7 +176,8 @@ namespace Geom {
       }
 
       doResolve(0, delta, circleb, orthob, circlec, orthoc);
-      return new Point(0, delta);
+      pt.x = 0; pt.y = delta;
+      return pt;
 
     } else if (cy >= ry1 && cy <= ry2) {
 
@@ -181,7 +188,8 @@ namespace Geom {
       }
 
       doResolve(delta, 0, circleb, orthob, circlec, orthoc);
-      return new Point(delta, 0);
+      pt.x = delta; pt.y = 0;
+      return pt;
 
     } else if (cx < rx1 && cy < ry1) {
 
@@ -215,9 +223,13 @@ namespace Geom {
       var deltaY = delta * Math.sin(angle);
 
       doResolve(deltaX, deltaY, circleb, orthob, circlec, orthoc);
-      return new Point(deltaX, deltaY);
+      pt.x = deltaX; pt.y = deltaY;
+      return pt;
 
     }
+    
+    pt.x = 0; pt.y = 0;
+    return pt; 
 
   }
 
@@ -256,7 +268,8 @@ namespace Geom {
         a.y += dy;
       }
 
-      return new Point(dx, dy);
+      pt.x = dx; pt.y = dy;
+      return pt;
 
     }
 

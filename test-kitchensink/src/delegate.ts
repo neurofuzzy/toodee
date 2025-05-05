@@ -36,7 +36,7 @@ class Delegate implements IEngineDelegate {
 
     let bndMask = 0b00001111;
 
-    for (let i = 0; i < 4000; i+=4) {
+    for (let i = 0; i < 400; i++) {
 
       let x = 20 + Math.random() * 1480;
       let y = 20 + Math.random() * 560;
@@ -264,7 +264,8 @@ class Delegate implements IEngineDelegate {
     if (model.rayHit) {
       let hitItem = model.bodies.getItemByID(model.rayHit.parentID);
       if (hitItem) {
-        hitItem.rotation = -1;
+        // Removed: This line was causing the unwanted rotation in the test app
+        // hitItem.rotation = -1;
       }
     }
 
