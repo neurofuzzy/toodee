@@ -24,12 +24,19 @@ namespace Physics {
 
       Geom.normalizePoint(penetration);
 
+      this.init(penetration, itemA, itemB, corAB);
+
+    }
+
+    init (penetration:Geom.IPoint, itemA:IBody, itemB:B, corAB:number = 1) {
+
+
       this.penetration = penetration;
       this.itemA = itemA;
       this.itemB = itemB;
       this.corAB = corAB;
 
-    }    
+    }
 
   }
 
@@ -39,7 +46,15 @@ namespace Physics {
 
   export class BodySegmentBodyContact extends BaseContact<ISegmentBody> {
 
-    public hitPoint:Geom.IPointHit
+    public hitPoint:Geom.IPointHit;
+
+    init (penetration:Geom.IPoint, itemA:IBody, itemB:ISegmentBody, corAB:number = 1) {
+
+      super.init(penetration, itemA, itemB, corAB);
+
+      this.hitPoint = null;
+
+    }
     
   }
   

@@ -10,6 +10,7 @@ namespace Simulation {
   }
 
   export var MAXVEL:number = 12;
+  const TIME_STEP = 1 / 60;
 
   export class Controller implements Models.IModelController<Model> {
 
@@ -24,6 +25,12 @@ namespace Simulation {
     protected bodySegmentContactIndices:Array<boolean>;
     protected bodyBeamContacts:Array<Physics.BodySegmentBodyContact>;
     protected bodyBeamContactIndices:Array<boolean>;
+
+    // Object Pools
+    private bodyBodyContactPool: Physics.BodyBodyContact[];
+    private bodyBoundaryContactPool: Physics.BodyBoundaryContact[];
+    private bodyBeamContactPool: Physics.BodySegmentBodyContact[];
+
     protected forces:Array<Physics.IForce>;
     protected dispatcher:Models.IEventDispatcher<Entity | Projectile | Boundary | Beam>;
     protected _api:API<Boundary, Entity>
@@ -48,6 +55,14 @@ namespace Simulation {
       this.bodyBoundaryMap = new Geom.SpatialPolygonMap().init();
       this.forces = [];
       this._api = new API(this.model, this.bodyGrid, this.boundaryGrid, this.bodyBoundaryMap, this.forces, this.dispatcher);
+
+      // Initialize Pools
+      this.bodyBodyContacts = [];
+      this.bodyBoundaryContacts = [];
+      this.bodyBeamContacts = [];
+      this.bodyBodyContactPool = [];
+      this.bodyBoundaryContactPool = [];
+      this.bodyBeamContactPool = [];
 
     }
 
@@ -121,7 +136,18 @@ namespace Simulation {
 
           if (penetration) {
             this.bodyBodyContactIndices[contactPairIdx] = true;
-            this.bodyBodyContacts.push(new Physics.BodyBodyContact(penetration, itemA, itemB, itemA.cor * itemB.cor));
+            
+            // --- Pooling Start ---
+            let contact = this.bodyBodyContactPool.pop(); // Try to get from pool
+            if (contact) {
+                // Re-initialize reused object using the BaseContact.init method
+                contact.init(penetration, itemA, itemB, itemA.cor * itemB.cor);
+            } else {
+                // Create new if pool was empty
+                contact = new Physics.BodyBodyContact(penetration, itemA, itemB, itemA.cor * itemB.cor);
+            }
+            this.bodyBodyContacts.push(contact); // Add to active list
+            // --- Pooling End ---
           }
 
         } 
@@ -159,7 +185,17 @@ namespace Simulation {
       if (penetration) {
 
         this.bodySegmentContactIndices[contactPairIdx] = true;
-        this.bodyBoundaryContacts.push(new Physics.BodyBoundaryContact(penetration, item, seg, item.cor * parentPoly.cor));
+
+        // --- Pooling Start ---
+        let contact = this.bodyBoundaryContactPool.pop();
+        if (contact) {
+            // Re-initialize reused object using the BaseContact.init method
+            contact.init(penetration, item, seg, item.cor * parentPoly.cor);
+        } else {
+            contact = new Physics.BodyBoundaryContact(penetration, item, seg, item.cor * parentPoly.cor);
+        }
+        this.bodyBoundaryContacts.push(contact);
+        // --- Pooling End ---
         
         if (this.dispatcher) {
           this.dispatcher.dispatch(EventType.Contact, item, parentPoly, penetration);
@@ -247,9 +283,18 @@ namespace Simulation {
         if (penetration) {
 
           this.bodyBeamContactIndices[contactPairIdx] = true;
-          let contact = new Physics.BodySegmentBodyContact(penetration, item, beam, item.cor * beam.cor);
-          contact.hitPoint = hit;
+
+          // --- Pooling Start ---
+          let contact = this.bodyBeamContactPool.pop();
+          if (contact) {
+              // Re-initialize reused object using the BaseContact.init method
+              contact.init(penetration, item, beam, item.cor * beam.cor);
+          } else {
+              contact = new Physics.BodySegmentBodyContact(penetration, item, beam, item.cor * beam.cor);
+          }
+          contact.hitPoint = hit; // Special property for this type
           this.bodyBeamContacts.push(contact);
+          // --- Pooling End ---
           
           if (this.dispatcher) {
             this.dispatcher.dispatch(EventType.Contact, beam, item, penetration);
@@ -281,13 +326,21 @@ namespace Simulation {
     private applyForces () {
 
       let forcePt = new Geom.Point();
+      let forcesToKeep: Physics.IForce[] = []; // Use a new array for active forces
 
       this.forces.forEach(force => {
+        let keepForce = true; // Flag to track if the force should be kept
 
         if (force instanceof Physics.ProximityForce) {
 
-          let bodies = this.api.bodiesNear(force.origin, force.range);
+          // Calculate the base rotated force vector ONCE for this ProximityForce
+          forcePt.y = 0;
+          forcePt.x = force.power * TIME_STEP;
+          Geom.rotatePoint(forcePt, force.angle);
+          const baseForceX = forcePt.x; // Store the rotated components
+          const baseForceY = forcePt.y;
 
+          let bodies = this.api.bodiesNear(force.origin, force.range);
           let ptA = force.origin;
 
           bodies.forEach(body => {
@@ -299,14 +352,15 @@ namespace Simulation {
             let ptB = body.bounds.anchor;
             let angle = 0 - Geom.angleBetween(ptA.x, ptA.y, ptB.x, ptB.y);
 
-            forcePt.y = 0;
-            forcePt.x = force.power * 0.0166; // 60 frames per second
+            // Reuse the pre-calculated base force vector
+            forcePt.x = baseForceX;
+            forcePt.y = baseForceY;
 
-            Geom.rotatePoint(forcePt, force.angle);
+            // Apply the relative angle rotation
             Geom.rotatePoint(forcePt, angle);
             this.applyPointAsForce(forcePt, body);
 
-          })
+          });
 
         } else if (force instanceof Physics.AreaForce) {
 
@@ -315,7 +369,7 @@ namespace Simulation {
           if (bodies) {
 
             forcePt.y = 0;
-            forcePt.x = force.power * 0.0166; // 60 frames per second
+            forcePt.x = force.power * TIME_STEP;
             Geom.rotatePoint(forcePt, force.angle);
 
             bodies.forEach(body => {
@@ -331,7 +385,7 @@ namespace Simulation {
           if (body) {
 
             forcePt.y = 0;
-            forcePt.x = force.power * 0.0166; // 60 frames per second
+            forcePt.x = force.power * TIME_STEP;
             Geom.rotatePoint(forcePt, force.angle);
             Geom.rotatePoint(forcePt, body.rotation);
             this.applyPointAsForce(forcePt, body);
@@ -340,22 +394,21 @@ namespace Simulation {
 
         }
 
+        // Check lifespan and update age
         if (force.lifespan > 0) {
           force.age++;
+          if (force.age > force.lifespan) {
+            keepForce = false; // Mark force for removal
+          }
         }
 
+        if (keepForce) {
+          forcesToKeep.push(force); // Add to the new array if it's still active
+        }
       });
 
-      // remove spent forces
-
-      let i = this.forces.length;
-
-      while (i--) {
-        let force = this.forces[i];
-        if (force.lifespan > 0 && force.age > force.lifespan) {
-          this.forces.splice(i, 1);
-        }
-      }
+      // Replace the old forces array with the filtered one
+      this.forces = forcesToKeep;
 
     }
 
@@ -375,9 +428,25 @@ namespace Simulation {
 
     public update = (secondPass?:boolean) => {
 
-      this.bodyBodyContacts = [];
-      this.bodyBoundaryContacts = [];
-      this.bodyBeamContacts = [];
+      // --- Pooling Start: Release contacts from previous frame ---
+      let i;
+      for (i = 0; i < this.bodyBodyContacts.length; i++) {
+          this.bodyBodyContactPool.push(this.bodyBodyContacts[i]);
+      }
+      for (i = 0; i < this.bodyBoundaryContacts.length; i++) {
+          this.bodyBoundaryContactPool.push(this.bodyBoundaryContacts[i]);
+      }
+      for (i = 0; i < this.bodyBeamContacts.length; i++) {
+          this.bodyBeamContactPool.push(this.bodyBeamContacts[i]);
+      }
+      // --- Pooling End ---
+
+      // Clear active contact lists for the new frame
+      this.bodyBodyContacts.length = 0;
+      this.bodyBoundaryContacts.length = 0;
+      this.bodyBeamContacts.length = 0;
+
+      // Reset index lookup tables (these don't store objects)
       this.bodyBodyContactIndices = [];
       this.bodySegmentContactIndices = [];
       this.bodyBeamContactIndices = [];
@@ -455,75 +524,78 @@ namespace Simulation {
       // projectiles
 
       var projectiles = this.model.projectiles;
+      const projectilesToRemove: Projectile[] = []; // Array to collect projectiles for removal
 
       projectiles.items.forEach(projectile => {
 
         projectile.age++;
 
-        // if end of lifespan
+        // Check lifespan
         if (projectile.age > projectile.lifespan) {
-          this.model.projectiles.removeItem(projectile);
+          projectilesToRemove.push(projectile); // Mark for removal
           return;
         }
 
         let polygon = this.bodyBoundaryMap.getPolygonFromPoint(projectile.position, true);
 
-        // if out of bounds
+        // Check if out of bounds
         if (!polygon) {
           if (this.dispatcher) {
             this.dispatcher.dispatch(EventType.Contact, projectile, this.bodyBoundaryMap.getOutermostPolygon(), 0);
           }
-          this.model.projectiles.removeItem(projectile);
+          projectilesToRemove.push(projectile); // Mark for removal
           return;
         }
 
-        // masked out
+        // Check mask
         if (!(projectile.contactMask & polygon.contactMask)) {
-          return;
+          return; // Continue to next projectile if masked out
         }
 
-        // out of bounds by inverted polygon
-        if (polygon.inverted) { 
-
+        // Check inverted polygon bounds
+        if (polygon.inverted) {
           if (projectile.resolveMask & polygon.resolveMask) {
             if (this.dispatcher) {
               this.dispatcher.dispatch(EventType.Contact, projectile, polygon, 0);
             }
-            this.model.projectiles.removeItem(projectile);
+            projectilesToRemove.push(projectile); // Mark for removal
           }
-          return;
-
+          return; // Continue (or exit if removed)
         }
 
         let hitItems = this.bodyGrid.getItemsUnderPoint(projectile.position);
 
-        // if hit an object
-        if (hitItems.length > 0) { 
-          
-          let didHit = false;
-
+        // Check for hits with objects
+        if (hitItems.length > 0) {
+          let didHit = false; // Renamed for clarity, though not strictly needed now
           hitItems.forEach(item => {
-            if (!(projectile.contactMask & item.contactMask)) {
-              return;
-            }
-            if (projectile.parentID == item.id) {
+            // Skip if already marked for removal
+            if (projectilesToRemove.indexOf(projectile) !== -1) return;
+
+            if (!(projectile.contactMask & item.contactMask) || projectile.parentID == item.id) {
               return;
             }
             if (projectile.resolveMask & item.resolveMask) {
-              didHit = true;
+              didHit = true; // Mark hit occurred
               if (this.dispatcher) {
                 this.dispatcher.dispatch(EventType.Contact, projectile, item, 0);
               }
+              projectilesToRemove.push(projectile); // Mark for removal
+              // Optional: If a projectile should be removed on FIRST hit, we can stop checking this projectile
+              // We could use a flag or immediately return from the inner forEach and check the flag.
+              // Current logic removes it but continues checking hits for the same projectile in this step.
             }
           });
-
-          if (didHit) {
-            this.model.projectiles.removeItem(projectile);
+          // If projectile was marked for removal by hitting an item, no need to process further in this step
+          if (projectilesToRemove.indexOf(projectile) !== -1) {
+             return;
           }
-
-          return;
         }
+      });
 
+      // Remove collected projectiles AFTER the main loop
+      projectilesToRemove.forEach(projectile => {
+        this.model.projectiles.removeItem(projectile);
       });
 
       // beams
